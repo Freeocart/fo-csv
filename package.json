@@ -1,0 +1,16 @@
+{
+  "name": "foc_csv_oc23",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "gulp",
+    "pack": "bash pack.sh",
+    "test": "gulp test",
+    "build": "npm run --prefix ./frontend/foc_csv build --prod && bash pack.sh"
+  },
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-zip": "^4.1.0"
+  }
+}
