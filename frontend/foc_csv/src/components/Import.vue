@@ -1,0 +1,275 @@
+<template>
+  <div class="hello">
+    <div>
+      <h1>{{ msg }}</h1>
+      <!-- <div v-if="!importingCsvProgress"> -->
+        <div>
+          <label for="">Профиль</label>
+          <select v-model="currentProfileName">
+            <option v-for="(profile, idx) in profiles" :key="idx">{{ idx }}</option>
+          </select>
+        </div>
+
+        <button @click.prevent="savingProfile = true">Сохранить профиль как</button>
+
+        <div v-if="savingProfile">
+          <input type="text" placeholder="Название профиля" ref="newProfileName" :value="currentProfileName">
+          <button @click.prevent="saveNewProfile($refs.newProfileName.value)">Сохранить профиль</button>
+        </div>
+
+        <div>
+          <label for="">Ключевое поле (по нему идет сличение)</label>
+          <select v-model="keyField">
+            <option v-for="(field, idx) in keyFields" :key="idx">{{ field }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="">Кодировка</label>
+          <select v-model="encoding">
+            <option v-for="(encodingName, idx) in encodings" :key="idx" :value="encodingName">{{ encodingName }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="">Разделитель полей</label>
+          <input type="text" placeholder="Разделитель полей" v-model="csvFieldDelimiter">
+        </div>
+
+        <div>
+          <label for="">Режим импорта</label>
+          <select v-model="importMode">
+            <option value="onlyUpdate">Только обновить существующие</option>
+            <option value="onlyAdd">Добавить как новые</option>
+            <option value="updateCreate">Обновить существующие и добавить новые</option>
+            <option value="addIfNotFound">Только добавить отсутствующие</option>
+            <option value="removeByList">Удалить совпавшие</option>
+            <option value="removeOthers">Удалить несовпавшие</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="">Разделитель категорий</label>
+          <input type="text" v-model="categoryDelimiter">
+        </div>
+
+        <div>
+          <label for="">Пропустить первую строку
+            <input type="checkbox" v-model="skipFirstLine">
+          </label>
+        </div>
+
+        <div>
+          <label for="">Сопоставление полей</label>
+          <div v-for="(field, idx) in csvFields" :key="idx">
+            <span>{{ field }}</span>
+            <db-fields-select :selected="currentProfile.bindings[idx]" :data="dbFields" @changed="bindDBToCsvField([ idx, $event ])"></db-fields-select>
+          </div>
+        </div>
+
+        <div>
+          <label for="">Сколько обновлять записей за раз</label>
+          <input type="text" v-model="processAtStepNum">
+        </div>
+
+        <csv-file-upload></csv-file-upload>
+
+        <div>
+          <label for="">
+            Подкачивать картинки по URL (все ссылки начинающиеся на http/https)
+            <input type="checkbox" v-model="downloadImages">
+          </label>
+        </div>
+
+        <div>
+          ZIP Архив картинок
+          <input type="file" accept=".zip">
+        </div>
+
+        <div>
+          <label for="">
+            Разделитель в поле изображений
+            <input type="text" v-model="csvImageFieldDelimiter">
+          </label>
+        </div>
+
+        <div>
+          <button @click.prevent="submitImportData">Погнали!</button>
+        </div>
+      <!-- </div> -->
+
+      <!-- <div v-else> -->
+        <p>importing...</p>
+        <import-progress :progress="csvImportProgress"></import-progress>
+      <!-- </div> -->
+    </div>
+  </div>
+</template>
+
+<script>
+import { mapGetters, mapActions } from 'vuex'
+import DbFieldsSelect from './DbFieldsSelect'
+import CsvFileUpload from './CsvFileUpload'
+import { submitData } from '@/helpers'
+import axios from 'axios'
+import ImportProgress from './ImportProgress'
+
+export default {
+  components: {
+    DbFieldsSelect,
+    CsvFileUpload,
+    ImportProgress
+  },
+  data () {
+    return {
+      msg: 'Import',
+      newProfileName: '',
+      savingProfile: false,
+      importingCsvProgress: false,
+      csvImportProgress: {
+        current: 0,
+        total: 0
+      }
+    }
+  },
+  computed: {
+    processAtStepNum: {
+      get () {
+        return this.$store.getters.processAtStepNum
+      },
+      set (val) {
+        this.$store.dispatch('setProcessAtStepNum', val)
+      }
+    },
+    skipFirstLine: {
+      get () {
+        return this.$store.getters.skipFirstLine
+      },
+      set (val) {
+        this.$store.dispatch('setSkipFirstLine', val)
+      }
+    },
+    keyField: {
+      get () {
+        return this.$store.getters.currentKeyField
+      },
+      set (field) {
+        this.$store.dispatch('setCurrentKeyField', field)
+      }
+    },
+    currentProfileName: {
+      get () {
+        return this.$store.getters.currentProfileName
+      },
+      set (profile) {
+        this.$store.dispatch('setCurrentProfile', profile)
+      }
+    },
+    csvImageFieldDelimiter: {
+      get () {
+        return this.$store.getters.csvImageFieldDelimiter
+      },
+      set (val) {
+        this.$store.dispatch('setCsvImageFieldDelimiter', val)
+      }
+    },
+    importMode: {
+      get () {
+        return this.$store.getters.importMode
+      },
+      set (val) {
+        this.$store.dispatch('setImportMode', val)
+      }
+    },
+    downloadImages: {
+      get () {
+        return this.$store.getters.downloadImages
+      },
+      set (val) {
+        this.$store.dispatch('setDownloadImages', val)
+      }
+    },
+    encoding: {
+      get () {
+        return this.$store.getters.encoding
+      },
+      set (val) {
+        this.$store.dispatch('setEncoding', val)
+      }
+    },
+    csvFieldDelimiter: {
+      get () {
+        return this.$store.getters.csvFieldDelimiter
+      },
+      set (val) {
+        this.$store.dispatch('setCsvFieldDelimiter', val)
+      }
+    },
+    categoryDelimiter: {
+      get () {
+        return this.$store.getters.categoryDelimiter
+      },
+      set (val) {
+        this.$store.dispatch('setCategoryDelimiter', val)
+      }
+    },
+    ...mapGetters([
+      'dbFields',
+      'csvFields',
+      'encodings',
+      'profiles',
+      'keyFields',
+      'currentProfile'
+    ])
+  },
+  methods: {
+    async submitImportPart ({ importUrl, key, position }) {
+      try {
+        let data = {
+          key,
+          position,
+          profile: this.$store.getters.profile
+        }
+        let response = await axios.post(decodeURIComponent(importUrl), data)
+
+        console.log(response.data)
+        position = response.data.message.position
+        this.csvImportProgress.current = position
+
+        console.log(position, this.csvImportProgress.total)
+        if (position < this.csvImportProgress.total) {
+          this.submitImportPart({ importUrl, key, position })
+        }
+        else {
+          this.importingCsvProgress = false
+        }
+      }
+      catch (e) {
+        console.error(e)
+      }
+    },
+    async submitImportData () {
+      try {
+        console.log(this.$store.getters.submittableData)
+        let response = await submitData(this.$store.actionUrl('import'), this.$store.getters.submittableData)
+        console.log(response)
+        if (response.data.status === 'ok') {
+          this.csvImportProgress.total = response.data.message.csvTotal
+          this.importingCsvProgress = true
+          this.submitImportPart(response.data.message)
+        }
+      }
+      catch (e) {
+        alert('Ошибка при отправке!')
+        console.error(e)
+      }
+      // submitData(this.$store.getters.submittableData)
+    },
+    ...mapActions([
+      'bindDBToCsvField',
+      'setCurrentProfile',
+      'saveNewProfile'
+    ])
+  }
+}
+</script>

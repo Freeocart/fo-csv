@@ -1,0 +1,45 @@
+{
+  "requestConfig": {
+    "token": "jjj",
+    "baseRoute": "ii",
+    "baseUrl": "kk"
+  },
+  "initial": {
+      "data": {
+          "keyFields": [
+            "product_id",
+            "sku",
+            "model"
+          ],
+          "profiles": {
+              "default": {
+                  "encoding": "UTF8",
+                  "csvFieldDelimiter": ";",
+                  "categoryDelimiter": "/",
+                  "keyField": "product_id",
+                  "skipFirstLine": 1,
+                  "csvToDbBindings": {
+                      "Idx": "product.product_id"
+                  },
+                  "bindings": {
+                      "5": "nothing",
+                      "6": "name",
+                      "10": "sku"
+                  },
+                  "importMode": "updateCreate",
+                  "csvImageFieldDelimiter": ";"
+              }
+          },
+          "encodings": ["UTF8", "CP1251"],
+          "csvFields": [],
+          "dbFields": {
+              "other": ["nothing"],
+              "product": ["product_id", "name"],
+              "product_description": ["product_description"]
+          },
+          "fileRef": {}
+      },
+      "csvFields": ["_CATEGORY_", "_NAME_", "_MODEL_", "_SKU_", "_MANUFACTURER_", "_PRICE_", "_QUANTITY_", "_STOCK_STATUS_", "_META_TITLE_", "_META_KEYWORDS_", "_META_DESCRIPTION_", "_DESCRIPTION_", "_PRODUCT_TAG_", "_IMAGE_", "_SORT_ORDER_", "_STATUS_", "_SEO_KEYWORD_", "_ATTRIBUTES_", "_IMAGES_", "_URL_"],
+      "csvFileRef": {}
+  }
+}
