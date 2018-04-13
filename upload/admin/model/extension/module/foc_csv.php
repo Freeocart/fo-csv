@@ -133,8 +133,39 @@ class ModelExtensionModuleFocCsv extends Model {
     return $key;
   }
 
-  public function importPart($key, $position, $profile) {
+  /*
+    Убирает все лишние/пустые поля
+  */
+  private function filterCsvToDBBindings ($bindings) {
+    $cleared = array();
 
+    foreach ($bindings as $csv_idx => $db_field) {
+      if ($db_field === 'nothing' || trim($db_field) === '') {
+        continue;
+      }
+      $cleared[$csv_idx] = $db_field;
+    }
+
+    return $cleared;
+  }
+
+  private function getCsvToDBFields ($bindings, $csv_row) {
+    $cleared = $this->filterCsvToDBBindings($bindings);
+    $data = array();
+
+    foreach ($cleared as $csv_idx => $db_field) {
+      if (isset($csv_row[$csv_idx])) {
+        $data[$db_field] = $csv_row[$csv_idx];
+      }
+    }
+
+    return $data;
+  }
+
+  public function importProduct ($profile, $csv_row) {
+    $bindings = $profile['bindings'];
+
+    $csvToDB = $this->getCsvToDBFields($bindings, $csv_row);
   }
 
 }

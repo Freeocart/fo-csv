@@ -192,16 +192,13 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
           $i = 0;
 
-          $log = fopen(DIR_LOGS . '/LOG.txt', 'a');
-
           while (($line = fgetcsv($csv_fid, 0, $delimiter)) !== false && $i < $importAtOnce) {
             if ($i++ === 0 && $skipFirstLine) {
               continue;
             }
             // import stuff..
-            fwrite($log, $line[0] . " ::: ");
+            $this->model_extension_module_foc_csv->importProduct($profile, $line);
           }
-          fclose($log);
 
           $position = ftell($csv_fid);
           fclose($csv_fid);
