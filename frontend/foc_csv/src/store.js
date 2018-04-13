@@ -21,13 +21,13 @@ const store = new Vuex.Store({
       commit('SET_INITIAL_DATA', data)
       commit('SET_CURRENT_PROFILE', DEFAULT_PROFILE_NAME)
     },
-    setCurrentKeyField ({ commit }, keyField) {
+    setKeyField ({ commit }, keyField) {
       commit('SET_CURRENT_KEY_FIELD', keyField)
     },
     setSkipFirstLine ({ commit }, val) {
       commit('SET_SKIP_FIRST_LINE', val)
     },
-    setCurrentProfile ({ commit }, profile) {
+    setCurrentProfileName ({ commit }, profile) {
       commit('SET_CURRENT_PROFILE', profile)
     },
     setCsvFieldNames ({ commit }, fieldNames) {
@@ -77,7 +77,6 @@ const store = new Vuex.Store({
   mutations: {
     SET_INITIAL_DATA (state, initial) {
       Vue.set(state, 'data', initial.data)
-      console.log(initial)
     },
     SET_CURRENT_PROFILE (state, profile) {
       state.currentProfile = profile
@@ -140,7 +139,7 @@ const store = new Vuex.Store({
     keyFields (state) {
       return state.data.keyFields
     },
-    currentKeyField (state) {
+    keyField (state) {
       return state.profile.keyField
     },
     currentProfileName (state) {

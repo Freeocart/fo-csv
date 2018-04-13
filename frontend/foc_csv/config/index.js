@@ -8,11 +8,8 @@ module.exports = {
   dev: {
 
     // // Paths
-    // assetsSubDirectory: 'static',
-    // assetsPublicPath: '/',
-    assetsRoot: path.resolve(__dirname, '../../../upload/admin/view/javascript/foc_csv'),
-    assetsSubDirectory: '',
-    assetsPublicPath: '../../../upload/admin/view/javascript/foc_csv',
+    assetsSubDirectory: 'static',
+    assetsPublicPath: '/',
 
     proxyTable: {
       '/': {

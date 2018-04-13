@@ -88,9 +88,6 @@ const parseCsvHeaders = (raw, delimiter = ';') => {
 
 const submitData = async function (url, { data, profile }) {
   let request = new FormData()
-
-  // let xhr = new XMLHttpRequest()
-
   request.append('csv-file', data.csvFileRef.files[0])
 
   if (data.imagesFileRef && data.imagesFileRef.files.length > 0) {
@@ -100,25 +97,33 @@ const submitData = async function (url, { data, profile }) {
   request.append('profile-json', JSON.stringify(profile))
 
   return axios.post(url, request)
+}
 
-  // xhr.open('POST', '/test.php')
-  // xhr.onreadystatechange = function (e) {
-  //   if (e.target.readyState === 4) {
-  //     if (e.target.status === 200) {
-  //       // alert('ok!')
-  //     }
-  //     else {
-  //       // alert('fail!')
-  //     }
-  //   }
-  // }
+const validateProfile = (profile) => {
+  // validate key field
+  return profile.keyField && profile.bindings.findIndex(val => val === profile.keyField) !== -1
+}
 
-  // xhr.send(request)
+const mapVuexModels = function (models) {
+  return models.reduce(function (prev, key) {
+    prev[key] = {
+      get () {
+        return this.$store.getters[key]()
+      },
+      set (val) {
+        this.$store.dispatch(`set${key.toUpperCase()}`, val)
+      }
+    }
+
+    return prev
+  }, {})
 }
 
 export {
+  mapVuexModels,
   validateAppConfig,
   FirstLineReader,
   parseCsvHeaders,
-  submitData
+  submitData,
+  validateProfile
 }

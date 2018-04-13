@@ -108,11 +108,11 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import DbFieldsSelect from './DbFieldsSelect'
-import CsvFileUpload from './CsvFileUpload'
-import { submitData } from '@/helpers'
+import { submitData, validateProfile, mapVuexModels } from '@/helpers'
 import axios from 'axios'
-import ImportProgress from './ImportProgress'
+import DbFieldsSelect from '@/components/DbFieldsSelect'
+import CsvFileUpload from '@/components/CsvFileUpload'
+import ImportProgress from '@/components/ImportProgress'
 
 export default {
   components: {
@@ -133,86 +133,6 @@ export default {
     }
   },
   computed: {
-    processAtStepNum: {
-      get () {
-        return this.$store.getters.processAtStepNum
-      },
-      set (val) {
-        this.$store.dispatch('setProcessAtStepNum', val)
-      }
-    },
-    skipFirstLine: {
-      get () {
-        return this.$store.getters.skipFirstLine
-      },
-      set (val) {
-        this.$store.dispatch('setSkipFirstLine', val)
-      }
-    },
-    keyField: {
-      get () {
-        return this.$store.getters.currentKeyField
-      },
-      set (field) {
-        this.$store.dispatch('setCurrentKeyField', field)
-      }
-    },
-    currentProfileName: {
-      get () {
-        return this.$store.getters.currentProfileName
-      },
-      set (profile) {
-        this.$store.dispatch('setCurrentProfile', profile)
-      }
-    },
-    csvImageFieldDelimiter: {
-      get () {
-        return this.$store.getters.csvImageFieldDelimiter
-      },
-      set (val) {
-        this.$store.dispatch('setCsvImageFieldDelimiter', val)
-      }
-    },
-    importMode: {
-      get () {
-        return this.$store.getters.importMode
-      },
-      set (val) {
-        this.$store.dispatch('setImportMode', val)
-      }
-    },
-    downloadImages: {
-      get () {
-        return this.$store.getters.downloadImages
-      },
-      set (val) {
-        this.$store.dispatch('setDownloadImages', val)
-      }
-    },
-    encoding: {
-      get () {
-        return this.$store.getters.encoding
-      },
-      set (val) {
-        this.$store.dispatch('setEncoding', val)
-      }
-    },
-    csvFieldDelimiter: {
-      get () {
-        return this.$store.getters.csvFieldDelimiter
-      },
-      set (val) {
-        this.$store.dispatch('setCsvFieldDelimiter', val)
-      }
-    },
-    categoryDelimiter: {
-      get () {
-        return this.$store.getters.categoryDelimiter
-      },
-      set (val) {
-        this.$store.dispatch('setCategoryDelimiter', val)
-      }
-    },
     ...mapGetters([
       'dbFields',
       'csvFields',
@@ -220,6 +140,18 @@ export default {
       'profiles',
       'keyFields',
       'currentProfile'
+    ]),
+    ...mapVuexModels([
+      'processAtStepNum',
+      'skipFirstLine',
+      'currentProfileName',
+      'categoryDelimiter',
+      'csvFieldDelimiter',
+      'encoding',
+      'downloadImages',
+      'importMode',
+      'csvImageFieldDelimiter',
+      'keyField'
     ])
   },
   methods: {
@@ -232,11 +164,9 @@ export default {
         }
         let response = await axios.post(decodeURIComponent(importUrl), data)
 
-        console.log(response.data)
         position = response.data.message.position
         this.csvImportProgress.current = position
 
-        console.log(position, this.csvImportProgress.total)
         if (position < this.csvImportProgress.total) {
           this.submitImportPart({ importUrl, key, position })
         }
@@ -249,21 +179,26 @@ export default {
       }
     },
     async submitImportData () {
-      try {
-        console.log(this.$store.getters.submittableData)
-        let response = await submitData(this.$store.actionUrl('import'), this.$store.getters.submittableData)
-        console.log(response)
-        if (response.data.status === 'ok') {
-          this.csvImportProgress.total = response.data.message.csvTotal
-          this.importingCsvProgress = true
-          this.submitImportPart(response.data.message)
+      let data = this.$store.getters.submittableData
+
+      if (validateProfile(data.profile)) {
+        try {
+          let response = await submitData(this.$store.actionUrl('import'), data)
+
+          if (response.data.status === 'ok') {
+            this.csvImportProgress.total = response.data.message.csvTotal
+            this.importingCsvProgress = true
+            this.submitImportPart(response.data.message)
+          }
+        }
+        catch (e) {
+          alert('Ошибка при отправке!')
+          console.error(e)
         }
       }
-      catch (e) {
-        alert('Ошибка при отправке!')
-        console.error(e)
+      else {
+        alert('Error in profile!')
       }
-      // submitData(this.$store.getters.submittableData)
     },
     ...mapActions([
       'bindDBToCsvField',
