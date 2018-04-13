@@ -104,14 +104,18 @@ const validateProfile = (profile) => {
   return profile.keyField && profile.bindings.findIndex(val => val === profile.keyField) !== -1
 }
 
-const mapVuexModels = function (models) {
+const capitalizeFirstLetter = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+const mapVuexModels = (models) => {
   return models.reduce(function (prev, key) {
     prev[key] = {
       get () {
-        return this.$store.getters[key]()
+        return this.$store.getters[key]
       },
       set (val) {
-        this.$store.dispatch(`set${key.toUpperCase()}`, val)
+        this.$store.dispatch(`set${capitalizeFirstLetter(key)}`, val)
       }
     }
 
