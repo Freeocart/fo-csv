@@ -48,6 +48,9 @@ const store = new Vuex.Store({
     setCsvFileRef ({ commit }, ref) {
       commit('SET_CSV_FILE_REF', ref)
     },
+    setImagesZipRef ({ commit }, ref) {
+      commit('SET_IMAGES_ZIP_FILE_REF', ref)
+    },
     setDownloadImages ({ commit }, download/* ? */) {
       commit('SET_DOWNLOAD_IMAGES', download)
     },
@@ -112,6 +115,9 @@ const store = new Vuex.Store({
     },
     SET_CSV_FILE_REF (state, ref) {
       Vue.set(state.data, 'csvFileRef', ref)
+    },
+    SET_IMAGES_ZIP_FILE_REF (state, ref) {
+      Vue.set(state.data, 'imagesZipFileRef', ref)
     },
     SET_DOWNLOAD_IMAGES (state, download) {
       Vue.set(state.profile, 'downloadImages', download)

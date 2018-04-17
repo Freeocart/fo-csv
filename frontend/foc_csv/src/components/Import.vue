@@ -83,7 +83,7 @@
 
         <div>
           ZIP Архив картинок
-          <input type="file" accept=".zip">
+          <images-zip-upload></images-zip-upload>
         </div>
 
         <div>
@@ -112,12 +112,14 @@ import { submitData, validateProfile, mapVuexModels } from '@/helpers'
 import axios from 'axios'
 import DbFieldsSelect from '@/components/DbFieldsSelect'
 import CsvFileUpload from '@/components/CsvFileUpload'
+import ImagesZipUpload from '@/components/ImagesZipUpload'
 import ImportProgress from '@/components/ImportProgress'
 
 export default {
   components: {
     DbFieldsSelect,
     CsvFileUpload,
+    ImagesZipUpload,
     ImportProgress
   },
   data () {

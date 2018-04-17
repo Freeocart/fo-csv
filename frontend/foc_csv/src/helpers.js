@@ -90,8 +90,8 @@ const submitData = async function (url, { data, profile }) {
   let request = new FormData()
   request.append('csv-file', data.csvFileRef.files[0])
 
-  if (data.imagesFileRef && data.imagesFileRef.files.length > 0) {
-    request.append('images-zip', data.imagesFileRef.files)
+  if (data.imagesZipFileRef && data.imagesZipFileRef.files.length > 0) {
+    request.append('images-zip', data.imagesZipFileRef.files[0])
   }
 
   request.append('profile-json', JSON.stringify(profile))
@@ -112,7 +112,14 @@ const mapVuexModels = (models) => {
   return models.reduce(function (prev, key) {
     prev[key] = {
       get () {
-        return this.$store.getters[key]
+        let val = null
+        try {
+          val = this.$store.getters[key]
+        }
+        catch (e) {
+          console.error(`missing getter ${key}`)
+        }
+        return val
       },
       set (val) {
         this.$store.dispatch(`set${capitalizeFirstLetter(key)}`, val)
