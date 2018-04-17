@@ -81,6 +81,9 @@ const store = new Vuex.Store({
     setLanguage ({ commit }, language) {
       commit('SET_LANGUAGE', language)
     },
+    setFillParentCategories ({ commit }, toggle) {
+      commit('SET_FILL_PARENT_CATEGORIES', toggle)
+    },
     async saveNewProfile ({ commit, state }, name) {
       try {
         await axios.post(this.actionUrl('saveProfile'), {
@@ -105,6 +108,9 @@ const store = new Vuex.Store({
     },
     SET_PROCESS_AT_STEP_NUM (state, num) {
       Vue.set(state.profile, 'processAtStepNum', num)
+    },
+    SET_FILL_PARENT_CATEGORIES (state, toggle) {
+      state.profile.fillParentCategories = toggle
     },
     SET_STORE (state, storeId) {
       state.profile.storeId = storeId
@@ -213,6 +219,9 @@ const store = new Vuex.Store({
     },
     language (state) {
       return state.profile.languageId
+    },
+    fillParentCategories (state) {
+      return state.profile.fillParentCategories
     },
     csvFieldDelimiter (state) {
       return state.profile.csvFieldDelimiter

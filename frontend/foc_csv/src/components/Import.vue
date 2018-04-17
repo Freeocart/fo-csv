@@ -70,6 +70,10 @@
           <label for="">Разделитель категорий</label>
           <input type="text" v-model="categoryDelimiter">
         </div>
+        <div>
+          <label for="">Заполнить родительские категории</label>
+          <input type="checkbox" v-model="fillParentCategories">
+        </div>
 
         <div>
           <label for="">Пропустить первую строку
@@ -129,8 +133,7 @@
           <label for="">Режим установки изображений</label>
           <select v-model="imagesImportMode">
             <option value="add">Добавить загруженные</option>
-            <option value="replaceNew">Заменить если есть новые</option>
-            <option value="replace">Заменить (если нет новых - просто удалит)</option>
+            <option value="skip">Не добавлять если галерея не пуста</option>
           </select>
         </div>
 
@@ -202,7 +205,8 @@ export default {
       'previewFromGallery',
       'clearGalleryBeforeImport',
       'store',
-      'language'
+      'language',
+      'fillParentCategories'
     ])
   },
   methods: {
