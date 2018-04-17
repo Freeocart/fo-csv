@@ -176,10 +176,11 @@ class ControllerExtensionModuleFocCsv extends Controller {
     if ($key === null && $position === null && $profile === null) {
       if ($this->request->server['REQUEST_METHOD'] == 'POST') {
         $json = json_decode(file_get_contents('php://input'), true);
+
         $this->load->model('extension/module/foc_csv');
 
         if (isset($json['position']) && isset($json['key']) && isset($json['profile'])) {
-          $key = $json['key'];
+          $import_key = $json['key'];
           $position = $json['position'];
           $profile = $json['profile'];
 
@@ -187,7 +188,14 @@ class ControllerExtensionModuleFocCsv extends Controller {
           $delimiter = empty($profile['csvFieldDelimiter']) ? ';' : $profile['csvFieldDelimiter'];
           $importAtOnce = empty($profile['importAtOnce']) ? 10 : $profile['importAtOnce'];
 
-          $path = $this->model_extension_module_foc_csv->getImportCsvFilePath($key);
+          $mode = $profile['importMode'];
+          $this->model_extension_module_foc_csv->setImportMode($mode);
+
+          $key_field = $profile['keyField'];
+          list($table, $key) = explode(':', $key_field);
+          $this->model_extension_module_foc_csv->toggleKeyField($table, $key);
+
+          $path = $this->model_extension_module_foc_csv->getImportCsvFilePath($import_key);
           $csv_fid = fopen($path, 'r');
 
           if ($position > 0) {
@@ -208,7 +216,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
           fclose($csv_fid);
 
           $this->sendOk(array(
-            'key' => $key,
+            'key' => $import_key,
             'position' => $position,
             'lines' => $i
           ));

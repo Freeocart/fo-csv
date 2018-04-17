@@ -10,6 +10,18 @@ class ModelExtensionModuleFocCsv extends Model {
 
   private $tableFieldDelimiter = ':';
 
+  // import settings
+  private $importMode = 'updateCreate';
+  // public $keyFieldData = array(
+  //   'table' => null,
+  //   'field' => null
+  // );
+
+  public function __construct ($registry) {
+    parent::__construct($registry);
+    $this->log = new Log('foc_csv.txt');
+  }
+
   public function install () {
     $this->load->model('setting/setting');
     $this->model_setting_setting->editSetting($this->profiles_code, array($this->profiles_key => array()));
@@ -48,14 +60,14 @@ class ModelExtensionModuleFocCsv extends Model {
   */
   public function getKeyFields () {
     return array(
-      'product_id',
-      'sku',
-      'model',
-      'name',
-      'ean',
-      'mpn',
-      'jan',
-      'isbn'
+      DB_PREFIX . 'product:product_id',
+      DB_PREFIX . 'product:sku',
+      DB_PREFIX . 'product:model',
+      DB_PREFIX . 'product:name',
+      DB_PREFIX . 'product:ean',
+      DB_PREFIX . 'product:mpn',
+      DB_PREFIX . 'product:jan',
+      DB_PREFIX . 'product:isbn'
     );
   }
 
@@ -65,7 +77,11 @@ class ModelExtensionModuleFocCsv extends Model {
   public function getDbFields () {
     $tables = array(
       DB_PREFIX . 'product',
-      DB_PREFIX . 'product_description'
+      DB_PREFIX . 'product_description',
+      DB_PREFIX . 'product_image',
+      DB_PREFIX . 'manufacturer',
+      DB_PREFIX . 'category',
+      DB_PREFIX . 'category_description'
     );
 
     $result = array();
@@ -119,7 +135,6 @@ class ModelExtensionModuleFocCsv extends Model {
   */
   public function setProfile ($name, $data) {
     $profiles = $this->loadProfiles();
-    // var_dump($profiles);
     $profiles[$name] = $data;
     $this->saveProfiles($profiles);
   }
@@ -194,11 +209,61 @@ class ModelExtensionModuleFocCsv extends Model {
 
     foreach ($cleared as $csv_idx => $db_field) {
       if (isset($csv_row[$csv_idx])) {
-        $data[$db_field] = $csv_row[$csv_idx];
+        list($table, $field) = explode(':', $db_field);
+        if (!isset($data[$table])) {
+          $data[$table] = array();
+        }
+
+        $data[$table][$field] = $csv_row[$csv_idx];
       }
     }
 
     return $data;
+  }
+
+  public function toggleKeyField ($table, $key) {
+    $this->keyFieldData = array(
+      'table' => $table,
+      'field'   => $key
+    );
+  }
+
+  public function setImportMode ($mode) {
+    // check by key field
+    $this->checkBeforeInsert = true;
+    // check result value
+    $this->checkerValue = true;
+    // update founded items
+    $this->updateExisting = true;
+    // insert new items if not found
+    $this->insertNew = true;
+    // delete founded items?
+    $this->deleteMode = false;
+
+    switch ($mode) {
+      case 'onlyUpdate':
+        $this->insertNew = false;
+      break;
+      case 'onlyAdd':
+        $this->checkBeforeInsert = false;
+      break;
+      case 'updateCreate':
+        // default settings...
+      break;
+      case 'addIfNotFound':
+        $this->checkerValue = false;
+        $this->updateExisting = false;
+      break;
+      case 'removeByList':
+        $this->deleteMode = true;
+      break;
+      case 'removeOthers':
+        $this->checkerValue = false;
+        $this->deleteMode = true;
+      break;
+    }
+
+    $this->importMode = $mode;
   }
 
   /*
@@ -207,13 +272,93 @@ class ModelExtensionModuleFocCsv extends Model {
   public function importProduct ($profile, $csv_row) {
     $bindings = $profile['bindings'];
 
-    $csvToDB = $this->getCsvToDBFields($bindings, $csv_row);
+    $tablesData = $this->getCsvToDBFields($bindings, $csv_row);
+    $kfData = $this->keyFieldData;
+    $key_value = $tablesData[$kfData['table']][$kfData['field']];
 
-    $key_field = $profile['keyField'];
-    $mode = $profile['importMode'];
+    if (empty($key_value)) {
+      $this->log->write('[ERR] Empty key field [' . $kfData['field'] . '] value on [' . print_r($csv_row, true) . ']');
+      return;
+    }
 
-    var_dump($profile);
-    var_dump($csvToDB);
+    $manufacturer_id = $this->importManufacturer($tablesData[DB_PREFIX . 'manufacturer']);
+
+    // set manufacturer id to product fields
+    $tablesData[DB_PREFIX . 'product']['manufacturer_id'] = $manufacturer_id;
+
+  }
+
+
+  private function fieldsToSQL ($fields) {
+    $keys = implode(',', array_keys($fields));
+    $update = '';
+
+    foreach ($fields as $key => $value) {
+      if (is_numeric($value)) {
+        $fields[$key] = $this->db->escape($value);
+      }
+      else {
+        $fields[$key] = '"' . $this->db->escape($value) . '"';
+      }
+      $update .= $key . '=' . $fields[$key] . ' ';
+    }
+    return array(
+      'keys' => $keys,
+      'values' => implode(',', array_values($fields)),
+      'update' => $update
+    );
+  }
+
+
+  private function importProduct () {
+
+  }
+
+  /*
+    Update existing manufacturer or create new
+  */
+  private function importManufacturer ($fields) {
+    $fieldsSql = $this->fieldsToSQL($fields);
+
+    $id = 0;
+
+    if (isset($fields['name']) && !empty($fields['name'])) {
+      $id = $this->db->query('SELECT IFNULL((SELECT manufacturer_id FROM '. DB_PREFIX .'manufacturer WHERE name LIKE "' . $fields['name'] . '" LIMIT 1), 0) AS `id`')->row['id'];
+    }
+    else {
+      $this->log->write('[WARN] Manufacturer [' . $fields['name'] . '] has wrong name, so skipping...');
+      return 0;
+    }
+
+    /*
+      If need check before insert and checking successfull -> update or delete
+    */
+    if (!$this->checkBeforeInsert || $this->checkerValue === ($id > 0)) {
+      if ($this->updateExisting) {
+        $sql = 'UPDATE ' . DB_PREFIX . 'manufacturer SET ' . $fieldsSql['update'] . ' WHERE name LIKE "' . $fields['name'] . '"';
+        $this->db->query($sql);
+
+        return $id;
+      }
+      if ($this->deleteMode) {
+        $sql = 'DELETE FROM ' . DB_PREFIX . 'manufacturer WHERE name LIKE "' . $fields['name'] . '"';
+        $this->db->query($sql);
+
+        return $id;
+      }
+    }
+
+    /*
+      Insert new manufacturer
+    */
+    if ($this->insertNew) {
+      $sql = 'INSERT INTO `' . DB_PREFIX . 'manufacturer` (' . $fieldsSql['keys'] . ') VALUES (' . $fieldsSql['values'] . ')';
+
+      $this->db->query($sql);
+      return $this->db->getLastId();
+    }
+
+    return 0;
   }
 
   private function checkIsProductExist ($field, $value) {
