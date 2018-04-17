@@ -365,11 +365,20 @@ class ModelExtensionModuleFocCsv extends Model {
       $setPreviewFromGallery = true;
     }
 
-    if (isset($profile['clearGalleryBeforeImport']) && $profile['clearGalleryBeforeImport']) {
-      $this->db->query('DELETE FROM ' . DB_PREFIX . 'product_image WHERE product_id=' . (int)$product_id);
+    $imagesImportMode = isset($profile['imagesImportMode']) ? $profile['imagesImportMode'] : 'add';
+    $skipImportGallery = false;
+
+    if ($imagesImportMode === 'skip') {
+      $skipImportGallery = $this->productGalleryNotEmpty($product_id);
     }
 
-    $this->importGallery($tablesData[DB_PREFIX . 'product_image'], $profile['csvImageFieldDelimiter'], $profile['downloadImages'], $setPreviewFromGallery, $product_id);
+    if (!$skipImportGallery) {
+      if (isset($profile['clearGalleryBeforeImport']) && $profile['clearGalleryBeforeImport']) {
+        $this->db->query('DELETE FROM ' . DB_PREFIX . 'product_image WHERE product_id=' . (int)$product_id);
+      }
+
+      $this->importGallery($tablesData[DB_PREFIX . 'product_image'], $profile['csvImageFieldDelimiter'], $profile['downloadImages'], $setPreviewFromGallery, $product_id);
+    }
 
     /* IMPORT CATEGORIES */
     $category_ids = $this->importProductCategories($tablesData[DB_PREFIX . 'category_description'], $profile['categoryDelimiter'], $profile['categoryLevelDelimiter'], $this->language_id, $this->store_id);
@@ -480,6 +489,16 @@ class ModelExtensionModuleFocCsv extends Model {
       }
     }
   }
+
+  /*
+    Check if product has images
+  */
+  private function productGalleryNotEmpty ($product_id) {
+    $count = $this->db->query('SELECT COUNT(product_id) AS `count` FROM ' . DB_PREFIX . 'product_image WHERE product_id = ' . (int)$product_id)->row['count'];
+
+    return $count > 0;
+  }
+
 
   /*
     Check if url is url:)
