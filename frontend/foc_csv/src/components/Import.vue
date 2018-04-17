@@ -1,151 +1,188 @@
 <template>
-  <div class="hello">
-    <div>
-      <h1>{{ msg }}</h1>
-      <!-- <div v-if="!importingCsvProgress"> -->
-        <div>
-          <label for="">Профиль</label>
-          <select v-model="currentProfileName">
-            <option v-for="(profile, idx) in profiles" :key="idx">{{ idx }}</option>
-          </select>
+  <div class="foc-csv-settings-panel">
+    <template v-if="importingCsvProgress">
+      <div class="well">
+        <h3>importing...</h3>
+        <import-progress :progress="csvImportProgress"></import-progress>
+      </div>
+    </template>
+    <div class="row" v-else>
+      <div class="col-md-12">
+        <div class="form-group text-right">
+          <button @click.prevent="submitImportData" class="btn btn-primary btn-lg"><i class="fa fa-rocket"></i> Погнали!</button>
         </div>
+      </div>
+      <div class="col-md-4">
+        <div class="well">
+          <h3>Основное</h3>
 
-        <button @click.prevent="savingProfile = true">Сохранить профиль как</button>
+          <div class="form-group">
+            <label for="" class="label label-default">Профиль</label>
+            <select v-model="currentProfileName" class="form-control">
+              <option v-for="(profile, idx) in profiles" :key="idx">{{ idx }}</option>
+            </select>
+          </div>
 
-        <div v-if="savingProfile">
-          <input type="text" placeholder="Название профиля" ref="newProfileName" :value="currentProfileName">
-          <button @click.prevent="saveNewProfile($refs.newProfileName.value)">Сохранить профиль</button>
-        </div>
+          <button @click.prevent="savingProfile = true" class="btn btn-default"><i class="fa fa-save"></i> Сохранить профиль как</button>
 
-        <div>
-          <label for="">Магазин</label>
-          <select v-model="store">
-            <option v-for="(store, idx) in stores" :key="idx" :value="store.id">{{ store.name }}</option>
-          </select>
-        </div>
+          <div v-if="savingProfile" class="input-group">
+            <input type="text" placeholder="Название профиля" ref="newProfileName" :value="currentProfileName" class="form-control">
+            <span class="input-group-btn">
+              <button @click.prevent="saveNewProfile($refs.newProfileName.value)" class="btn btn-success"><i class="fa fa-check"></i> Сохранить профиль</button>
+            </span>
+          </div>
 
-        <div>
-          <label for="">Язык</label>
-          <select v-model="language">
-            <option v-for="(lang, idx) in languages" :key="idx" :value="lang.id">{{ lang.name }}</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label for="" class="label label-default">Магазин</label>
+            <select v-model="store" class="form-control">
+              <option v-for="(store, idx) in stores" :key="idx" :value="store.id">{{ store.name }}</option>
+            </select>
+          </div>
 
-        <div>
-          <label for="">Ключевое поле (по нему идет сличение)</label>
-          <select v-model="keyField">
-            <option v-for="(field, idx) in keyFields" :key="idx">{{ field }}</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label for="" class="label label-default">Язык</label>
+            <select v-model="language" class="form-control">
+              <option v-for="(lang, idx) in languages" :key="idx" :value="lang.id">{{ lang.name }}</option>
+            </select>
+          </div>
 
-        <div>
-          <label for="">Кодировка</label>
-          <select v-model="encoding">
-            <option v-for="(encodingName, idx) in encodings" :key="idx" :value="encodingName">{{ encodingName }}</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label for="" class="label label-default">CSV файл</label>
+            <csv-file-upload></csv-file-upload>
+          </div>
 
-        <div>
-          <label for="">Разделитель полей</label>
-          <input type="text" placeholder="Разделитель полей" v-model="csvFieldDelimiter">
-        </div>
+          <div class="form-group">
+            <label for="" class="label label-default">Ключевое поле (по нему идет сличение)</label>
+            <select v-model="keyField" class="form-control">
+              <option v-for="(field, idx) in keyFields" :key="idx">{{ field }}</option>
+            </select>
+          </div>
 
-        <div>
-          <label for="">Режим импорта</label>
-          <select v-model="importMode">
-            <option value="onlyUpdate">Только обновить существующие</option>
-            <option value="onlyAdd">Добавить как новые</option>
-            <option value="updateCreate">Обновить существующие и добавить новые</option>
-            <option value="addIfNotFound">Только добавить отсутствующие</option>
-            <option value="removeByList">Удалить совпавшие</option>
-            <option value="removeOthers">Удалить несовпавшие</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="">Разделитель вложенности категорий</label>
-          <input type="text" v-model="categoryLevelDelimiter">
-        </div>
-        <div>
-          <label for="">Разделитель категорий</label>
-          <input type="text" v-model="categoryDelimiter">
-        </div>
-        <div>
-          <label for="">Заполнить родительские категории</label>
-          <input type="checkbox" v-model="fillParentCategories">
-        </div>
-
-        <div>
-          <label for="">Пропустить первую строку
-            <input type="checkbox" v-model="skipFirstLine">
-          </label>
-        </div>
-
-        <div>
-          <label for="">Сопоставление полей</label>
-          <div v-for="(field, idx) in csvFields" :key="idx">
-            <span>{{ field }}</span>
-            <db-fields-select :selected="currentProfile.bindings[idx]" :data="dbFields" @changed="bindDBToCsvField([ $event, idx ])"></db-fields-select>
+          <div class="form-group">
+            <label for="" class="label label-default">Сколько обновлять записей за раз</label>
+            <input type="text" v-model="processAtStepNum" class="form-control">
           </div>
         </div>
+      </div>
 
-        <div>
-          <label for="">Сколько обновлять записей за раз</label>
-          <input type="text" v-model="processAtStepNum">
+      <div class="col-md-4">
+        <div class="well">
+
+          <div class="form-group">
+            <label for="" class="label label-default">Пропустить первую строку</label>
+            <input type="checkbox" v-model="skipFirstLine">
+          </div>
+
+          <label for="" class="label label-default">Сопоставление полей</label>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>CSV Поле</th>
+                <th>DB Поле</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(field, idx) in csvFields" :key="idx">
+                <td>
+                  <span>{{ field }}</span>
+                </td>
+                <td>
+                  <db-fields-select :selected="currentProfile.bindings[idx]" :data="dbFields" @changed="bindDBToCsvField([ $event, idx ])"></db-fields-select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      </div>
 
-        <csv-file-upload></csv-file-upload>
+      <div class="col-md-4">
+        <div class="well">
+          <h3>Настройки сличения</h3>
 
-        <div>
-          <label for="">
-            Подкачивать картинки по URL (все ссылки начинающиеся на http/https)
-            <input type="checkbox" v-model="downloadImages">
-          </label>
+          <div class="form-group">
+            <label for="" class="label label-default">Разделитель полей</label>
+            <input type="text" placeholder="Разделитель полей" v-model="csvFieldDelimiter" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="" class="label label-default">Кодировка</label>
+            <select v-model="encoding" class="form-control">
+              <option v-for="(encodingName, idx) in encodings" :key="idx" :value="encodingName">{{ encodingName }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="" class="label label-default">Режим импорта</label>
+            <select v-model="importMode" class="form-control">
+              <option value="onlyUpdate">Только обновить существующие</option>
+              <option value="onlyAdd">Добавить как новые</option>
+              <option value="updateCreate">Обновить существующие и добавить новые</option>
+              <option value="addIfNotFound">Только добавить отсутствующие</option>
+              <option value="removeByList">Удалить совпавшие</option>
+              <option value="removeOthers">Удалить несовпавшие</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="" class="label label-default">Разделитель вложенности категорий</label>
+            <input type="text" v-model="categoryLevelDelimiter" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="" class="label label-default">Разделитель категорий</label>
+            <input type="text" v-model="categoryDelimiter" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="" class="label label-default">Заполнить родительские категории</label>
+            <input type="checkbox" v-model="fillParentCategories" class="form-control">
+          </div>
+
+          <hr>
+
+          <h3>Управление изображениями</h3>
+
+          <div class="form-group">
+            <label class="label label-default">ZIP Архив картинок</label>
+            <images-zip-upload></images-zip-upload>
+          </div>
+
+          <div class="form-group">
+            <label for="" class="label label-default">
+              Разделитель в поле изображений
+            </label>
+            <input type="text" v-model="csvImageFieldDelimiter" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="" class="label label-default">
+              Установить главное изображение из галереи в случае отсутствия
+            </label>
+            <input type="checkbox" v-model="previewFromGallery" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="" class="label label-default">
+              Удалить изображения из галереи перед импортом
+            </label>
+            <input type="checkbox" v-model="clearGalleryBeforeImport" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="" class="label label-default">
+              Подкачивать картинки по URL (все ссылки начинающиеся на http/https)
+            </label>
+
+            <input type="checkbox" v-model="downloadImages" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="" class="label label-default">Режим установки изображений</label>
+            <select v-model="imagesImportMode" class="form-control">
+              <option value="add">Добавить загруженные</option>
+              <option value="skip">Не добавлять если галерея не пуста</option>
+            </select>
+          </div>
         </div>
-
-        <div>
-          ZIP Архив картинок
-          <images-zip-upload></images-zip-upload>
-        </div>
-
-        <div>
-          <label for="">
-            Разделитель в поле изображений
-            <input type="text" v-model="csvImageFieldDelimiter">
-          </label>
-        </div>
-
-        <div>
-          <label for="">
-            Установить главное изображение из галереи в случае отсутствия
-          </label>
-          <input type="checkbox" v-model="previewFromGallery">
-        </div>
-
-        <div>
-          <label for="">
-            Удалить изображения из галереи перед импортом
-          </label>
-          <input type="checkbox" v-model="clearGalleryBeforeImport">
-        </div>
-
-        <div>
-          <label for="">Режим установки изображений</label>
-          <select v-model="imagesImportMode">
-            <option value="add">Добавить загруженные</option>
-            <option value="skip">Не добавлять если галерея не пуста</option>
-          </select>
-        </div>
-
-        <div>
-          <button @click.prevent="submitImportData">Погнали!</button>
-        </div>
-      <!-- </div> -->
-
-      <!-- <div v-else> -->
-        <p>importing...</p>
-        <import-progress :progress="csvImportProgress"></import-progress>
-      <!-- </div> -->
+      </div>
     </div>
   </div>
 </template>

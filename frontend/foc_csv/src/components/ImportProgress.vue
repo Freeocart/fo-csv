@@ -23,7 +23,7 @@ export default {
 <style scoped>
 .progress {
   height: 30px;
-  background-color: blue;
+  background-color: #06a3d9;
   text-align: center;
 }
 </style>
