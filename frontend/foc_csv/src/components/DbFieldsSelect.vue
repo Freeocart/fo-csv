@@ -1,5 +1,6 @@
 <template>
   <select v-model="__selected">
+    <option :value="null">Не выбрано</option>
     <optgroup v-for="(group, groupKey) in data" :key="groupKey" :label="groupKey">
       <option :value="(groupKey + ':' + dbField)" v-for="(dbField, idx) in group" :key="idx">{{ dbField }}</option>
     </optgroup>
