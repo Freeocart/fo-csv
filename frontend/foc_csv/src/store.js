@@ -66,6 +66,12 @@ const store = new Vuex.Store({
     setImagesImportMode ({ commit }, mode) {
       commit('SET_IMAGES_IMPORT_MODE', mode)
     },
+    setPreviewFromGallery ({ commit }, toggle) {
+      commit('SET_PREVIEW_FROM_GALLERY', toggle)
+    },
+    setClearGalleryBeforeImport ({ commit }, toggle) {
+      commit('SET_CLEAR_GALLERY_BEFORE_IMPORT', toggle)
+    },
     async saveNewProfile ({ commit, state }, name) {
       try {
         await axios.post(this.actionUrl('saveProfile'), {
@@ -133,6 +139,12 @@ const store = new Vuex.Store({
     },
     SET_IMAGES_IMPORT_MODE (state, mode) {
       Vue.set(state.profile, 'imagesImportMode', mode)
+    },
+    SET_PREVIEW_FROM_GALLERY (state, toggle) {
+      Vue.set(state.profile, 'previewFromGallery', toggle)
+    },
+    SET_CLEAR_GALLERY_BEFORE_IMPORT (state, toggle) {
+      Vue.set(state.profile, 'clearGalleryBeforeImport', toggle)
     }
   },
   getters: {
@@ -195,6 +207,12 @@ const store = new Vuex.Store({
     },
     skipFirstLine (state) {
       return state.profile.skipFirstLine
+    },
+    previewFromGallery (state) {
+      return state.profile.previewFromGallery
+    },
+    clearGalleryBeforeImport (state) {
+      return state.profile.clearGalleryBeforeImport
     },
     submittableData (state) {
       return {

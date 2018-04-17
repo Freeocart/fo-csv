@@ -94,6 +94,20 @@
         </div>
 
         <div>
+          <label for="">
+            Установить главное изображение из галереи в случае отсутствия
+          </label>
+          <input type="checkbox" v-model="previewFromGallery">
+        </div>
+
+        <div>
+          <label for="">
+            Удалить изображения из галереи перед импортом
+          </label>
+          <input type="checkbox" v-model="clearGalleryBeforeImport">
+        </div>
+
+        <div>
           <label for="">Режим установки изображений</label>
           <select v-model="imagesImportMode">
             <option value="add">Добавить загруженные</option>
@@ -163,7 +177,9 @@ export default {
       'importMode',
       'csvImageFieldDelimiter',
       'keyField',
-      'imagesImportMode'
+      'imagesImportMode',
+      'previewFromGallery',
+      'clearGalleryBeforeImport'
     ])
   },
   methods: {
