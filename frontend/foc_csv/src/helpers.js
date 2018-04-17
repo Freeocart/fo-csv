@@ -101,7 +101,7 @@ const submitData = async function (url, { data, profile }) {
 
 const validateProfile = (profile) => {
   // validate key field
-  return profile.keyField && profile.bindings.findIndex(val => val === profile.keyField) !== -1
+  return profile.keyField && profile.bindings.findIndex(val => val === 'oc_product:' + profile.keyField) !== -1
 }
 
 const capitalizeFirstLetter = (str) => {

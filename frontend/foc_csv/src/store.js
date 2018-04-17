@@ -63,6 +63,9 @@ const store = new Vuex.Store({
     setProcessAtStepNum ({ commit }, num) {
       commit('SET_PROCESS_AT_STEP_NUM', num)
     },
+    setImagesImportMode ({ commit }, mode) {
+      commit('SET_IMAGES_IMPORT_MODE', mode)
+    },
     async saveNewProfile ({ commit, state }, name) {
       try {
         await axios.post(this.actionUrl('saveProfile'), {
@@ -111,7 +114,7 @@ const store = new Vuex.Store({
       state.profile.encoding = encoding
     },
     BIND_DB_TO_CSV_FIELD (state, [ dbField, csvField ]) {
-      Vue.set(state.profile.bindings, dbField, csvField)
+      Vue.set(state.profile.bindings, csvField, dbField)
     },
     SET_CSV_FILE_REF (state, ref) {
       Vue.set(state.data, 'csvFileRef', ref)
@@ -127,6 +130,9 @@ const store = new Vuex.Store({
     },
     SET_CSV_IMAGE_FIELD_DELIMITER (state, delimiter) {
       Vue.set(state.profile, 'csvImageFieldDelimiter', delimiter)
+    },
+    SET_IMAGES_IMPORT_MODE (state, mode) {
+      Vue.set(state.profile, 'imagesImportMode', mode)
     }
   },
   getters: {
@@ -180,6 +186,9 @@ const store = new Vuex.Store({
     },
     importMode (state) {
       return state.profile.importMode
+    },
+    imagesImportMode (state) {
+      return state.profile.imagesImportMode
     },
     csvImageFieldDelimiter (state) {
       return state.profile.csvImageFieldDelimiter

@@ -63,7 +63,7 @@
           <label for="">Сопоставление полей</label>
           <div v-for="(field, idx) in csvFields" :key="idx">
             <span>{{ field }}</span>
-            <db-fields-select :selected="currentProfile.bindings[idx]" :data="dbFields" @changed="bindDBToCsvField([ idx, $event ])"></db-fields-select>
+            <db-fields-select :selected="currentProfile.bindings[idx]" :data="dbFields" @changed="bindDBToCsvField([ $event, idx ])"></db-fields-select>
           </div>
         </div>
 
@@ -91,6 +91,15 @@
             Разделитель в поле изображений
             <input type="text" v-model="csvImageFieldDelimiter">
           </label>
+        </div>
+
+        <div>
+          <label for="">Режим установки изображений</label>
+          <select v-model="imagesImportMode">
+            <option value="add">Добавить загруженные</option>
+            <option value="replaceNew">Заменить если есть новые</option>
+            <option value="replace">Заменить (если нет новых - просто удалит)</option>
+          </select>
         </div>
 
         <div>
@@ -153,7 +162,8 @@ export default {
       'downloadImages',
       'importMode',
       'csvImageFieldDelimiter',
-      'keyField'
+      'keyField',
+      'imagesImportMode'
     ])
   },
   methods: {

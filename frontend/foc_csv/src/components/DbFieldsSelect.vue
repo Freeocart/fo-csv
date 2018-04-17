@@ -1,7 +1,7 @@
 <template>
   <select v-model="__selected">
-    <optgroup v-for="(group, key) in data" :key="key" :label="key">
-      <option :value="dbField" v-for="(dbField, idx) in group" :key="idx">{{ dbField }}</option>
+    <optgroup v-for="(group, groupKey) in data" :key="groupKey" :label="groupKey">
+      <option :value="(groupKey + ':' + dbField)" v-for="(dbField, idx) in group" :key="idx">{{ dbField }}</option>
     </optgroup>
   </select>
 </template>

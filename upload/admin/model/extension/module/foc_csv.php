@@ -8,6 +8,8 @@ class ModelExtensionModuleFocCsv extends Model {
   private $imagesZipImportFileName = 'images.zip';
   private $imagesZipExtractPath = 'images';
 
+  private $tableFieldDelimiter = ':';
+
   public function install () {
     $this->load->model('setting/setting');
     $this->model_setting_setting->editSetting($this->profiles_code, array($this->profiles_key => array()));
@@ -19,15 +21,16 @@ class ModelExtensionModuleFocCsv extends Model {
   */
   public function getDefaultProfile () {
     return array(
-      "encoding" => "UTF8",
-      "csvFieldDelimiter" => ";",
-      "categoryDelimiter" => "/",
-      "keyField" => "product_id",
-      "skipFirstLine" => true,
-      "bindings" => array(),
-      "importMode" => "updateCreate",
-      "csvImageFieldDelimiter" => ";",
-      "processAtStepNum" => 20
+      'encoding' => 'UTF8',
+      'csvFieldDelimiter' => ';',
+      'categoryDelimiter' => '/',
+      'keyField' => 'product_id',
+      'skipFirstLine' => true,
+      'bindings' => new stdclass,
+      'importMode' => 'updateCreate',
+      'imagesImportMode' => 'add',
+      'csvImageFieldDelimiter' => ';',
+      'processAtStepNum' => 20
     );
   }
 
@@ -205,6 +208,24 @@ class ModelExtensionModuleFocCsv extends Model {
     $bindings = $profile['bindings'];
 
     $csvToDB = $this->getCsvToDBFields($bindings, $csv_row);
+
+    $key_field = $profile['keyField'];
+    $mode = $profile['importMode'];
+
+    var_dump($profile);
+    var_dump($csvToDB);
+  }
+
+  private function checkIsProductExist ($field, $value) {
+    $sql = "SELECT COUNT({$field}) FROM oc_product WHERE ({$field} LIKE {$value})";
+    return count($this->db->query($sql)->rows) > 0;
+  }
+
+  private function importDataToTable ($table, $data) {
+    $sql = "INSERT INTO " . $table . "(";
+
+    $sql .= ") values (";
+
   }
 
 }

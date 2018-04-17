@@ -138,6 +138,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
         move_uploaded_file($_FILES['images-zip']['tmp_name'], $imagesFile);
 
         // unzip...unset
+        // todo: add zip check content before unzipping!
         $zip = new ZipArchive();
         $can_open = $zip->open($imagesFile);
 
@@ -168,6 +169,9 @@ class ControllerExtensionModuleFocCsv extends Controller {
     }
   }
 
+  /*
+    Импортирует часть позиций
+  */
   public function importPart ($key = null, $position = null, $profile = null) {
     if ($key === null && $position === null && $profile === null) {
       if ($this->request->server['REQUEST_METHOD'] == 'POST') {
