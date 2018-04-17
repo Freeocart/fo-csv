@@ -50,6 +50,7 @@ class ModelExtensionModuleFocCsv extends Model {
       'csvImageFieldDelimiter' => ';',
       'previewFromGallery' => true,
       'processAtStepNum' => 20,
+      'removeCharsFromCategory' => '[]{}',
       'storeId' => $this->config->get('config_store_id'),
       'languageId' => $this->config->get('language_id')
     );
@@ -381,7 +382,9 @@ class ModelExtensionModuleFocCsv extends Model {
     }
 
     /* IMPORT CATEGORIES */
-    $category_ids = $this->importProductCategories($tablesData[DB_PREFIX . 'category_description'], $profile['categoryDelimiter'], $profile['categoryLevelDelimiter'], $this->language_id, $this->store_id);
+    $cleanCategoryNames = isset($profile['removeCharsFromCategory']) ? $profile['removeCharsFromCategory'] : '';
+
+    $category_ids = $this->importProductCategories($tablesData[DB_PREFIX . 'category_description'], $profile['categoryDelimiter'], $profile['categoryLevelDelimiter'], $cleanCategoryNames, $this->language_id, $this->store_id);
 
     $fillParentCategories = isset($profile['fillParentCategories']) ? $profile['fillParentCategories'] : false;
     $clearCategoriesBeforeImport = isset($profile['clearCategoriesBeforeImport']) ? $profile['clearCategoriesBeforeImport'] : false;
@@ -418,11 +421,12 @@ class ModelExtensionModuleFocCsv extends Model {
   /*
     Lite category import (names only)
   */
-  private function importProductCategories ($fields, $delimiter, $levelDelimiter, $language_id) {
+  private function importProductCategories ($fields, $delimiter, $levelDelimiter, $cleanCategoryNames = '') {
     $result = array();
 
     if (isset($fields['name']) && !empty($fields['name'])) {
-      $categories = explode($delimiter, $fields['name']);
+      $category_raw = str_replace(str_split($cleanCategoryNames), '', $fields['name']);
+      $categories = explode($delimiter, $category_raw);
 
       $this->load->model('catalog/category');
 

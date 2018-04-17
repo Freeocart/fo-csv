@@ -10,7 +10,7 @@
         </div>
       </div>
     </template>
-    <div class="row" v-else>
+    <div class="row">
       <div class="col-md-12">
         <div class="form-group text-right">
           <button @click.prevent="submitImportData" class="btn btn-primary btn-lg"><i class="fa fa-rocket"></i> Погнали!</button>

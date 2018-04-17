@@ -22,7 +22,8 @@ let fields = genStoreFields([
   'clearGalleryBeforeImport',
   'previewFromGallery',
   'csvImageFieldDelimiter',
-  'csvFieldDelimiter'
+  'csvFieldDelimiter',
+  'removeCharsFromCategory'
 ], 'profile')
 
 const DEFAULT_PROFILE_NAME = 'default'
