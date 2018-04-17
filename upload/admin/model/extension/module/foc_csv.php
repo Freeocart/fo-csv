@@ -41,6 +41,7 @@ class ModelExtensionModuleFocCsv extends Model {
       'encoding' => 'UTF8',
       'csvFieldDelimiter' => ';',
       'categoryDelimiter' => '/',
+      'categoryLevelDelimiter' => '>>',
       'keyField' => 'product_id',
       'skipFirstLine' => true,
       'bindings' => new stdclass,
@@ -98,6 +99,28 @@ class ModelExtensionModuleFocCsv extends Model {
     }
 
     return $result;
+  }
+
+  /*
+    DB Schema templates here
+    This functions helping generate data for database
+  */
+  private function productDescriptionTemplate ($data = array()) {
+    return array_replace(array(
+      'meta_title' => '',
+      'tag' => '',
+      'meta_description' => '',
+      'meta_keyword' => '',
+      'language_id' => $this->language_id,
+      'product_id' => $this->product_id
+    ), $data);
+  }
+
+  private function productToStoreTemplate ($data = array()) {
+    return array_replace(array(
+      'store_id' => $this->store_id,
+      'product_id' => $this->product_id
+    ), $data);
   }
 
   /*
@@ -307,18 +330,32 @@ class ModelExtensionModuleFocCsv extends Model {
 
     $tablesData = $this->getCsvToDBFields($bindings, $csv_row);
 
+    $this->language_id = (int) $this->config->get('config_language_id');
+    if (isset($profile['languageId'])) {
+      $this->language_id = (int) $profile['languageId'];
+    }
+
+    $this->store_id = (int) $this->config->get('config_store_id');
+    if (isset($profile['storeId'])) {
+      $this->store_id = (int) $profile['storeId'];
+    }
+
     $manufacturer_id = $this->importManufacturer($tablesData[DB_PREFIX . 'manufacturer']);
 
     // set manufacturer id to product fields
     $tablesData[DB_PREFIX . 'product']['manufacturer_id'] = $manufacturer_id;
 
+    /* IMPORT PRODUCTS */
     $product_id = $this->importProduct($tablesData[DB_PREFIX . 'product']);
 
     $product_description_table = DB_PREFIX . 'product_description';
     if (isset($tablesData[$product_description_table])) {
-      $this->importProductSubtable('product_description', $tablesData[$product_description_table], $product_id);
+      $this->importProductSubtable('product_description', $this->productDescriptionTemplate($tablesData[$product_description_table]), $product_id);
     }
 
+    $this->importProductSubtable('product_to_store', $this->productToStoreTemplate(), $product_id);
+
+    /* IMPORT IMAGES */
     $setPreviewFromGallery = false;
     $image = $this->db->query('SELECT `image` FROM '.DB_PREFIX.'product WHERE product_id = ' . (int)$product_id)->row['image'];
 
@@ -330,11 +367,93 @@ class ModelExtensionModuleFocCsv extends Model {
       $this->db->query('DELETE FROM ' . DB_PREFIX . 'product_image WHERE product_id=' . (int)$product_id);
     }
 
-    // upload gallery
     $this->importGallery($tablesData[DB_PREFIX . 'product_image'], $profile['csvImageFieldDelimiter'], $profile['downloadImages'], $setPreviewFromGallery, $product_id);
 
+    /* IMPORT CATEGORIES */
+    $category_ids = $this->importProductCategories($tablesData[DB_PREFIX . 'category_description'], $profile['categoryDelimiter'], $profile['categoryLevelDelimiter'], $language_id, $store_id);
+
+    $fillParentCategories = isset($profile['fillParentCategories']) ? $profile['fillParentCategories'] : false;
+    $clearCategoriesBeforeImport = isset($profile['clearCategoriesBeforeImport']) ? $profile['clearCategoriesBeforeImport'] : false;
+
+    if ($clearCategoriesBeforeImport) {
+      $this->db->query('DELETE FROM ' . DB_PREFIX . 'product_to_category WHERE product_id = ' . (int)$product_id);
+    }
+
+    foreach ($category_ids as $path => $ids) {
+      if ($fillParentCategories) {
+        foreach ($ids as $category_id) {
+          $this->bindProductToCategory($product_id, $category_id);
+        }
+      }
+      else {
+        $category_id = array_pop($ids);
+        $this->bindProductToCategory($product_id, $category_id);
+      }
+    }
   }
 
+  /*
+    Bind product to category
+  */
+  private function bindProductToCategory ($product_id, $category_id) {
+    $exist = $this->db->query('SELECT IFNULL((SELECT product_id FROM ' . DB_PREFIX . 'product_to_category WHERE product_id = ' . (int)$product_id . ' AND category_id = ' . (int) $category_id . ' LIMIT 1), 0) AS id')->row['id'];
+
+    if (!$exist) {
+      $this->db->query('INSERT INTO ' . DB_PREFIX . 'product_to_category (product_id, category_id) VALUES (' . (int)$product_id . ',' . (int)$category_id . ')');
+      return $this->db->getLastId();
+    }
+  }
+
+  /*
+    Lite category import (names only)
+  */
+  private function importProductCategories ($fields, $delimiter, $levelDelimiter, $language_id) {
+    $result = array();
+
+    if (isset($fields['name']) && !empty($fields['name'])) {
+      $categories = explode($delimiter, $fields['name']);
+
+      $this->load->model('catalog/category');
+
+      foreach ($categories as $categoryPath) {
+        $categoryParts = array_map('trim', explode($levelDelimiter, $categoryPath));
+
+        $prev_id = 0;
+
+        foreach ($categoryParts as $categoryName) {
+          $id = (int)$this->db->query("SELECT IFNULL((SELECT category_id FROM " . DB_PREFIX . 'category_description WHERE name LIKE "' . $this->db->escape($categoryName) . '" AND language_id = '.(int)$language_id.' LIMIT 1), 0) AS `id`')->row['id'];
+
+          $category = (int)$this->db->query('SELECT IFNULL((SELECT category_id FROM ' . DB_PREFIX . 'category WHERE category_id = ' . (int)$id . '), 0) AS `id`')->row['id'];
+
+          if (!$category && !$id) {
+            $this->db->query('INSERT INTO ' . DB_PREFIX . 'category (parent_id, status) VALUES (' . (int)$prev_id . ', 1)');
+            $prev_id = $this->db->getLastId();
+          }
+          else if (!$category && $id) {
+            $this->db->query('INSERT INTO ' . DB_PREFIX . 'category (category_id, parent_id, status) VALUES (' . (int)$id . ',' . $prev_id . ', 1)');
+          }
+
+          if ($id === 0) {
+            $this->db->query('INSERT INTO ' . DB_PREFIX . 'category_description (category_id, name, language_id) VALUES ('.(int)$prev_id.',"' . $this->db->escape($categoryName) . '", ' . (int)$language_id . ')');
+          }
+          else {
+            $this->db->query('UPDATE ' . DB_PREFIX . 'category_description SET name = "' . $this->db->escape($categoryName) . '", language_id = ' . (int)$language_id . ' WHERE category_id = ' . (int)$id);
+            $prev_id = $id;
+          }
+
+          $result[$categoryPath][] = $prev_id;
+        }
+      }
+    }
+    $this->model_catalog_category->repairCategories();
+
+    $this->cache->delete('category');
+    return $result;
+  }
+
+  /*
+    Imports gallery to DB
+  */
   private function importGallery ($fields, $separator, $download = false, $setPreview = false, $product_id) {
     if (isset($fields['image']) && !empty($fields['image'])) {
       $images = explode($separator, $fields['image']);
@@ -360,10 +479,16 @@ class ModelExtensionModuleFocCsv extends Model {
     }
   }
 
+  /*
+    Check if url is url:)
+  */
   private function isUrl ($url) {
     return preg_match('/^https?\:\/\//', $url);
   }
 
+  /*
+    Simple image downloader
+  */
   private function downloadImage ($url) {
     if ($this->isUrl($url)) {
       $file_name = md5($url);
@@ -390,21 +515,27 @@ class ModelExtensionModuleFocCsv extends Model {
     }
   }
 
+  /*
+    Product import helper
+  */
   private function importProductSubtable ($table, $fields, $product_id) {
     $fieldsSql = $this->fieldsToSQL($fields);
 
-    $id = $this->db->query('SELECT IFNULL((SELECT product_id FROM ' . DB_PREFIX . $table . ' WHERE product_id LIKE "'.$this->db->escape($product_id).'"), 0) AS `id`')->row['id'];
+    $id = (int)$this->db->query('SELECT IFNULL((SELECT product_id FROM ' . DB_PREFIX . $table . ' WHERE product_id LIKE "'.$this->db->escape($product_id).'"), 0) AS `id`')->row['id'];
 
     if ($id > 0) {
-      $sql = 'UPDATE ' . DB_PREFIX . $table . ' SET ' . $fieldsSql['update'] . ' WHERE product_id LIKE ' . $this->db->escape($product_id);
+      $this->db->query('UPDATE ' . DB_PREFIX . $table . ' SET ' . $fieldsSql['update'] . ' WHERE product_id LIKE ' . $this->db->escape($product_id));
       return $id;
     }
     else {
-      $sql = 'INSERT INTO ' . DB_PREFIX . $table . ' VALUES ('.$fieldsSql['values'].')';
+      $this->db->query('INSERT INTO ' . DB_PREFIX . $table . ' (' . $fieldsSql['keys'] . ') VALUES ('.$fieldsSql['values'].')');
       return $this->db->getLastId();
     }
   }
 
+  /*
+    Import product fields
+  */
   private function importProduct ($fields) {
 
     if (!empty($fields['image'])) {
@@ -456,6 +587,7 @@ class ModelExtensionModuleFocCsv extends Model {
       return $this->db->getLastId();
     }
 
+    // just for test
     var_dump($id);
     die;
   }
@@ -505,18 +637,6 @@ class ModelExtensionModuleFocCsv extends Model {
     }
 
     return 0;
-  }
-
-  private function checkIsProductExist ($field, $value) {
-    $sql = "SELECT COUNT({$field}) FROM oc_product WHERE ({$field} LIKE {$value})";
-    return count($this->db->query($sql)->rows) > 0;
-  }
-
-  private function importDataToTable ($table, $data) {
-    $sql = "INSERT INTO " . $table . "(";
-
-    $sql .= ") values (";
-
   }
 
 }
