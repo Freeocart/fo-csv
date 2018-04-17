@@ -351,6 +351,10 @@ class ModelExtensionModuleFocCsv extends Model {
     /* IMPORT PRODUCTS */
     $product_id = $this->importProduct($tablesData[DB_PREFIX . 'product']);
 
+    if (!$product_id) {
+      return false;
+    }
+
     $product_description_table = DB_PREFIX . 'product_description';
     if (isset($tablesData[$product_description_table])) {
       $this->importProductSubtable('product_description', $this->productDescriptionTemplate($tablesData[$product_description_table]), $product_id);
@@ -404,6 +408,8 @@ class ModelExtensionModuleFocCsv extends Model {
         $this->bindProductToCategory($product_id, $category_id);
       }
     }
+
+    return true;
   }
 
   /*
@@ -436,7 +442,7 @@ class ModelExtensionModuleFocCsv extends Model {
         $prev_id = 0;
 
         foreach ($categoryParts as $categoryName) {
-          $id = (int)$this->db->query("SELECT IFNULL((SELECT category_id FROM " . DB_PREFIX . 'category_description WHERE name LIKE "' . $this->db->escape($categoryName) . '" AND language_id = '.(int)$language_id.' LIMIT 1), 0) AS `id`')->row['id'];
+          $id = (int)$this->db->query("SELECT IFNULL((SELECT category_id FROM " . DB_PREFIX . 'category_description WHERE name LIKE "' . $this->db->escape($categoryName) . '" AND language_id = '.(int)$this->language_id.' LIMIT 1), 0) AS `id`')->row['id'];
 
           $category = (int)$this->db->query('SELECT IFNULL((SELECT category_id FROM ' . DB_PREFIX . 'category WHERE category_id = ' . (int)$id . '), 0) AS `id`')->row['id'];
 
@@ -449,10 +455,10 @@ class ModelExtensionModuleFocCsv extends Model {
           }
 
           if ($id === 0) {
-            $this->db->query('INSERT INTO ' . DB_PREFIX . 'category_description (category_id, name, language_id) VALUES ('.(int)$prev_id.',"' . $this->db->escape($categoryName) . '", ' . (int)$language_id . ')');
+            $this->db->query('INSERT INTO ' . DB_PREFIX . 'category_description (category_id, name, language_id) VALUES ('.(int)$prev_id.',"' . $this->db->escape($categoryName) . '", ' . (int)$this->language_id . ')');
           }
           else {
-            $this->db->query('UPDATE ' . DB_PREFIX . 'category_description SET name = "' . $this->db->escape($categoryName) . '", language_id = ' . (int)$language_id . ' WHERE category_id = ' . (int)$id);
+            $this->db->query('UPDATE ' . DB_PREFIX . 'category_description SET name = "' . $this->db->escape($categoryName) . '", language_id = ' . (int)$this->language_id . ' WHERE category_id = ' . (int)$id);
             $prev_id = $id;
           }
 
@@ -543,8 +549,10 @@ class ModelExtensionModuleFocCsv extends Model {
   /*
     Product import helper
   */
-  private function importProductSubtable ($table, $fields, $product_id) {
-    $fields['product_id'] = $product_id;
+  private function importProductSubtable ($table, $fields, $product_id = null) {
+    if ($product_id) {
+      $fields['product_id'] = $product_id;
+    }
 
     $fieldsSql = $this->fieldsToSQL($fields);
 
@@ -575,8 +583,8 @@ class ModelExtensionModuleFocCsv extends Model {
     $key_value = $fields[$kfData['field']];
 
     if (empty($key_value)) {
-      $this->log->write('[ERR] Empty key field [' . $kfData['field'] . '] value on [' . print_r($csv_row, true) . ']');
-      return;
+      $this->log->write('[ERR] Empty key field [' . $kfData['field'] . '] value on [' . print_r($fields, true) . ']');
+      return null;
     }
 
     $id = 0;
@@ -588,6 +596,8 @@ class ModelExtensionModuleFocCsv extends Model {
       $this->log->write('[ERR] Product has empty key field [' . $kfData['field'] . ']!');
       return 0;
     }
+
+    // var_dump($id);
 
     if (!$this->checkBeforeInsert || $this->checkerValue === ($id > 0)) {
       if ($this->updateExisting) {

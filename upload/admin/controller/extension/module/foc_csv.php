@@ -237,7 +237,9 @@ class ControllerExtensionModuleFocCsv extends Controller {
               continue;
             }
             // import stuff..
-            $this->model_extension_module_foc_csv->import($profile, $line);
+            if (!$this->model_extension_module_foc_csv->import($profile, $line)) {
+              $this->sendFail();
+            }
           }
 
           $position = ftell($csv_fid);
