@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Vue from 'vue'
 
 /*
   Валидация обязательных полей
@@ -130,11 +131,41 @@ const mapVuexModels = (models) => {
   }, {})
 }
 
+const toMutationName = (name) => {
+  let parts = name.match(/([A-Z]?[^A-Z]*)/g).slice(0, -1)
+  return parts.join('_').toUpperCase()
+}
+
+const genStoreFields = (fields, storeAttr) => {
+  let result = {
+    getters: {},
+    actions: {},
+    mutations: {}
+  }
+
+  fields.reduce(function (prev, field) {
+    prev.getters[field] = function (state) {
+      return state[storeAttr][field]
+    }
+    prev.actions[`set${field.charAt(0).toUpperCase() + field.substr(1)}`] = function ({ commit }, data) {
+      commit(toMutationName(field), data)
+    }
+    prev.mutations[toMutationName(field)] = function (state, value) {
+      Vue.set(state[storeAttr], field, value)
+    }
+
+    return prev
+  }, result)
+
+  return result
+}
+
 export {
   mapVuexModels,
   validateAppConfig,
   FirstLineReader,
   parseCsvHeaders,
   submitData,
-  validateProfile
+  validateProfile,
+  genStoreFields
 }
