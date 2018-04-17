@@ -37,6 +37,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $data['baseUrl'] = $this->url->link('');
 
     $this->load->model('extension/module/foc_csv');
+    $this->load->model('setting/store');
+    $this->load->model('localisation/language');
 
     $data['breadcrumbs'] = $this->breadcrumbs();
 
@@ -56,6 +58,30 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $initial['keyFields'] = $this->model_extension_module_foc_csv->getKeyFields();
     $initial['encodings'] = array('UTF8', 'cp1251');
     $initial['dbFields'] = $this->model_extension_module_foc_csv->getDbFields();
+
+    $initial['stores'] = array();
+    $initial['stores'][] = array(
+      'name' => $this->config->get('config_name'),
+      'id'   => $this->config->get('config_store_id'),
+      'current' => true
+    );
+
+    $stores = $this->model_setting_store->getStores();
+    foreach ($stores as $store) {
+      $initial['stores'][] = array(
+        'name' => $store['name'],
+        'id'   => $store['store_id']
+      );
+    }
+
+    $initial['languages'] = array();
+    $languages = $this->model_localisation_language->getLanguages();
+    foreach ($languages as $lang) {
+      $initial['languages'][] = array(
+        'name' => $lang['name'],
+        'id'   => $lang['language_id']
+      );
+    }
 
     $data['initial'] = json_encode($initial);
 

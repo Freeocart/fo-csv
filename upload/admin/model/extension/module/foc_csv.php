@@ -49,7 +49,9 @@ class ModelExtensionModuleFocCsv extends Model {
       'imagesImportMode' => 'add',
       'csvImageFieldDelimiter' => ';',
       'previewFromGallery' => true,
-      'processAtStepNum' => 20
+      'processAtStepNum' => 20,
+      'storeId' => $this->config->get('config_store_id'),
+      'languageId' => $this->config->get('language_id')
     );
   }
 
@@ -370,7 +372,7 @@ class ModelExtensionModuleFocCsv extends Model {
     $this->importGallery($tablesData[DB_PREFIX . 'product_image'], $profile['csvImageFieldDelimiter'], $profile['downloadImages'], $setPreviewFromGallery, $product_id);
 
     /* IMPORT CATEGORIES */
-    $category_ids = $this->importProductCategories($tablesData[DB_PREFIX . 'category_description'], $profile['categoryDelimiter'], $profile['categoryLevelDelimiter'], $language_id, $store_id);
+    $category_ids = $this->importProductCategories($tablesData[DB_PREFIX . 'category_description'], $profile['categoryDelimiter'], $profile['categoryLevelDelimiter'], $this->language_id, $this->store_id);
 
     $fillParentCategories = isset($profile['fillParentCategories']) ? $profile['fillParentCategories'] : false;
     $clearCategoriesBeforeImport = isset($profile['clearCategoriesBeforeImport']) ? $profile['clearCategoriesBeforeImport'] : false;
@@ -519,6 +521,8 @@ class ModelExtensionModuleFocCsv extends Model {
     Product import helper
   */
   private function importProductSubtable ($table, $fields, $product_id) {
+    $fields['product_id'] = $product_id;
+
     $fieldsSql = $this->fieldsToSQL($fields);
 
     $id = (int)$this->db->query('SELECT IFNULL((SELECT product_id FROM ' . DB_PREFIX . $table . ' WHERE product_id LIKE "'.$this->db->escape($product_id).'"), 0) AS `id`')->row['id'];
