@@ -5,6 +5,8 @@ class ModelExtensionModuleFocCsv extends Model {
   private $profiles_code = 'foc_csv';
   private $profiles_key = 'foc_csv_profiles';
   private $csvImportFileName = 'import.csv';
+  private $imagesZipImportFileName = 'images.zip';
+  private $imagesZipExtractPath = 'images';
 
   public function install () {
     $this->load->model('setting/setting');
@@ -12,6 +14,9 @@ class ModelExtensionModuleFocCsv extends Model {
     $this->saveProfiles($this->getDefaultProfiles());
   }
 
+  /*
+    Default profile data
+  */
   public function getDefaultProfile () {
     return array(
       "encoding" => "UTF8",
@@ -26,12 +31,18 @@ class ModelExtensionModuleFocCsv extends Model {
     );
   }
 
+  /*
+    Default profiles list
+  */
   public function getDefaultProfiles () {
     return array(
       'default' => $this->getDefaultProfile()
     );
   }
 
+  /*
+    Key fields
+  */
   public function getKeyFields () {
     return array(
       'product_id',
@@ -45,6 +56,9 @@ class ModelExtensionModuleFocCsv extends Model {
     );
   }
 
+  /*
+    Generate DB fields list
+  */
   public function getDbFields () {
     $tables = array(
       DB_PREFIX . 'product',
@@ -61,7 +75,9 @@ class ModelExtensionModuleFocCsv extends Model {
     return $result;
   }
 
-  // загружает все профили
+  /*
+    Load all profiles
+  */
   public function loadProfiles () {
     $this->load->model('setting/setting');
 
@@ -74,13 +90,17 @@ class ModelExtensionModuleFocCsv extends Model {
     return $profiles;
   }
 
-  // сохраняет все профили
+  /*
+    Save profiles list
+  */
   public function saveProfiles ($profiles) {
     $this->load->model('setting/setting');
     $this->model_setting_setting->editSettingValue($this->profiles_code, $this->profiles_key, $profiles);
   }
 
-  // загружает профиль по имени
+  /*
+    Load profile by name
+  */
   public function loadProfile ($name) {
     $profiles = $this->loadProfiles();
 
@@ -91,7 +111,9 @@ class ModelExtensionModuleFocCsv extends Model {
     return null;
   }
 
-  // сохраняет профиль по имени
+  /*
+    Save profile by name
+  */
   public function setProfile ($name, $data) {
     $profiles = $this->loadProfiles();
     // var_dump($profiles);
@@ -103,21 +125,34 @@ class ModelExtensionModuleFocCsv extends Model {
     return DIR_CACHE . $this->profiles_code . '/' . $key . '/import/';
   }
 
+  /*
+    Returns import storage path for csv file
+  */
   public function getImportCsvFilePath ($key) {
     $path = $this->getImportCsvPath($key);
     return $path . $this->csvImportFileName;
   }
 
+  /*
+    Returns import storage path for images zip file
+  */
   public function getImportImagesZipPath ($key) {
     $path = $this->getImportCsvPath($key);
-    return $path . 'images.zip';
+    return $path . $this->imagesZipImportFileName;
   }
 
+  /*
+    Returns images extract path
+  */
   public function getImportImagesPath ($key) {
     $path = $this->getImportCsvPath($key);
-    return $path . 'images/';
+    return $path . $this->imagesZipExtractPath;
   }
 
+  /*
+    Prepare import storage
+    Returns storage key
+  */
   public function prepareImportPath () {
     $key = md5(rand() . time());
     $path = $this->getImportCsvPath($key);
@@ -126,15 +161,13 @@ class ModelExtensionModuleFocCsv extends Model {
       return $this->prepareImportPath();
     }
 
-    mkdir($path, '0755', true);
-    // папка для изображений
-    // mkdir($path . '/images', '0755', true);
+    mkdir($path, 0755, true);
 
     return $key;
   }
 
   /*
-    Убирает все лишние/пустые поля
+    Remove all unnecessary fields from csv
   */
   private function filterCsvToDBBindings ($bindings) {
     $cleared = array();
@@ -149,6 +182,9 @@ class ModelExtensionModuleFocCsv extends Model {
     return $cleared;
   }
 
+  /*
+    Generating csv field => db field bindings
+  */
   private function getCsvToDBFields ($bindings, $csv_row) {
     $cleared = $this->filterCsvToDBBindings($bindings);
     $data = array();
@@ -162,6 +198,9 @@ class ModelExtensionModuleFocCsv extends Model {
     return $data;
   }
 
+  /*
+    Import entry point
+  */
   public function importProduct ($profile, $csv_row) {
     $bindings = $profile['bindings'];
 
