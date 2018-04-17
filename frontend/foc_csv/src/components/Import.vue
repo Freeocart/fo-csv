@@ -18,6 +18,20 @@
         </div>
 
         <div>
+          <label for="">Магазин</label>
+          <select v-model="store">
+            <option v-for="(store, idx) in stores" :key="idx" :value="store.id">{{ store.name }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="">Язык</label>
+          <select v-model="language">
+            <option v-for="(lang, idx) in languages" :key="idx" :value="lang.id">{{ lang.name }}</option>
+          </select>
+        </div>
+
+        <div>
           <label for="">Ключевое поле (по нему идет сличение)</label>
           <select v-model="keyField">
             <option v-for="(field, idx) in keyFields" :key="idx">{{ field }}</option>
@@ -48,6 +62,10 @@
           </select>
         </div>
 
+        <div>
+          <label for="">Разделитель вложенности категорий</label>
+          <input type="text" v-model="categoryLevelDelimiter">
+        </div>
         <div>
           <label for="">Разделитель категорий</label>
           <input type="text" v-model="categoryDelimiter">
@@ -164,13 +182,16 @@ export default {
       'encodings',
       'profiles',
       'keyFields',
-      'currentProfile'
+      'currentProfile',
+      'stores',
+      'languages'
     ]),
     ...mapVuexModels([
       'processAtStepNum',
       'skipFirstLine',
       'currentProfileName',
       'categoryDelimiter',
+      'categoryLevelDelimiter',
       'csvFieldDelimiter',
       'encoding',
       'downloadImages',
@@ -179,7 +200,9 @@ export default {
       'keyField',
       'imagesImportMode',
       'previewFromGallery',
-      'clearGalleryBeforeImport'
+      'clearGalleryBeforeImport',
+      'store',
+      'language'
     ])
   },
   methods: {

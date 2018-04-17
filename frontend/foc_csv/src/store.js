@@ -72,6 +72,15 @@ const store = new Vuex.Store({
     setClearGalleryBeforeImport ({ commit }, toggle) {
       commit('SET_CLEAR_GALLERY_BEFORE_IMPORT', toggle)
     },
+    setCategoryLevelDelimiter ({ commit }, delimiter) {
+      commit('SET_CATEGORY_LEVEL_DELIMITER', delimiter)
+    },
+    setStore ({ commit }, store) {
+      commit('SET_STORE', store)
+    },
+    setLanguage ({ commit }, language) {
+      commit('SET_LANGUAGE', language)
+    },
     async saveNewProfile ({ commit, state }, name) {
       try {
         await axios.post(this.actionUrl('saveProfile'), {
@@ -97,6 +106,12 @@ const store = new Vuex.Store({
     SET_PROCESS_AT_STEP_NUM (state, num) {
       Vue.set(state.profile, 'processAtStepNum', num)
     },
+    SET_STORE (state, storeId) {
+      state.profile.storeId = storeId
+    },
+    SET_LANGUAGE (state, langId) {
+      state.profile.languageId = langId
+    },
     SET_SKIP_FIRST_LINE (state, val) {
       Vue.set(state.profile, 'skipFirstLine', val)
     },
@@ -112,6 +127,9 @@ const store = new Vuex.Store({
     },
     SET_CATEGORY_DELIMITER (state, delimiter) {
       state.profile.categoryDelimiter = delimiter
+    },
+    SET_CATEGORY_LEVEL_DELIMITER (state, delimiter) {
+      state.profile.categoryLevelDelimiter = delimiter
     },
     SET_CSVFIELD_DELIMITER (state, delimiter) {
       state.profile.csvFieldDelimiter = delimiter
@@ -163,6 +181,12 @@ const store = new Vuex.Store({
     keyFields (state) {
       return state.data.keyFields
     },
+    languages (state) {
+      return state.data.languages
+    },
+    stores (state) {
+      return state.data.stores
+    },
     keyField (state) {
       return state.profile.keyField
     },
@@ -184,11 +208,20 @@ const store = new Vuex.Store({
     profile (state) {
       return state.profile
     },
+    store (state) {
+      return state.profile.storeId
+    },
+    language (state) {
+      return state.profile.languageId
+    },
     csvFieldDelimiter (state) {
       return state.profile.csvFieldDelimiter
     },
     categoryDelimiter (state) {
       return state.profile.categoryDelimiter
+    },
+    categoryLevelDelimiter (state) {
+      return state.profile.categoryLevelDelimiter
     },
     encoding (state) {
       return state.profile.encoding
