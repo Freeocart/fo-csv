@@ -1,7 +1,7 @@
 <template>
   <div class="progress-container">
     <div class="progress" :style="{ width: width }"></div>
-    <span class="progress-counter" :style="{ color: progressValue < 50 ? '#000' : '#fff'}">{{ progress.width }}%</span>
+    <span class="progress-counter" :style="{ color: progressValue < 50 ? '#000' : '#fff'}">{{ parseInt(progressValue) }}%</span>
   </div>
 </template>
 
@@ -20,7 +20,7 @@ export default {
       return ((this.progress.current / this.progress.total) * 100) || 0
     },
     width () {
-      return `${this.progressValue}%`
+      return `${parseInt(this.progressValue)}%`
     }
   }
 }
