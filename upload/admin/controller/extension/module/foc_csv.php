@@ -184,6 +184,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
           $position = $json['position'];
           $profile = $json['profile'];
 
+          $this->model_extension_module_foc_csv->setImportKey($import_key);
+
           $skipFirstLine = $position === 0 ? $profile['skipFirstLine'] : false;
           $delimiter = empty($profile['csvFieldDelimiter']) ? ';' : $profile['csvFieldDelimiter'];
           $importAtOnce = empty($profile['importAtOnce']) ? 10 : $profile['importAtOnce'];
@@ -209,7 +211,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
               continue;
             }
             // import stuff..
-            $this->model_extension_module_foc_csv->importProduct($profile, $line);
+            $this->model_extension_module_foc_csv->import($profile, $line);
           }
 
           $position = ftell($csv_fid);

@@ -7,6 +7,7 @@ class ModelExtensionModuleFocCsv extends Model {
   private $csvImportFileName = 'import.csv';
   private $imagesZipImportFileName = 'images.zip';
   private $imagesZipExtractPath = 'images';
+  private $imageSavePath = 'catalog/import';
 
   private $tableFieldDelimiter = ':';
 
@@ -20,6 +21,10 @@ class ModelExtensionModuleFocCsv extends Model {
   public function __construct ($registry) {
     parent::__construct($registry);
     $this->log = new Log('foc_csv.txt');
+
+    if (!is_dir(DIR_IMAGE . $this->imageSavePath)) {
+      mkdir(DIR_IMAGE . $this->imageSavePath, 0755, true);
+    }
   }
 
   public function install () {
@@ -42,6 +47,7 @@ class ModelExtensionModuleFocCsv extends Model {
       'importMode' => 'updateCreate',
       'imagesImportMode' => 'add',
       'csvImageFieldDelimiter' => ';',
+      'previewFromGallery' => true,
       'processAtStepNum' => 20
     );
   }
@@ -184,6 +190,10 @@ class ModelExtensionModuleFocCsv extends Model {
     return $key;
   }
 
+  public function setImportKey ($key) {
+    $this->importKey = $key;
+  }
+
   /*
     Remove all unnecessary fields from csv
   */
@@ -267,28 +277,8 @@ class ModelExtensionModuleFocCsv extends Model {
   }
 
   /*
-    Import entry point
+    Helper to create SQL queries
   */
-  public function importProduct ($profile, $csv_row) {
-    $bindings = $profile['bindings'];
-
-    $tablesData = $this->getCsvToDBFields($bindings, $csv_row);
-    $kfData = $this->keyFieldData;
-    $key_value = $tablesData[$kfData['table']][$kfData['field']];
-
-    if (empty($key_value)) {
-      $this->log->write('[ERR] Empty key field [' . $kfData['field'] . '] value on [' . print_r($csv_row, true) . ']');
-      return;
-    }
-
-    $manufacturer_id = $this->importManufacturer($tablesData[DB_PREFIX . 'manufacturer']);
-
-    // set manufacturer id to product fields
-    $tablesData[DB_PREFIX . 'product']['manufacturer_id'] = $manufacturer_id;
-
-  }
-
-
   private function fieldsToSQL ($fields) {
     $keys = implode(',', array_keys($fields));
     $update = '';
@@ -300,18 +290,174 @@ class ModelExtensionModuleFocCsv extends Model {
       else {
         $fields[$key] = '"' . $this->db->escape($value) . '"';
       }
-      $update .= $key . '=' . $fields[$key] . ' ';
+      $update .= $key . '=' . $fields[$key] . ',';
     }
     return array(
       'keys' => $keys,
       'values' => implode(',', array_values($fields)),
-      'update' => $update
+      'update' => rtrim($update, ',')
     );
   }
 
+  /*
+    Import entry point
+  */
+  public function import ($profile, $csv_row) {
+    $bindings = $profile['bindings'];
 
-  private function importProduct () {
+    $tablesData = $this->getCsvToDBFields($bindings, $csv_row);
 
+    $manufacturer_id = $this->importManufacturer($tablesData[DB_PREFIX . 'manufacturer']);
+
+    // set manufacturer id to product fields
+    $tablesData[DB_PREFIX . 'product']['manufacturer_id'] = $manufacturer_id;
+
+    $product_id = $this->importProduct($tablesData[DB_PREFIX . 'product']);
+
+    $product_description_table = DB_PREFIX . 'product_description';
+    if (isset($tablesData[$product_description_table])) {
+      $this->importProductSubtable('product_description', $tablesData[$product_description_table], $product_id);
+    }
+
+    $setPreviewFromGallery = false;
+    $image = $this->db->query('SELECT `image` FROM '.DB_PREFIX.'product WHERE product_id = ' . (int)$product_id)->row['image'];
+
+    if (isset($profile['previewFromGallery']) && $profile['previewFromGallery'] && empty($image)) {
+      $setPreviewFromGallery = true;
+    }
+
+    if (isset($profile['clearGalleryBeforeImport']) && $profile['clearGalleryBeforeImport']) {
+      $this->db->query('DELETE FROM ' . DB_PREFIX . 'product_image WHERE product_id=' . (int)$product_id);
+    }
+
+    // upload gallery
+    $this->importGallery($tablesData[DB_PREFIX . 'product_image'], $profile['csvImageFieldDelimiter'], $profile['downloadImages'], $setPreviewFromGallery, $product_id);
+
+  }
+
+  private function importGallery ($fields, $separator, $download = false, $setPreview = false, $product_id) {
+    if (isset($fields['image']) && !empty($fields['image'])) {
+      $images = explode($separator, $fields['image']);
+
+      if (count($images) > 0) {
+        $imageCounter = 0;
+
+        foreach ($images as $image) {
+          $url = $this->downloadImage($image);
+
+          if (!$url) {
+            continue;
+          }
+
+          if ($imageCounter++ == 0 && $setPreview) {
+            $this->db->query("UPDATE " . DB_PREFIX . "product SET image = '" . $this->db->escape($url) . "' WHERE product_id = '" . (int)$product_id . "'");
+          }
+          else {
+            $this->db->query('INSERT INTO ' . DB_PREFIX . 'product_image (product_id, image, sort_order) VALUES (' . (int)$product_id . ',"' . $this->db->escape($url) . '",' . (int)$imageCounter . ')');
+          }
+        }
+      }
+    }
+  }
+
+  private function isUrl ($url) {
+    return preg_match('/^https?\:\/\//', $url);
+  }
+
+  private function downloadImage ($url) {
+    if ($this->isUrl($url)) {
+      $file_name = md5($url);
+      $save_path = DIR_IMAGE . $this->imageSavePath . '/' . $this->importKey . $file_name;
+
+      file_put_contents($save_path, file_get_contents($url));
+
+      $image = new Image($save_path);
+
+      if (!empty($image->getMime())) {
+        $image->save($save_path . '.png');
+        return $this->imageSavePath . '/' . $this->importKey . $file_name . '.png';
+      }
+
+      unlink($save_path);
+      return null;
+    }
+    else if (is_file($this->getImportImagesPath($this->importKey) . '/' . $url)) {
+      rename($this->getImportImagesPath($this->importKey) . '/' . $url, DIR_IMAGE . $this->imageSavePath . '/' . $this->importKey . $url);
+      return $this->imageSavePath . '/' . $this->importKey . $url;
+    }
+    else if (is_file(DIR_IMAGE . $this->imageSavePath . '/' . $this->importKey . $url)) {
+      return $this->imageSavePath . '/' . $this->importKey . $url;
+    }
+  }
+
+  private function importProductSubtable ($table, $fields, $product_id) {
+    $fieldsSql = $this->fieldsToSQL($fields);
+
+    $id = $this->db->query('SELECT IFNULL((SELECT product_id FROM ' . DB_PREFIX . $table . ' WHERE product_id LIKE "'.$this->db->escape($product_id).'"), 0) AS `id`')->row['id'];
+
+    if ($id > 0) {
+      $sql = 'UPDATE ' . DB_PREFIX . $table . ' SET ' . $fieldsSql['update'] . ' WHERE product_id LIKE ' . $this->db->escape($product_id);
+      return $id;
+    }
+    else {
+      $sql = 'INSERT INTO ' . DB_PREFIX . $table . ' VALUES ('.$fieldsSql['values'].')';
+      return $this->db->getLastId();
+    }
+  }
+
+  private function importProduct ($fields) {
+
+    if (!empty($fields['image'])) {
+      $fields['image'] = $this->downloadImage($fields['image']);
+    }
+
+    $fieldsSql = $this->fieldsToSQL($fields);
+
+    $kfData = $this->keyFieldData;
+    $key_value = $fields[$kfData['field']];
+
+    if (empty($key_value)) {
+      $this->log->write('[ERR] Empty key field [' . $kfData['field'] . '] value on [' . print_r($csv_row, true) . ']');
+      return;
+    }
+
+    $id = 0;
+
+    if (!empty($key_value)) {
+      $id = $this->db->query('SELECT IFNULL((SELECT product_id FROM ' . DB_PREFIX . 'product WHERE '.$kfData['field'].' LIKE "'.$this->db->escape($key_value).'"), 0) AS `id`')->row['id'];
+    }
+    else {
+      $this->log->write('[ERR] Product has empty key field [' . $kfData['field'] . ']!');
+      return 0;
+    }
+
+    if (!$this->checkBeforeInsert || $this->checkerValue === ($id > 0)) {
+      if ($this->updateExisting) {
+        $sql = 'UPDATE ' . DB_PREFIX . 'product SET ' . $fieldsSql['update'] . ' WHERE '.$kfData['field'].' LIKE "' . $this->db->escape($key_value) . '"';
+        $this->db->query($sql);
+
+        return $id;
+      }
+      if ($this->deleteMode) {
+        $sql = 'DELETE FROM ' . DB_PREFIX . 'product WHERE ' . $fieldsSql['update'] . ' LIKE "' . $this->db->escape($key_value) . '"';
+        $this->db->query($sql);
+
+        return $id;
+      }
+    }
+
+    /*
+      Insert new manufacturer
+    */
+    if ($this->insertNew) {
+      $sql = 'INSERT INTO `' . DB_PREFIX . 'product` (' . $fieldsSql['keys'] . ') VALUES (' . $fieldsSql['values'] . ')';
+
+      $this->db->query($sql);
+      return $this->db->getLastId();
+    }
+
+    var_dump($id);
+    die;
   }
 
   /*
