@@ -35,6 +35,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $data['token'] = $this->session->data['token'];
     $data['baseRoute'] = 'extension/module/foc_csv';
     $data['baseUrl'] = $this->url->link('');
+    $data['language'] = $this->language->get('code');
 
     $this->load->model('extension/module/foc_csv');
     $this->load->model('setting/store');
