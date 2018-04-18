@@ -3,7 +3,7 @@
     <template v-if="importingCsvProgress">
       <div class="panel panel-primary">
         <div class="panel-heading">
-          Импорт данных в процессе
+          {{ $t('Import in progress') }}
         </div>
         <div class="panel-body">
           <import-progress :progress="csvImportProgress"></import-progress>
@@ -13,40 +13,40 @@
     <div class="row">
       <div class="col-md-12">
         <div class="form-group text-right">
-          <button @click.prevent="submitImportData" class="btn btn-primary btn-lg"><i class="fa fa-rocket"></i> Погнали!</button>
+          <button @click.prevent="submitImportData" class="btn btn-primary btn-lg"><i class="fa fa-rocket"></i> {{ $t('Start import!') }}</button>
         </div>
       </div>
       <div class="col-md-4">
         <div class="panel panel-primary">
           <div class="panel-heading">
-            Основное
+            {{ $t('Main settings') }}
           </div>
           <div class="panel-body">
             <div class="form-group">
-              <label for="" class="label label-default">Профиль</label>
+              <label for="" class="label label-default">{{ $t('Profile') }}</label>
               <select v-model="currentProfileName" class="form-control">
                 <option v-for="(profile, idx) in profiles" :key="idx">{{ idx }}</option>
               </select>
             </div>
 
-            <button @click.prevent="savingProfile = true" class="btn btn-default"><i class="fa fa-save"></i> Сохранить профиль как</button>
+            <button @click.prevent="savingProfile = true" class="btn btn-default"><i class="fa fa-save"></i> {{ $t('Save profile as') }}</button>
 
             <div v-if="savingProfile" class="input-group">
               <input type="text" placeholder="Название профиля" ref="newProfileName" :value="currentProfileName" class="form-control">
               <span class="input-group-btn">
-                <button @click.prevent="saveNewProfile($refs.newProfileName.value)" class="btn btn-success"><i class="fa fa-check"></i> Сохранить профиль</button>
+                <button @click.prevent="saveNewProfile($refs.newProfileName.value)" class="btn btn-success"><i class="fa fa-check"></i> {{ $t('Save profile') }}</button>
               </span>
             </div>
 
             <div class="form-group">
-              <label for="" class="label label-default">Магазин</label>
+              <label for="" class="label label-default">{{ $t('Store') }}</label>
               <select v-model="store" class="form-control">
                 <option v-for="(store, idx) in stores" :key="idx" :value="store.id">{{ store.name }}</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="" class="label label-default">Язык</label>
+              <label for="" class="label label-default">{{ $t('Language') }}</label>
               <select v-model="language" class="form-control">
                 <option v-for="(lang, idx) in languages" :key="idx" :value="lang.id">{{ lang.name }}</option>
               </select>
@@ -56,49 +56,49 @@
 
         <div class="panel panel-primary">
           <div class="panel-heading">
-            Управление изображениями
+            {{ $t('Images settings') }}
           </div>
 
           <div class="panel-body">
             <div class="form-group">
-              <label class="label label-default">ZIP Архив картинок</label>
+              <label class="label label-default">{{ $t('Images ZIP file') }}</label>
               <images-zip-upload></images-zip-upload>
             </div>
 
             <div class="form-group">
               <label for="" class="label label-default">
-                Разделитель в поле изображений
+                {{ $t('Images list delimiter') }}
               </label>
               <input type="text" v-model="csvImageFieldDelimiter" class="form-control">
             </div>
 
             <div class="form-group">
               <label for="" class="label label-default">
-                Установить главное изображение из галереи в случае отсутствия
+                {{ $t('If no preview - set it from gallery') }}
               </label>
               <input type="checkbox" v-model="previewFromGallery" class="form-control">
             </div>
 
             <div class="form-group">
               <label for="" class="label label-default">
-                Удалить изображения из галереи перед импортом
+                {{ $t('Clear gallery before import') }}
               </label>
               <input type="checkbox" v-model="clearGalleryBeforeImport" class="form-control">
             </div>
 
             <div class="form-group">
               <label for="" class="label label-default">
-                Подкачивать картинки по URL
+                {{ $t('Download images with URL') }}
               </label>
 
               <input type="checkbox" v-model="downloadImages" class="form-control">
             </div>
 
             <div class="form-group">
-              <label for="" class="label label-default">Режим установки изображений</label>
+              <label for="" class="label label-default">{{ $t('Images import mode') }}</label>
               <select v-model="imagesImportMode" class="form-control">
-                <option value="add">Добавить загруженные</option>
-                <option value="skip">Не добавлять если галерея не пуста</option>
+                <option value="add">{{ $t('Add images') }}</option>
+                <option value="skip">{{ $t('Skip if gallery has images') }}</option>
               </select>
             </div>
           </div>
@@ -108,38 +108,38 @@
       <div class="col-md-5">
         <div class="panel panel-primary">
           <div class="panel-heading">
-            Управление полями
+            {{ $t('Fields settings') }}
           </div>
           <div class="panel-body">
 
             <div class="form-group">
-              <label for="" class="label label-default">CSV файл</label>
+              <label for="" class="label label-default">{{ $t('CSV file') }}</label>
               <csv-file-upload></csv-file-upload>
             </div>
 
             <div class="form-group">
-              <label for="" class="label label-default">Сколько обновлять записей за раз</label>
+              <label for="" class="label label-default">{{ $t('Process lines per query') }}</label>
               <input type="text" v-model="processAtStepNum" class="form-control">
             </div>
 
             <div class="form-group">
-              <label for="" class="label label-default">Пропустить первую строку</label>
+              <label for="" class="label label-default">{{ $t('Skip first line') }}</label>
               <input type="checkbox" v-model="skipFirstLine">
             </div>
 
             <div class="form-group">
-              <label for="" class="label label-danger">Ключевое поле (по нему идет сличение)</label>
+              <label for="" class="label label-danger">{{ $t('Key field') }}</label>
               <select v-model="keyField" class="form-control">
                 <option v-for="(field, idx) in keyFields" :key="idx">{{ field }}</option>
               </select>
             </div>
 
-            <label for="" class="label label-default">Сопоставление полей</label>
+            <label for="" class="label label-default">{{ $t('Fields matching') }}</label>
             <table class="table table-bordered table-striped">
               <thead>
                 <tr>
-                  <th>CSV Поле</th>
-                  <th>DB Поле</th>
+                  <th>{{ $t('CSV field') }}</th>
+                  <th>{{ $t('DB field') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -165,48 +165,48 @@
 
           <div class="panel-body">
             <div class="form-group">
-              <label for="" class="label label-default">Разделитель полей</label>
+              <label for="" class="label label-default">{{ $t('Field delimiter') }}</label>
               <input type="text" placeholder="Разделитель полей" v-model="csvFieldDelimiter" class="form-control">
             </div>
 
             <div class="form-group">
-              <label for="" class="label label-default">Кодировка</label>
+              <label for="" class="label label-default">{{ $t('Encoding') }}</label>
               <select v-model="encoding" class="form-control">
                 <option v-for="(encodingName, idx) in encodings" :key="idx" :value="encodingName">{{ encodingName }}</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="" class="label label-default">Удалить производителей перед импортом</label>
+              <label for="" class="label label-default">{{ $t('Clear manufacturers before import') }}</label>
               <input type="checkbox" class="form-control" v-model="removeManufacturersBeforeImport">
             </div>
 
             <div class="form-group">
-              <label for="" class="label label-default">Режим импорта</label>
+              <label for="" class="label label-default">{{ $t('Import mode') }}</label>
               <select v-model="importMode" class="form-control">
-                <option value="onlyUpdate">Только обновить существующие</option>
-                <option value="onlyAdd">Добавить как новые</option>
-                <option value="updateCreate">Обновить существующие и добавить новые</option>
-                <option value="addIfNotFound">Только добавить отсутствующие</option>
-                <option value="removeByList">Удалить совпавшие</option>
-                <option value="removeOthers">Удалить несовпавшие</option>
+                <option value="onlyUpdate">{{ $t('Only update existing') }}</option>
+                <option value="onlyAdd">{{ $t('Force add all as new') }}</option>
+                <option value="updateCreate">{{ $t('Update existing and add new') }}</option>
+                <option value="addIfNotFound">{{ $t('Only add missing as new') }}</option>
+                <option value="removeByList">{{ $t('Remove all matched') }}</option>
+                <option value="removeOthers">{{ $t('Remove all unmatched') }}</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="" class="label label-default">Разделитель вложенности категорий</label>
+              <label for="" class="label label-default">{{ $t('Category level delimiter') }}</label>
               <input type="text" v-model="categoryLevelDelimiter" class="form-control">
             </div>
             <div class="form-group">
-              <label for="" class="label label-default">Разделитель категорий</label>
+              <label for="" class="label label-default">{{ $t('Categories delimiter') }}</label>
               <input type="text" v-model="categoryDelimiter" class="form-control">
             </div>
             <div class="form-group">
-              <label for="" class="label label-default">Заполнить родительские категории</label>
+              <label for="" class="label label-default">{{ $t('Fill parent categories') }}</label>
               <input type="checkbox" v-model="fillParentCategories" class="form-control">
             </div>
             <div class="form-group">
-              <label for="" class="label label-default">Удалить символы из поля категорий</label>
+              <label for="" class="label label-default">{{ $t('Remove chars from category fields') }}</label>
               <input type="text" v-model="removeCharsFromCategory" class="form-control">
             </div>
 

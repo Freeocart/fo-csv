@@ -3,8 +3,8 @@
     <table class="table table-striped" v-if="statuses.length">
       <thead>
         <tr>
-          <th>Статус в Opencart</th>
-          <th>CSV Статус</th>
+          <th>{{ $t('Opencart status') }}</th>
+          <th>{{ $t('CSV status') }}</th>
         </tr>
       </thead>
       <tbody>
