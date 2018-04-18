@@ -48,7 +48,8 @@ class ModelExtensionModuleFocCsv extends Model {
       'storeId' => $this->config->get('config_store_id'),
       'languageId' => $this->config->get('language_id'),
       'statusRewrites' => array(),
-      'stockStatusRewrites' => array()
+      'stockStatusRewrites' => array(),
+      'downloadImages' => false
     );
   }
 
@@ -699,9 +700,21 @@ class ModelExtensionModuleFocCsv extends Model {
     Remove all manufacturers
   */
   public function clearManufacturers () {
+    $seo_url_table = 'url_alias';
+
+    if ($this->isOpencart3()) {
+      $seo_url_table = 'seo_url';
+    }
+
     $this->db->query("DELETE FROM " . DB_PREFIX . "manufacturer");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "manufacturer_to_store");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "url_alias WHERE query LIKE 'manufacturer_id=%'");
+    $this->db->query("DELETE FROM " . DB_PREFIX . $seo_url_table . " WHERE query LIKE 'manufacturer_id=%'")
+    ;
+  }
+
+  public function isOpencart3 () {
+    $version = (int)preg_replace('/\./', '', VERSION);
+    return $version > 2999;
   }
 
 }

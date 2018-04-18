@@ -5,6 +5,18 @@ class ControllerExtensionModuleFocCsv extends Controller {
   const CONFIG_PROFILES = 'fo_csv_profiles';
 
   public function install () {
+    // Remove unnecessary template version
+    $templatePath = DIR_APPLICATION . 'view/template/extension/module/';
+    $viewFile = 'foc_csv.twig';
+
+    if ($this->isOpencart3()) {
+      $viewFile = 'foc_csv.php';
+    }
+
+    if (is_file($templatePath . $viewFile)) {
+      unlink($templatePath . $viewFile);
+    }
+
     $this->load->model('extension/module/foc_csv');
     $this->model_extension_module_foc_csv->install();
   }
@@ -25,6 +37,23 @@ class ControllerExtensionModuleFocCsv extends Controller {
     die;
   }
 
+  private function getTokenName () {
+    $this->load->model('extension/module/foc_csv');
+
+    if ($this->model_extension_module_foc_csv->isOpencart3()) {
+      return 'user_token';
+    }
+    return 'token';
+  }
+
+  private function getToken () {
+    return $this->session->data[$this->getTokenName()];
+  }
+
+  private function createUrl ($path) {
+    return $this->url->link($path, $this->getTokenName() . '=' . $this->getToken(), 'ssl');
+  }
+
   public function index () {
     $data = array();
 
@@ -32,7 +61,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $this->document->setTitle($this->language->get('heading_title'));
     $data['heading_title'] = $this->language->get('heading_title');
 
-    $data['token'] = $this->session->data['token'];
+    $data['tokenName'] = $this->getTokenName();
+    $data['token'] = $this->getToken();
     $data['baseRoute'] = 'extension/module/foc_csv';
     $data['baseUrl'] = $this->url->link('');
     $data['language'] = $this->language->get('code');
@@ -192,7 +222,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
       $csv_file->seek(PHP_INT_MAX);
       $csv_total = $csv_file->ftell();
 
-      $import_url = $this->url->link('extension/module/foc_csv/importPart', 'token=' . $this->session->data['token'], 'ssl');
+      $import_url = $this->createUrl('extension/module/foc_csv/importPart');
+      //$this->url->link('extension/module/foc_csv/importPart', 'token=' . $this->session->data['token'], 'ssl');
 
       // remove manufacturers if necessary
       if (isset($profile['removeManufacturersBeforeImport']) && $profile['removeManufacturersBeforeImport']) {
@@ -280,17 +311,17 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
     $breadcrumbs[] = array(
 			'text'      => $this->language->get('text_home'),
-			'href'      => $this->url->link('common/home', 'token=' . $this->session->data['token'], 'SSL'),
+			'href'      => $this->createUrl('common/home'),//url->link('common/home', 'token=' . $this->session->data['token'], 'SSL'),
 			'separator' => false
     );
     $breadcrumbs[] = array(
       'text'      => $this->language->get('text_extension'),
-      'href'      => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL'),
+      'href'      => $this->createUrl('extension/extension'),//url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL'),
       'separator' => ' :: '
     );
 		$breadcrumbs[] = array(
 			'text'      => $this->language->get('heading_title'),
-			'href'      => $this->url->link('extension/module/foc_csv', 'token=' . $this->session->data['token'], 'SSL'),
+			'href'      => $this->createUrl('extension/module/foc_csv'), //url->link('extension/module/foc_csv', 'token=' . $this->session->data['token'], 'SSL'),
 			'separator' => ' :: '
     );
 
