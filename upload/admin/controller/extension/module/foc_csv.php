@@ -299,7 +299,12 @@ class ControllerExtensionModuleFocCsv extends Controller {
 			'text'      => $this->language->get('text_home'),
 			'href'      => $this->url->link('common/home', 'token=' . $this->session->data['token'], 'SSL'),
 			'separator' => false
-		);
+    );
+    $breadcrumbs[] = array(
+      'text'      => $this->language->get('text_extension'),
+      'href'      => $this->url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL'),
+      'separator' => ' :: '
+    );
 		$breadcrumbs[] = array(
 			'text'      => $this->language->get('heading_title'),
 			'href'      => $this->url->link('extension/module/foc_csv', 'token=' . $this->session->data['token'], 'SSL'),
