@@ -39,6 +39,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $this->load->model('extension/module/foc_csv');
     $this->load->model('setting/store');
     $this->load->model('localisation/language');
+    $this->load->model('localisation/stock_status');
 
     $data['breadcrumbs'] = $this->breadcrumbs();
 
@@ -66,6 +67,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
       'current' => true
     );
 
+    /* stores */
     $stores = $this->model_setting_store->getStores();
     foreach ($stores as $store) {
       $initial['stores'][] = array(
@@ -73,6 +75,28 @@ class ControllerExtensionModuleFocCsv extends Controller {
         'id'   => $store['store_id']
       );
     }
+
+    /* available statuses */
+    $initial['stock_statuses'] = array();
+    $statuses = $this->model_localisation_stock_status->getStockStatuses();
+
+    foreach ($statuses as $status) {
+      $initial['stock_statuses'][] = array(
+        'id' => $status['stock_status_id'],
+        'name' => $status['name']
+      );
+    }
+
+    $initial['statuses'] = array(
+      array(
+        'id' => 0,
+        'name' => 'Включен'
+      ),
+      array(
+        'id' => 1,
+        'name' => 'Выключен'
+      )
+    );
 
     $initial['languages'] = array();
     $languages = $this->model_localisation_language->getLanguages();
@@ -155,6 +179,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
       $importFile = $this->model_extension_module_foc_csv->getImportCsvFilePath($key);
       $imagesFile = $this->model_extension_module_foc_csv->getImportImagesZipPath($key);
 
+      $profile = json_decode($_POST['profile-json'], true);
+
       // цсвэшник - просто перемещаем
       if (isset($_FILES['csv-file'])) {
         move_uploaded_file($_FILES['csv-file']['tmp_name'], $importFile);
@@ -183,6 +209,11 @@ class ControllerExtensionModuleFocCsv extends Controller {
       $csv_total = $csv_file->ftell();
 
       $import_url = $this->url->link('extension/module/foc_csv/importPart', 'token=' . $this->session->data['token'], 'ssl');
+
+      // remove manufacturers if necessary
+      if (isset($profile['removeManufacturersBeforeImport']) && $profile['removeManufacturersBeforeImport']) {
+        $this->model_extension_module_foc_csv->clearManufacturers();
+      }
 
       // urlencode()
       // возвращаем данные на клиент и ожидаем запросы
@@ -238,7 +269,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
             }
             // import stuff..
             if (!$this->model_extension_module_foc_csv->import($profile, $line)) {
-              $this->sendFail();
+              // $this->sendFail();
             }
           }
 

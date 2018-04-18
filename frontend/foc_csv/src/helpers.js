@@ -97,7 +97,11 @@ const submitData = async function (url, { data, profile }) {
 
   request.append('profile-json', JSON.stringify(profile))
 
-  return axios.post(url, request)
+  return axios.post(url, request, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
 }
 
 const validateProfile = (profile) => {

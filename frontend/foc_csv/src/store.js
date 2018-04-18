@@ -23,7 +23,8 @@ let fields = genStoreFields([
   'previewFromGallery',
   'csvImageFieldDelimiter',
   'csvFieldDelimiter',
-  'removeCharsFromCategory'
+  'removeCharsFromCategory',
+  'removeManufacturersBeforeImport'
 ], 'profile')
 
 const DEFAULT_PROFILE_NAME = 'default'
@@ -35,7 +36,10 @@ const store = new Vuex.Store({
     },
     currentProfile: 'default',
     data: {},
-    profile: {}
+    profile: {
+      statusRewrites: {},
+      stockStatusRewrites: {}
+    }
   },
   actions: {
     setInitialData ({ commit }, data) {
@@ -70,11 +74,29 @@ const store = new Vuex.Store({
         alert('error on profile saving!')
       }
     },
+    setStockStatusRewriteRule ({ commit }, rule) {
+      commit('SET_STOCK_STATUS_REWRITE_RULE', rule)
+    },
+    setStatusRewriteRule ({ commit }, rule) {
+      commit('SET_STATUS_REWRITE_RULE', rule)
+    },
     ...fields.actions
   },
   mutations: {
     SET_INITIAL_DATA (state, initial) {
       Vue.set(state, 'data', initial.data)
+    },
+    SET_STOCK_STATUS_REWRITE_RULE (state, { value, id }) {
+      if (!state.profile.stockStatusRewrites) {
+        Vue.set(state.profile, 'stockStatusRewrites', {})
+      }
+      Vue.set(state.profile.stockStatusRewrites, id, value)
+    },
+    SET_STATUS_REWRITE_RULE (state, { value, id }) {
+      if (!state.profile.statusRewrites) {
+        Vue.set(state.profile, 'statusRewrites', {})
+      }
+      Vue.set(state.profile.statusRewrites, id, value)
     },
     SET_CURRENT_PROFILE (state, profile) {
       state.currentProfile = profile
@@ -143,6 +165,12 @@ const store = new Vuex.Store({
     },
     categoryDelimiter (state) {
       return state.profile.categoryDelimiter
+    },
+    statusRewrites (state) {
+      return state.profile.statusRewrites || {}
+    },
+    stockStatusRewrites (state) {
+      return state.profile.stockStatusRewrites || {}
     },
     submittableData (state) {
       return {

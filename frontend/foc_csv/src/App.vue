@@ -1,5 +1,6 @@
 <template>
   <div>
+    {{ appConfig }}
     <router-view/>
   </div>
 </template>

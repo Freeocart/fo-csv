@@ -51,6 +51,66 @@
                 <option v-for="(lang, idx) in languages" :key="idx" :value="lang.id">{{ lang.name }}</option>
               </select>
             </div>
+          </div>
+        </div>
+
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            Управление изображениями
+          </div>
+
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="label label-default">ZIP Архив картинок</label>
+              <images-zip-upload></images-zip-upload>
+            </div>
+
+            <div class="form-group">
+              <label for="" class="label label-default">
+                Разделитель в поле изображений
+              </label>
+              <input type="text" v-model="csvImageFieldDelimiter" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="" class="label label-default">
+                Установить главное изображение из галереи в случае отсутствия
+              </label>
+              <input type="checkbox" v-model="previewFromGallery" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="" class="label label-default">
+                Удалить изображения из галереи перед импортом
+              </label>
+              <input type="checkbox" v-model="clearGalleryBeforeImport" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="" class="label label-default">
+                Подкачивать картинки по URL
+              </label>
+
+              <input type="checkbox" v-model="downloadImages" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="" class="label label-default">Режим установки изображений</label>
+              <select v-model="imagesImportMode" class="form-control">
+                <option value="add">Добавить загруженные</option>
+                <option value="skip">Не добавлять если галерея не пуста</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-5">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            Управление полями
+          </div>
+          <div class="panel-body">
 
             <div class="form-group">
               <label for="" class="label label-default">CSV файл</label>
@@ -58,29 +118,20 @@
             </div>
 
             <div class="form-group">
-              <label for="" class="label label-default">Ключевое поле (по нему идет сличение)</label>
-              <select v-model="keyField" class="form-control">
-                <option v-for="(field, idx) in keyFields" :key="idx">{{ field }}</option>
-              </select>
-            </div>
-
-            <div class="form-group">
               <label for="" class="label label-default">Сколько обновлять записей за раз</label>
               <input type="text" v-model="processAtStepNum" class="form-control">
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div class="col-md-4">
-        <div class="panel panel-primary">
-          <div class="panel-heading">
-            Управление полями
-          </div>
-          <div class="panel-body">
             <div class="form-group">
               <label for="" class="label label-default">Пропустить первую строку</label>
               <input type="checkbox" v-model="skipFirstLine">
+            </div>
+
+            <div class="form-group">
+              <label for="" class="label label-danger">Ключевое поле (по нему идет сличение)</label>
+              <select v-model="keyField" class="form-control">
+                <option v-for="(field, idx) in keyFields" :key="idx">{{ field }}</option>
+              </select>
             </div>
 
             <label for="" class="label label-default">Сопоставление полей</label>
@@ -106,7 +157,7 @@
         </div>
       </div>
 
-      <div class="col-md-4">
+      <div class="col-md-3">
         <div class="panel panel-primary">
           <div class="panel-heading">
             Настройки сличения
@@ -123,6 +174,11 @@
               <select v-model="encoding" class="form-control">
                 <option v-for="(encodingName, idx) in encodings" :key="idx" :value="encodingName">{{ encodingName }}</option>
               </select>
+            </div>
+
+            <div class="form-group">
+              <label for="" class="label label-default">Удалить производителей перед импортом</label>
+              <input type="checkbox" class="form-control" v-model="removeManufacturersBeforeImport">
             </div>
 
             <div class="form-group">
@@ -154,52 +210,21 @@
               <input type="text" v-model="removeCharsFromCategory" class="form-control">
             </div>
 
-            <hr>
+            <!-- Статусы продукта -->
+            <status-rewrites
+              :statuses="$store.state.data.statuses"
+              :rules="$store.getters.statusRewrites"
+              @statusRewriteChange="setStatusRewriteRule($event)"
+            ></status-rewrites>
 
-            <h3>Управление изображениями</h3>
-
-            <div class="form-group">
-              <label class="label label-default">ZIP Архив картинок</label>
-              <images-zip-upload></images-zip-upload>
-            </div>
-
-            <div class="form-group">
-              <label for="" class="label label-default">
-                Разделитель в поле изображений
-              </label>
-              <input type="text" v-model="csvImageFieldDelimiter" class="form-control">
-            </div>
-
-            <div class="form-group">
-              <label for="" class="label label-default">
-                Установить главное изображение из галереи в случае отсутствия
-              </label>
-              <input type="checkbox" v-model="previewFromGallery" class="form-control">
-            </div>
-
-            <div class="form-group">
-              <label for="" class="label label-default">
-                Удалить изображения из галереи перед импортом
-              </label>
-              <input type="checkbox" v-model="clearGalleryBeforeImport" class="form-control">
-            </div>
-
-            <div class="form-group">
-              <label for="" class="label label-default">
-                Подкачивать картинки по URL (все ссылки начинающиеся на http/https)
-              </label>
-
-              <input type="checkbox" v-model="downloadImages" class="form-control">
-            </div>
-
-            <div class="form-group">
-              <label for="" class="label label-default">Режим установки изображений</label>
-              <select v-model="imagesImportMode" class="form-control">
-                <option value="add">Добавить загруженные</option>
-                <option value="skip">Не добавлять если галерея не пуста</option>
-              </select>
-            </div>
+            <!-- Статусы наличия -->
+            <status-rewrites
+              :statuses="$store.state.data.stock_statuses"
+              :rules="$store.getters.stockStatusRewrites"
+              @statusRewriteChange="setStockStatusRewriteRule($event)"
+            ></status-rewrites>
           </div>
+
         </div>
       </div>
     </div>
@@ -214,13 +239,15 @@ import DbFieldsSelect from '@/components/DbFieldsSelect'
 import CsvFileUpload from '@/components/CsvFileUpload'
 import ImagesZipUpload from '@/components/ImagesZipUpload'
 import ImportProgress from '@/components/ImportProgress'
+import StatusRewrites from '@/components/StatusRewrites'
 
 export default {
   components: {
     DbFieldsSelect,
     CsvFileUpload,
     ImagesZipUpload,
-    ImportProgress
+    ImportProgress,
+    StatusRewrites
   },
   data () {
     return {
@@ -263,10 +290,17 @@ export default {
       'store',
       'language',
       'fillParentCategories',
-      'removeCharsFromCategory'
+      'removeCharsFromCategory',
+      'removeManufacturersBeforeImport'
     ])
   },
   methods: {
+    setStatusRewriteRule (rule) {
+      this.$store.dispatch('setStatusRewriteRule', rule)
+    },
+    setStockStatusRewriteRule (rule) {
+      this.$store.dispatch('setStockStatusRewriteRule', rule)
+    },
     async submitImportPart ({ importUrl, key, position }) {
       try {
         let data = {
