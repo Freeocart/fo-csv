@@ -5,7 +5,7 @@ export default class UrlStore {
 
   actionUrl (action) {
     console.log(this._config)
-    return `${this._config.baseUrl}${this._config.baseRoute}/${action}&token=${this._config.token}`
+    return `${this._config.baseUrl}${this._config.baseRoute}/${action}&${this._config.tokenName}=${this._config.token}`
   }
 }
 
