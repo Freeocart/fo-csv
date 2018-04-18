@@ -3,8 +3,8 @@
     <table class="table table-striped" v-if="statuses.length">
       <thead>
         <tr>
-          <th>Статус</th>
-          <th>Rewrite</th>
+          <th>Статус в Opencart</th>
+          <th>CSV Статус</th>
         </tr>
       </thead>
       <tbody>
