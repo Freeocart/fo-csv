@@ -29,8 +29,8 @@ window.FOC_CSV_PARAMS = {
     'token': '<?php echo $token; ?>',
     'baseRoute': '<?php echo $baseRoute; ?>',
     'baseUrl': '<?php echo $baseUrl; ?>',
-    'language': '<?php echo $language; ?>'
   },
+  'language': '<?php echo $language; ?>',
   'initial' : {
     data: <?php echo $initial; ?>
   }
