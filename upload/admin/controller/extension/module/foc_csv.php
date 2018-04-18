@@ -56,11 +56,12 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $data['scripts'] = $this->document->getScripts('foc_csv_js');
 
     $initial = array();
-    $initial['profiles'] = $this->model_extension_module_foc_csv->loadProfiles(); //$this->config->get(self::CONFIG_PROFILES);
+    $initial['profiles'] = $this->model_extension_module_foc_csv->loadProfiles();
     $initial['keyFields'] = $this->model_extension_module_foc_csv->getKeyFields();
     $initial['encodings'] = array('UTF8', 'cp1251');
     $initial['dbFields'] = $this->model_extension_module_foc_csv->getDbFields();
 
+    /* stores */
     $initial['stores'] = array();
     $initial['stores'][] = array(
       'name' => $this->config->get('config_name'),
@@ -68,7 +69,6 @@ class ControllerExtensionModuleFocCsv extends Controller {
       'current' => true
     );
 
-    /* stores */
     $stores = $this->model_setting_store->getStores();
     foreach ($stores as $store) {
       $initial['stores'][] = array(
@@ -114,7 +114,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
   }
 
   /*
-    Загружает настройки профиля
+    Load profile settings from DB
   */
   public function loadProfile () {
     $this->load->model('extension/module/foc_csv');
@@ -132,23 +132,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
   }
 
   /*
-    Аплоадим CSV файл и отдаём его идентификатор
+    Save profile to DB
   */
-  public function uploadCsv () {
-    if ($this->request->server['REQUEST_METHOD'] == 'POST') {
-
-      var_dump($_FILES);
-      die;
-    }
-  }
-
-  /*
-    Читает инфу о CSV
-  */
-  public function csvFileInfo () {
-
-  }
-
   public function saveProfile () {
     if ($this->request->server['REQUEST_METHOD'] == 'POST') {
       $json = json_decode(file_get_contents('php://input'), true);
@@ -164,12 +149,10 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
       $this->sendFail();
     }
-
-    // var_dump($this->request->post);
   }
 
   /*
-    Выполняет импорт
+    Upload files and starting import
   */
   public function import () {
     if (!empty($_FILES) && isset($_POST['profile-json'])) {
@@ -228,7 +211,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
   }
 
   /*
-    Импортирует часть позиций
+    Import partition from CSV
   */
   public function importPart ($key = null, $position = null, $profile = null) {
     if ($key === null && $position === null && $profile === null) {

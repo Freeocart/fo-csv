@@ -592,29 +592,6 @@ class ModelExtensionModuleFocCsv extends Model {
   }
 
   /*
-    Product import helper
-  */
-  private function importProductSubtable ($table, $fields, $product_id = null) {
-    die('deprecated importProductSubtable');
-    // if ($product_id) {
-    //   $fields['product_id'] = $product_id;
-    // }
-
-    // $fieldsSql = $this->fieldsToSQL($fields);
-
-    // $id = (int)$this->db->query('SELECT IFNULL((SELECT product_id FROM ' . DB_PREFIX . $table . ' WHERE product_id LIKE "'.$this->db->escape($product_id).'"), 0) AS `id`')->row['id'];
-
-    // if ($id > 0) {
-    //   $this->db->query('UPDATE ' . DB_PREFIX . $table . ' SET ' . $fieldsSql['update'] . ' WHERE product_id LIKE ' . $this->db->escape($product_id));
-    //   return $id;
-    // }
-    // else {
-    //   $this->db->query('INSERT INTO ' . DB_PREFIX . $table . ' (' . $fieldsSql['keys'] . ') VALUES ('.$fieldsSql['values'].')');
-    //   return $this->db->getLastId();
-    // }
-  }
-
-  /*
     Import product fields
   */
   private function importProduct ($fields) {
@@ -664,7 +641,7 @@ class ModelExtensionModuleFocCsv extends Model {
     }
 
     /*
-      Insert new manufacturer
+      Insert new product
     */
     if ($this->insertNew) {
       return $this->model_catalog_product->addProduct($fields);
