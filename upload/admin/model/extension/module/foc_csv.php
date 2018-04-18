@@ -8,15 +8,8 @@ class ModelExtensionModuleFocCsv extends Model {
   private $imagesZipImportFileName = 'images.zip';
   private $imagesZipExtractPath = 'images';
   private $imageSavePath = 'catalog/import';
-
   private $tableFieldDelimiter = ':';
-
-  // import settings
   private $importMode = 'updateCreate';
-  // public $keyFieldData = array(
-  //   'table' => null,
-  //   'field' => null
-  // );
 
   public function __construct ($registry) {
     parent::__construct($registry);
@@ -112,7 +105,8 @@ class ModelExtensionModuleFocCsv extends Model {
     This functions helping generate data for database
   */
   private function productDescriptionTemplate ($data = array()) {
-    return array_replace(array(
+    $tableData = array();
+    $tableData[$this->language_id] = array_replace(array(
       'meta_title' => '',
       'tag' => '',
       'meta_description' => '',
@@ -120,14 +114,12 @@ class ModelExtensionModuleFocCsv extends Model {
       'language_id' => $this->language_id,
       'product_id' => $this->product_id
     ), $data);
+
+    return $tableData;
   }
 
   private function productToStoreTemplate () {
     return array($this->store_id);
-    // return array_replace(array(
-    //   'store_id' => $this->store_id,
-    //   'product_id' => $this->product_id
-    // ), $data);
   }
 
   private function productTemplate ($data = array()) {
@@ -319,6 +311,7 @@ class ModelExtensionModuleFocCsv extends Model {
       break;
       case 'onlyAdd':
         $this->checkBeforeInsert = false;
+        $this->updateExisting = false;
       break;
       case 'updateCreate':
         // default settings...
@@ -329,10 +322,14 @@ class ModelExtensionModuleFocCsv extends Model {
       break;
       case 'removeByList':
         $this->deleteMode = true;
+        $this->insertNew = false;
+        $this->updateExisting = false;
       break;
       case 'removeOthers':
         $this->checkerValue = false;
         $this->deleteMode = true;
+        $this->insertNew = false;
+        $this->updateExisting = false;
       break;
     }
 
@@ -389,8 +386,7 @@ class ModelExtensionModuleFocCsv extends Model {
 
     $productData = $this->productTemplate($tablesData[DB_PREFIX.'product']);
     $productData['manufacturer_id'] = $manufacturer_id;
-    $productData['product_description'] = array();
-    $productData['product_description'][$this->language_id] = $this->productDescriptionTemplate($tablesData[DB_PREFIX.'product_description']);
+    $productData['product_description'] = $this->productDescriptionTemplate($tablesData[DB_PREFIX.'product_description']);
 
     if (isset($profile['statusRewrites']) && in_array($productData['status'], $profile['statusRewrites'])) {
       $productData['status'] = array_search($productData['status'], $profile['statusRewrites']);
@@ -401,42 +397,35 @@ class ModelExtensionModuleFocCsv extends Model {
     }
 
     $productData['product_store'] = $this->productToStoreTemplate();
-    // var_dump($productData);die;
     $product_id = $this->importProduct($productData);
-// var_dump($product_id);
-    // die;
-    // var_dump($product_id);die;
+
     if (!$product_id) {
       return false;
     }
-    // $product_description_table = DB_PREFIX . 'product_description';
-    // if (isset($tablesData[$product_description_table])) {
-    //   $this->importProductSubtable('product_description', $this->productDescriptionTemplate($tablesData[$product_description_table]), $product_id);
-    // }
 
-    // $this->importProductSubtable('product_to_store', $this->productToStoreTemplate(), $product_id);
+    if (!$this->deleteMode) {
+      /* IMPORT IMAGES */
+      $setPreviewFromGallery = false;
+      $image = $this->db->query('SELECT `image` FROM '.DB_PREFIX.'product WHERE product_id = ' . (int)$product_id)->row['image'];
 
-    /* IMPORT IMAGES */
-    $setPreviewFromGallery = false;
-    $image = $this->db->query('SELECT `image` FROM '.DB_PREFIX.'product WHERE product_id = ' . (int)$product_id)->row['image'];
-
-    if (isset($profile['previewFromGallery']) && $profile['previewFromGallery'] && empty($image)) {
-      $setPreviewFromGallery = true;
-    }
-
-    $imagesImportMode = isset($profile['imagesImportMode']) ? $profile['imagesImportMode'] : 'add';
-    $skipImportGallery = false;
-
-    if ($imagesImportMode === 'skip') {
-      $skipImportGallery = $this->productGalleryNotEmpty($product_id);
-    }
-
-    if (!$skipImportGallery) {
-      if (isset($profile['clearGalleryBeforeImport']) && $profile['clearGalleryBeforeImport']) {
-        $this->db->query('DELETE FROM ' . DB_PREFIX . 'product_image WHERE product_id=' . (int)$product_id);
+      if (isset($profile['previewFromGallery']) && $profile['previewFromGallery'] && empty($image)) {
+        $setPreviewFromGallery = true;
       }
 
-      $this->importGallery($tablesData[DB_PREFIX . 'product_image'], $profile['csvImageFieldDelimiter'], $profile['downloadImages'], $setPreviewFromGallery, $product_id);
+      $imagesImportMode = isset($profile['imagesImportMode']) ? $profile['imagesImportMode'] : 'add';
+      $skipImportGallery = false;
+
+      if ($imagesImportMode === 'skip') {
+        $skipImportGallery = $this->productGalleryNotEmpty($product_id);
+      }
+
+      if (!$skipImportGallery) {
+        if (isset($profile['clearGalleryBeforeImport']) && $profile['clearGalleryBeforeImport']) {
+          $this->db->query('DELETE FROM ' . DB_PREFIX . 'product_image WHERE product_id=' . (int)$product_id);
+        }
+
+        $this->importGallery($tablesData[DB_PREFIX . 'product_image'], $profile['csvImageFieldDelimiter'], $profile['downloadImages'], $setPreviewFromGallery, $product_id);
+      }
     }
 
     /* IMPORT CATEGORIES */
@@ -451,15 +440,17 @@ class ModelExtensionModuleFocCsv extends Model {
       $this->db->query('DELETE FROM ' . DB_PREFIX . 'product_to_category WHERE product_id = ' . (int)$product_id);
     }
 
-    foreach ($category_ids as $path => $ids) {
-      if ($fillParentCategories) {
-        foreach ($ids as $category_id) {
+    if (!$this->deleteMode) {
+      foreach ($category_ids as $path => $ids) {
+        if ($fillParentCategories) {
+          foreach ($ids as $category_id) {
+            $this->bindProductToCategory($product_id, $category_id);
+          }
+        }
+        else {
+          $category_id = array_pop($ids);
           $this->bindProductToCategory($product_id, $category_id);
         }
-      }
-      else {
-        $category_id = array_pop($ids);
-        $this->bindProductToCategory($product_id, $category_id);
       }
     }
 
@@ -604,33 +595,23 @@ class ModelExtensionModuleFocCsv extends Model {
     Product import helper
   */
   private function importProductSubtable ($table, $fields, $product_id = null) {
-    if ($product_id) {
-      $fields['product_id'] = $product_id;
-    }
-
-    $fieldsSql = $this->fieldsToSQL($fields);
-
-    $id = (int)$this->db->query('SELECT IFNULL((SELECT product_id FROM ' . DB_PREFIX . $table . ' WHERE product_id LIKE "'.$this->db->escape($product_id).'"), 0) AS `id`')->row['id'];
-
-    if ($id > 0) {
-      $this->db->query('UPDATE ' . DB_PREFIX . $table . ' SET ' . $fieldsSql['update'] . ' WHERE product_id LIKE ' . $this->db->escape($product_id));
-      return $id;
-    }
-    else {
-      $this->db->query('INSERT INTO ' . DB_PREFIX . $table . ' (' . $fieldsSql['keys'] . ') VALUES ('.$fieldsSql['values'].')');
-      return $this->db->getLastId();
-    }
-  }
-
-  private function getIdFromKeyField ($keyField) {
-    // switch ($this->keyFieldData) {
-    //   'name':
-    //     break;
-    //   default:
-
-    //     break;
+    die('deprecated importProductSubtable');
+    // if ($product_id) {
+    //   $fields['product_id'] = $product_id;
     // }
 
+    // $fieldsSql = $this->fieldsToSQL($fields);
+
+    // $id = (int)$this->db->query('SELECT IFNULL((SELECT product_id FROM ' . DB_PREFIX . $table . ' WHERE product_id LIKE "'.$this->db->escape($product_id).'"), 0) AS `id`')->row['id'];
+
+    // if ($id > 0) {
+    //   $this->db->query('UPDATE ' . DB_PREFIX . $table . ' SET ' . $fieldsSql['update'] . ' WHERE product_id LIKE ' . $this->db->escape($product_id));
+    //   return $id;
+    // }
+    // else {
+    //   $this->db->query('INSERT INTO ' . DB_PREFIX . $table . ' (' . $fieldsSql['keys'] . ') VALUES ('.$fieldsSql['values'].')');
+    //   return $this->db->getLastId();
+    // }
   }
 
   /*
@@ -664,27 +645,20 @@ class ModelExtensionModuleFocCsv extends Model {
 
     $id = 0;
 
-    if (!empty($key_value)) {
-      $id = $this->db->query('SELECT IFNULL((SELECT product_id FROM ' . $key_table . ' WHERE ' . $key_field . ' LIKE "' . $this->db->escape($key_value).'"), 0) AS `id`')->row['id'];
+    if ($this->checkBeforeInsert && !empty($key_value)) {
+      @$id = $this->db->query('SELECT IFNULL((SELECT product_id FROM ' . $key_table . ' WHERE ' . $key_field . ' LIKE "' . $this->db->escape($key_value).'"), 0) AS `id`')->row['id'];
     }
     else {
       $this->log->write('[ERR] Product has empty key field [' . $key_field . ']!');
-      return 0;
     }
 
     if (!$this->checkBeforeInsert || $this->checkerValue === ($id > 0)) {
       if ($this->updateExisting) {
         $this->model_catalog_product->editProduct($id, $fields);
-
-        // $sql = 'UPDATE ' . DB_PREFIX . 'product SET ' . $fieldsSql['update'] . ' WHERE '.$kfData['field'].' LIKE "' . $this->db->escape($key_value) . '"';
-        // $this->db->query($sql);
         return $id;
       }
       if ($this->deleteMode) {
         $this->model_catalog_product->deleteProduct($id);
-        // $sql = 'DELETE FROM ' . DB_PREFIX . 'product WHERE ' . $fieldsSql['update'] . ' LIKE "' . $this->db->escape($key_value) . '"';
-        // $this->db->query($sql);
-
         return $id;
       }
     }
@@ -694,15 +668,7 @@ class ModelExtensionModuleFocCsv extends Model {
     */
     if ($this->insertNew) {
       return $this->model_catalog_product->addProduct($fields);
-      // $sql = 'INSERT INTO `' . DB_PREFIX . 'product` (' . $fieldsSql['keys'] . ') VALUES (' . $fieldsSql['values'] . ')';
-
-      // $this->db->query($sql);
-      // return $this->db->getLastId();
     }
-
-    // just for test
-    var_dump($id);
-    die;
   }
 
   /*
@@ -729,21 +695,15 @@ class ModelExtensionModuleFocCsv extends Model {
     */
     if (!$this->checkBeforeInsert || $this->checkerValue === ($id > 0)) {
       if ($this->updateExisting) {
-        // $sql = 'UPDATE ' . DB_PREFIX . 'manufacturer SET ' . $fieldsSql['update'] . ' WHERE name LIKE "' . $fields['name'] . '"';
-        // $this->db->query($sql);
-            // fix for editManufacturer
+        // fix for editManufacturer
         if (!isset($fields['keyword'])) {
           $fields['keyword'] = false;
         }
         $this->model_catalog_manufacturer->editManufacturer($id, $fields);
-
         return $id;
       }
       if ($this->deleteMode) {
-        // $sql = 'DELETE FROM ' . DB_PREFIX . 'manufacturer WHERE name LIKE "' . $fields['name'] . '"';
-        // $this->db->query($sql);
         $this->model_catalog_manufacturer->deleteManufacturer($id);
-
         return $id;
       }
     }
@@ -752,10 +712,6 @@ class ModelExtensionModuleFocCsv extends Model {
       Insert new manufacturer
     */
     if ($this->insertNew) {
-      // $sql = 'INSERT INTO `' . DB_PREFIX . 'manufacturer` (' . $fieldsSql['keys'] . ') VALUES (' . $fieldsSql['values'] . ')';
-
-      // $this->db->query($sql);
-      // return $this->db->getLastId();
       return $this->model_catalog_manufacturer->addManufacturer($fields);
     }
 
