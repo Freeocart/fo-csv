@@ -76,7 +76,7 @@ class ModelExtensionModuleFocCsv extends Model {
       DB_PREFIX . 'product:product_id',
       DB_PREFIX . 'product:sku',
       DB_PREFIX . 'product:model',
-      DB_PREFIX . 'product:name',
+      DB_PREFIX . 'product_description:name',
       DB_PREFIX . 'product:ean',
       DB_PREFIX . 'product:mpn',
       DB_PREFIX . 'product:jan',
@@ -296,7 +296,8 @@ class ModelExtensionModuleFocCsv extends Model {
   public function toggleKeyField ($table, $key) {
     $this->keyFieldData = array(
       'table' => $table,
-      'field'   => $key
+      'field'   => $key,
+      'attribute' => str_replace(DB_PREFIX, '', $table)
     );
   }
 
@@ -621,6 +622,17 @@ class ModelExtensionModuleFocCsv extends Model {
     }
   }
 
+  private function getIdFromKeyField ($keyField) {
+    // switch ($this->keyFieldData) {
+    //   'name':
+    //     break;
+    //   default:
+
+    //     break;
+    // }
+
+  }
+
   /*
     Import product fields
   */
@@ -631,21 +643,32 @@ class ModelExtensionModuleFocCsv extends Model {
       $fields['image'] = $this->downloadImage($fields['image']);
     }
 
-    $kfData = $this->keyFieldData;
-    $key_value = $fields[$kfData['field']];
+    $key_table = $this->keyFieldData['table'];
+    $key_field = $this->keyFieldData['field'];
+    $key_attribute = $this->keyFieldData['attribute'];
+    $key_value = null;
 
-    if (empty($key_value)) {
-      $this->log->write('[ERR] Empty key field [' . $kfData['field'] . '] value on [' . print_r($fields, true) . ']');
+    // key_field is in product table
+    if ($key_attribute === 'product') {
+      $key_value = $fields[$key_field];
+    }
+    // product_description for example
+    elseif (isset($fields[$key_attribute])) {
+      $key_value = $fields[$key_attribute][$this->language_id][$key_field];
+    }
+
+    if (is_null($key_value) || empty($key_value)) {
+      $this->log->write('[ERR] Empty key field [' . $key_field . '] value on [' . print_r($fields, true) . ']');
       return null;
     }
 
     $id = 0;
 
     if (!empty($key_value)) {
-      $id = $this->db->query('SELECT IFNULL((SELECT product_id FROM ' . DB_PREFIX . 'product WHERE '.$kfData['field'].' LIKE "'.$this->db->escape($key_value).'"), 0) AS `id`')->row['id'];
+      $id = $this->db->query('SELECT IFNULL((SELECT product_id FROM ' . $key_table . ' WHERE ' . $key_field . ' LIKE "' . $this->db->escape($key_value).'"), 0) AS `id`')->row['id'];
     }
     else {
-      $this->log->write('[ERR] Product has empty key field [' . $kfData['field'] . ']!');
+      $this->log->write('[ERR] Product has empty key field [' . $key_field . ']!');
       return 0;
     }
 
