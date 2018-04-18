@@ -160,7 +160,7 @@
       <div class="col-md-3">
         <div class="panel panel-primary">
           <div class="panel-heading">
-            Настройки сличения
+            {{ $t('Processing settings') }}
           </div>
 
           <div class="panel-body">

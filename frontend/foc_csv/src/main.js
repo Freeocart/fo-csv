@@ -25,7 +25,7 @@ if (validateAppConfig(AppConfig.requestConfig)) {
 
   store.dispatch('setInitialData', AppConfig.initial)
 
-  const language = AppConfig.language || 'ru'
+  const language = AppConfig.language || 'en'
 
   /* eslint-disable no-new */
   new Vue({

@@ -38,5 +38,6 @@
   "Fill parent categories": "Заполнить родительские категории",
   "Remove chars from category fields": "Удалить символы из поля категорий",
   "Opencart status": "Статус в Opencart",
-  "CSV status": "Статус в CSV"
+  "CSV status": "Статус в CSV",
+  "Processing settings": "Настройки обработки"
 }
