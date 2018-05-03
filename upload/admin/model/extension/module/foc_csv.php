@@ -1,5 +1,10 @@
 <?php
+/*
+  Model for FOC_CSV
 
+  TODO:
+    Refactor code (>900 loc is abnormal)
+*/
 class ModelExtensionModuleFocCsv extends Model {
 
   private $profiles_code = 'foc_csv';
@@ -11,6 +16,8 @@ class ModelExtensionModuleFocCsv extends Model {
   private $tableFieldDelimiter = ':';
   private $importMode = 'updateCreate';
 
+  private $attributeParsers = array();
+
   public function __construct ($registry) {
     parent::__construct($registry);
     $this->log = new Log('foc_csv.txt');
@@ -18,6 +25,28 @@ class ModelExtensionModuleFocCsv extends Model {
     if (!is_dir(DIR_IMAGE . $this->imageSavePath)) {
       mkdir(DIR_IMAGE . $this->imageSavePath, 0755, true);
     }
+
+    $this->language->load('extension/module/foc_attribute_parsers');
+
+    $this->attributeParsers['advantshop'] = array(
+      'title' => $this->language->get('parser_advantshop'),
+      'options' => array(
+        'keyvalue_delimiter' => array(
+          'title' => $this->language->get('parser_advantshop_keyvalue_delimiter'),
+          'default' => ':'
+        ),
+        'entries_delimiter' => array(
+          'title' => $this->language->get('parser_advantshop_entries_delimiter'),
+          'default' => ';'
+        )
+      )
+    );
+    /*
+      use this section to describe your attribute parsers via vq/ocmod
+      please see advantshop parser as reference
+    */
+    /* CUSTOM ATTRIBUTE PARSER DESCRIBE */
+
   }
 
   public function install () {
@@ -49,7 +78,9 @@ class ModelExtensionModuleFocCsv extends Model {
       'languageId' => $this->config->get('language_id'),
       'statusRewrites' => array(),
       'stockStatusRewrites' => array(),
-      'downloadImages' => false
+      'downloadImages' => false,
+      'attributeParser' => null,
+      'attributeParserData' => array()
     );
   }
 
@@ -200,6 +231,11 @@ class ModelExtensionModuleFocCsv extends Model {
     $this->saveProfiles($profiles);
   }
 
+  /* FILE MANIPULATION METHODS */
+
+  /*
+    Return path to file by key
+  */
   public function getImportCsvPath ($key) {
     return DIR_CACHE . $this->profiles_code . '/' . $key . '/import/';
   }
@@ -383,21 +419,52 @@ class ModelExtensionModuleFocCsv extends Model {
     // set manufacturer id to product fields
     $tablesData[DB_PREFIX . 'product']['manufacturer_id'] = $manufacturer_id;
 
+    /* IMPORT ATTRIBUTES */
+    $attributes = null;
+    $attributesIdx = isset($profile['attributesCSVField']) ? $profile['attributesCSVField'] : null;
+
+    if ($attributesIdx) {
+      $attributes = $this->parseAttributes($profile, $csv_row[$attributesIdx]);
+    }
+
     /* IMPORT PRODUCTS */
 
     $productData = $this->productTemplate($tablesData[DB_PREFIX.'product']);
     $productData['manufacturer_id'] = $manufacturer_id;
     $productData['product_description'] = $this->productDescriptionTemplate($tablesData[DB_PREFIX.'product_description']);
 
+    // set attributes to product bindings
+    if ($attributes) {
+      $productData['product_attribute'] = array();
+
+      foreach ($attributes as $attribute) {
+        $productAttribute = array(
+          'attribute_id' => $attribute['attribute_id'],
+          'product_attribute_description' => array()
+        );
+
+        $productAttribute['product_attribute_description'][$this->language_id] = array(
+          'text' => $attribute['value']
+        );
+        $productData['product_attribute'][] = $productAttribute;
+      }
+    }
+
+    // status rewrites processing
     if (isset($profile['statusRewrites']) && in_array($productData['status'], $profile['statusRewrites'])) {
       $productData['status'] = array_search($productData['status'], $profile['statusRewrites']);
     }
 
+    // stock_status rewrites processing
     if (isset($profile['stockStatusRewrites']) && in_array($productData['stock_status_id'], $profile['stockStatusRewrites'])) {
       $productData['stock_status_id'] = array_search($productData['stock_status_id'], $profile['stockStatusRewrites']);
     }
 
     $productData['product_store'] = $this->productToStoreTemplate();
+
+    /*
+      Import the product data
+    */
     $product_id = $this->importProduct($productData);
 
     if (!$product_id) {
@@ -458,6 +525,7 @@ class ModelExtensionModuleFocCsv extends Model {
     return true;
   }
 
+  /* CATEGORIES CODE */
   /*
     Bind product to category
   */
@@ -518,6 +586,8 @@ class ModelExtensionModuleFocCsv extends Model {
     return $result;
   }
 
+  /* IMAGES IMPORT CODE */
+
   /*
     Imports gallery to DB
   */
@@ -554,7 +624,6 @@ class ModelExtensionModuleFocCsv extends Model {
 
     return $count > 0;
   }
-
 
   /*
     Check if url is url:)
@@ -649,6 +718,8 @@ class ModelExtensionModuleFocCsv extends Model {
     }
   }
 
+  /* MANUFACTURER METHODS */
+
   /*
     Update existing manufacturer or create new
   */
@@ -712,6 +783,203 @@ class ModelExtensionModuleFocCsv extends Model {
     ;
   }
 
+  /* ATTRIBUTE PARSERS METHODS */
+
+  /*
+    Parser list getter
+  */
+  public function getAttributeParsers () {
+    return $this->attributeParsers;
+  }
+
+  /*
+    Shortcut to create and check parser method name
+  */
+  private function getParserMethodName ($name) {
+    $method = 'parser_' . $name;
+    if (method_exists($this, $method)) {
+      return $method;
+    }
+
+    return false;
+  }
+
+  /*
+    Insert or update and return attribute_group id by name
+  */
+  private function createOrUpdateAttributeGroup ($name) {
+    $this->load->model('catalog/attribute_group');
+
+    $id = $this->db->query('SELECT IFNULL((SELECT attribute_group_id FROM ' . DB_PREFIX . 'attribute_group_description WHERE `name` LIKE ' . $this->db->escape($name) . ' LIMIT 1), 0) AS id')->row['id'];
+
+    $data = array(
+      'sort_order' => 0,
+      'attribute_group_description' => array()
+    );
+    $data['attribute_group_description'][$this->language_id] = array(
+      'name' => $name
+    );
+
+    if (!$id) {
+      $id = $this->model_catalog_attribute_group->addAttributeGroup($data);
+    }
+    else {
+      $this->model_catalog_attribute_group->editAttributeGroup($id, $data);
+    }
+
+    return $id;
+  }
+
+  /*
+    Insert or update attribute and return id by attribute obj
+    [
+      group => ATTRIBUTE_GROUP_ID,
+      name  => ATTRIBUTE_NAME
+    ]
+  */
+  private function createOrUpdateAttribute ($attribute) {
+    $this->load->model('catalog/attribute');
+
+    $id = $this->db->query('SELECT IFNULL((SELECT attribute_id FROM ' . DB_PREFIX . 'attribute_description WHERE `name` LIKE "' . $this->db->escape($attribute['name']) . '" LIMIT 1), 0) AS id')->row['id'];
+
+    $data = array(
+      'attribute_group_id' => $attribute['group'],
+      'sort_order' => 0,
+      'attribute_description' => array()
+    );
+
+    $data['attribute_description'][$this->language_id] = array(
+      'name' => $attribute['name']
+    );
+
+    if (!$id) {
+      $id = $this->model_catalog_attribute->addAttribute($data);
+    }
+    else {
+      $this->model_catalog_attribute->editAttribute($id, $data);
+    }
+
+    return $id;
+  }
+
+  /*
+    Create options list, fill default values and validate
+  */
+  private function normalizeParser ($parser) {
+    $valid = false;
+    $parserMethod = false;
+
+    if (isset($parser['name'])
+        && isset($parser['defaultGroup'])
+        && isset($this->attributeParsers[$parser['name']])
+    ) {
+      $parserMethod = $this->getParserMethodName($parser['name']);
+
+      if ($parserMethod) {
+        $parserDescription = $this->attributeParsers[$parser['name']];
+
+        if (!empty($parserDescription['options']) && !empty($parser['options'])) {
+          foreach ($parserDescription['options'] as $name => $option) {
+            if (isset($parser['options'][$name]) && !empty($parser['options'][$name])) {
+              $valid = true;
+              continue;
+            }
+            elseif (isset($option['default'])) {
+              $parser['options'][$name] = $option['default'];
+              $valid = true;
+            }
+            else {
+              $this->log->write('[OPTION_ERROR] (' . $name . ') is not presented!');
+
+              $valid = false;
+            }
+          }
+        }
+        else {
+          $parser['options'] = array();
+        }
+      }
+    }
+
+    return array(
+      $valid,
+      $parser,
+      $parserMethod
+    );
+  }
+
+  /*
+    Call selected attribute parser and prepare data
+  */
+  public function parseAttributes ($profile, $atts) {
+    $result = array();
+
+    if (isset($profile['attributeParser'])) {
+
+      $parser = $profile['attributeParser'];
+      $parserOptions = isset($profile['attributeParserData'][$parser]) ? $profile['attributeParserData'][$parser] : array();
+
+      $parserObj = array(
+        'name' => $parser,
+        'options' => $parserOptions,
+        'defaultGroup'=> $profile['defaultAttributesGroup']
+      );
+
+      list ($valid, $parser, $parserMethod) = $this->normalizeParser($parserObj);
+
+      if ($valid && $parserMethod) {
+        $attributes = $this->{$parserMethod}($parser, $atts);
+        foreach ($attributes as $key => $attribute) {
+          $attributes[$key]['attribute_id'] = $this->createOrUpdateAttribute($attribute);
+        }
+        return $attributes;
+      }
+    }
+
+    return $result;
+  }
+
+  /*
+    Advantshop attributes format parser
+  */
+  private function parser_advantshop ($parser, $atts) {
+    $result = array();
+
+    if (trim($atts) !== ''
+        && isset($parser['options'])
+        && !empty($parser['options'])
+        && isset($parser['defaultGroup'])
+    ) {
+      $options = $parser['options'];
+
+      $keyValueDelimiter = $options['keyvalue_delimiter'];
+      $entriesDelimiter = $options['entries_delimiter'];
+
+      $entries = array_filter(explode($entriesDelimiter, $atts));
+
+      $group_id = $this->createOrUpdateAttributeGroup($parser['defaultGroup']);
+
+      $result = array();
+
+      foreach ($entries as $entry) {
+        list ($key, $value) = explode($keyValueDelimiter, $entry);
+        $result[] = array(
+          'name' => $key,
+          'value' => $value,
+          'group' => $group_id
+        );
+      }
+    }
+
+    return $result;
+  }
+  /* CUSTOM ATTRIBUTE PARSERS */
+
+  /* END CUSTOM ATTRIBUTE PARSERS */
+
+  /*
+    Just OC version checker used to provide forward/backward compatibility
+  */
   public function isOpencart3 () {
     $version = (int)preg_replace('/\./', '', VERSION);
     return $version > 2999;

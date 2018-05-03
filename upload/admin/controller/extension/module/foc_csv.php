@@ -138,6 +138,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
       );
     }
 
+    $initial['attributeParsers'] = $this->model_extension_module_foc_csv->getAttributeParsers();
+
     $data['initial'] = json_encode($initial);
 
     return $this->response->setOutput($this->load->view('extension/module/foc_csv', $data));
