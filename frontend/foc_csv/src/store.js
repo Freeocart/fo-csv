@@ -4,6 +4,8 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import { genStoreFields } from '@/helpers'
 
+import { SAVE_PROFILE_URL } from '@/urls'
+
 Vue.use(Vuex)
 
 let fields = genStoreFields([
@@ -65,7 +67,7 @@ const store = new Vuex.Store({
     },
     async saveNewProfile ({ commit, state }, name) {
       try {
-        await axios.post(this.actionUrl('saveProfile'), {
+        await axios.post(this.actionUrl(SAVE_PROFILE_URL), {
           name,
           profile: state.profile
         })
