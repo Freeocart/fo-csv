@@ -199,7 +199,29 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
       // цсвэшник - просто перемещаем
       if (isset($_FILES['csv-file'])) {
-        move_uploaded_file($_FILES['csv-file']['tmp_name'], $importFile);
+
+        $charset = strtolower($this->model_extension_module_foc_csv->getDBCharset());
+        $encoding = strtolower($profile['encoding']);
+
+        // try change file encoding
+        if ($charset !== $encoding) {
+          if (!function_exists('iconv')) {
+            $this->sendFail('Please install iconv or convert csv file to [' . $charset . ']');
+          }
+
+          $src = fopen($_FILES['csv-file']['tmp_name'], 'r');
+          $out = fopen($importFile, 'w');
+
+          while ($line = fgets($src)) {
+            fwrite($out, iconv($encoding, $charset, $line));
+          }
+
+          fclose($src);
+          fclose($out);
+        }
+        else {
+          move_uploaded_file($_FILES['csv-file']['tmp_name'], $importFile);
+        }
       }
       // архив картинок - перемещаем и распаковываем
       if (isset($_FILES['images-zip'])) {

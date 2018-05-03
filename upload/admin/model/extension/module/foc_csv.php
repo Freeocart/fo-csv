@@ -978,6 +978,13 @@ class ModelExtensionModuleFocCsv extends Model {
   /* END CUSTOM ATTRIBUTE PARSERS */
 
   /*
+    Get database charset
+  */
+  public function getDBCharset () {
+    return $this->db->query('SELECT @@character_set_database AS `charset`')->row['charset'];
+  }
+
+  /*
     Just OC version checker used to provide forward/backward compatibility
   */
   public function isOpencart3 () {
