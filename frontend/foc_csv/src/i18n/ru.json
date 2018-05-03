@@ -7,6 +7,7 @@
   "Save profile": "Сохранить профиль как",
   "Store": "Магазин",
   "Language": "Язык",
+  "Encoding": "Кодировка",
   "Images settings": "Настройки изображений",
   "Images ZIP file": "ZIP Архив картинок",
   "Images list delimiter": "Разделитель в поле изображений",
@@ -40,5 +41,8 @@
   "Opencart status": "Статус в Opencart",
   "CSV status": "Статус в CSV",
   "Processing settings": "Настройки обработки",
-  "Default attributes group": "Группа по умолчанию для атрибутов"
+  "Default attributes group": "Группа по умолчанию для атрибутов",
+  "Attributes import": "Импорт атрибутов",
+  "Attributes field": "Поле для извлечения атрибутов",
+  "Attributes parser": "Парсер атрибутов"
 }
