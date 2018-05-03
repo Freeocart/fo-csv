@@ -12,7 +12,7 @@
   <div class="form-group">
     <label for="" class="label label-default">{{ $t('Attributes parser') }}</label>
     <select class="form-control" v-model="currentAttributeParser">
-      <option :value="null">NULL</option>
+      <option :value="null">{{ $t('Not selected') }}</option>
       <option v-for="(parser, key, idx) in $store.getters.attributeParsers" :key="idx" :value="key">
         {{ parser.title }}
       </option>
