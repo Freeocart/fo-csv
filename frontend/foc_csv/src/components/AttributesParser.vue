@@ -57,7 +57,6 @@ export default {
       'attributesCSVField'
     ]),
     attributesGroupUrl () {
-      console.log(this.$store.actionUrl(ATTRIBUTES_GROUP_AUTOCOMPLETE_URL))
       return this.$store.actionUrl(ATTRIBUTES_GROUP_AUTOCOMPLETE_URL)
     },
     currentAttributeParser: {
