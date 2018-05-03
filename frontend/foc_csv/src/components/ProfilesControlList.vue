@@ -1,5 +1,6 @@
 <template>
   <div>
+    <label class="label label-default">{{ $t('Profile control') }}</label>
     <table class="table table-bordered">
       <tbody>
         <tr v-for="(profile, name, idx) in $store.state.data.profiles" :key="idx">
