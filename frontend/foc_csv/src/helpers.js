@@ -1,4 +1,3 @@
-import axios from 'axios'
 import Vue from 'vue'
 
 /*
@@ -97,7 +96,7 @@ const submitData = async function (url, { data, profile }) {
 
   request.append('profile-json', JSON.stringify(profile))
 
-  return axios.post(url, request, {
+  return Vue.http.post(url, request, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }

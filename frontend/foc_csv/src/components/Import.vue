@@ -246,7 +246,8 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import { submitData, validateProfile, mapVuexModels } from '@/helpers'
-import axios from 'axios'
+import { IMPORT_URL } from '@/urls'
+
 import DbFieldsSelect from '@/components/DbFieldsSelect'
 import CsvFileUpload from '@/components/CsvFileUpload'
 import ImagesZipUpload from '@/components/ImagesZipUpload'
@@ -322,7 +323,7 @@ export default {
           position,
           profile: this.$store.getters.profile
         }
-        let response = await axios.post(decodeURIComponent(importUrl), data)
+        let response = await this.$http.post(decodeURIComponent(importUrl), data)
 
         position = response.data.message.position
         this.csvImportProgress.current = position
@@ -343,7 +344,7 @@ export default {
 
       if (validateProfile(data.profile)) {
         try {
-          let response = await submitData(this.$store.actionUrl('import'), data)
+          let response = await submitData(this.$store.actionUrl(IMPORT_URL), data)
 
           if (response.data.status === 'ok') {
             this.csvImportProgress.total = response.data.message.csvTotal
