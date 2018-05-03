@@ -330,6 +330,23 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $this->sendFail();
   }
 
+  /*
+    Autocomplete to choose attributes default group
+  */
+  public function attributesGroupAutocomplete () {
+    $this->load->model('catalog/attribute_group');
+    $groups = $this->model_catalog_attribute_group->getAttributeGroups();
+    $response = array();
+    foreach ($groups as $group) {
+      $response[] = array(
+        'name' => $group['name']
+      );
+    }
+
+    echo json_encode($response);
+    die;
+  }
+
   private function breadcrumbs () {
     $breadcrumbs = array();
 

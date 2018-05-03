@@ -978,6 +978,18 @@ class ModelExtensionModuleFocCsv extends Model {
   /* END CUSTOM ATTRIBUTE PARSERS */
 
   /*
+    Find attribute groups by name (fuzzy)
+  */
+  public function findGroups ($name) {
+    $sql = "SELECT * FROM " . DB_PREFIX . "attribute_group ag LEFT JOIN " . DB_PREFIX . "attribute_group_description agd ON (ag.attribute_group_id = agd.attribute_group_id) WHERE agd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND agd.name LIKE '" . $this->db->escape($name) . "%' LIMIT 10";
+
+    $query = $this->db->query($sql);
+
+    return $query->rows;
+
+  }
+
+  /*
     Get database charset
   */
   public function getDBCharset () {
