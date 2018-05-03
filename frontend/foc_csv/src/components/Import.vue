@@ -103,6 +103,18 @@
             </div>
           </div>
         </div>
+
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            {{ $t('Attributes import') }}
+          </div>
+
+          <div class="panel-body">
+
+            <attributes-parser></attributes-parser>
+
+          </div>
+        </div>
       </div>
 
       <div class="col-md-5">
@@ -240,6 +252,7 @@ import CsvFileUpload from '@/components/CsvFileUpload'
 import ImagesZipUpload from '@/components/ImagesZipUpload'
 import ImportProgress from '@/components/ImportProgress'
 import StatusRewrites from '@/components/StatusRewrites'
+import AttributesParser from '@/components/AttributesParser'
 
 export default {
   components: {
@@ -247,7 +260,8 @@ export default {
     CsvFileUpload,
     ImagesZipUpload,
     ImportProgress,
-    StatusRewrites
+    StatusRewrites,
+    AttributesParser
   },
   data () {
     return {

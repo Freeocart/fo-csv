@@ -39,5 +39,6 @@
   "Remove chars from category fields": "Удалить символы из поля категорий",
   "Opencart status": "Статус в Opencart",
   "CSV status": "Статус в CSV",
-  "Processing settings": "Настройки обработки"
+  "Processing settings": "Настройки обработки",
+  "Default attributes group": "Группа по умолчанию для атрибутов"
 }

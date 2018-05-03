@@ -24,7 +24,9 @@ let fields = genStoreFields([
   'csvImageFieldDelimiter',
   'csvFieldDelimiter',
   'removeCharsFromCategory',
-  'removeManufacturersBeforeImport'
+  'removeManufacturersBeforeImport',
+  'defaultAttributesGroup',
+  'attributesCSVField'
 ], 'profile')
 
 const DEFAULT_PROFILE_NAME = 'default'
@@ -80,6 +82,12 @@ const store = new Vuex.Store({
     setStatusRewriteRule ({ commit }, rule) {
       commit('SET_STATUS_REWRITE_RULE', rule)
     },
+    setAttributeParser ({ commit }, parser) {
+      commit('SET_ATTRIBUTE_PARSER', parser)
+    },
+    setAttributeParserData ({ commit }, data) {
+      commit('SET_ATTRIBUTE_PARSER_DATA', data)
+    },
     ...fields.actions
   },
   mutations: {
@@ -124,6 +132,33 @@ const store = new Vuex.Store({
     SET_IMAGES_ZIP_FILE_REF (state, ref) {
       Vue.set(state.data, 'imagesZipFileRef', ref)
     },
+    SET_ATTRIBUTE_PARSER (state, parser) {
+      Vue.set(state.profile, 'attributeParser', parser)
+
+      if (!parser) {
+        return
+      }
+
+      if (!state.profile.attributeParserData || !state.profile.attributeParserData[parser]) {
+        Vue.set(state.profile, 'attributeParserData', {
+          [parser]: {}
+        })
+      }
+
+      let parserObj = state.data.attributeParsers[parser]
+
+      if (parserObj.options) {
+        for (let key in parserObj.options) {
+          if (!state.profile.attributeParserData[parser][key] && parserObj.options[key].default) {
+            Vue.set(state.profile.attributeParserData[parser], key, parserObj.options[key].default)
+          }
+        }
+      }
+    },
+    SET_ATTRIBUTE_PARSER_DATA (state, [ key, value ]) {
+      let parser = state.profile.attributeParser
+      Vue.set(state.profile.attributeParserData[parser], key, value)
+    },
     ...fields.mutations
   },
   getters: {
@@ -147,6 +182,29 @@ const store = new Vuex.Store({
     },
     stores (state) {
       return state.data.stores
+    },
+    attributeParsers (state) {
+      return state.data.attributeParsers
+    },
+    currentAttributeParser (state) {
+      return state.profile.attributeParser
+    },
+    attributeParserOptions (state) {
+      let parser = state.profile.attributeParser
+
+      if (!parser || !state.data.attributeParsers[parser]) {
+        return []
+      }
+
+      if (state.data.attributeParsers[parser].options) {
+        return state.data.attributeParsers[parser].options
+      }
+
+      return []
+    },
+    attributeParserOptionData (state) {
+      let parser = state.profile.attributeParser
+      return state.profile.attributeParserData[parser] || []
     },
     currentProfileName (state) {
       return state.currentProfile
