@@ -1,6 +1,6 @@
 <?php
-$_['parser_advantshop'] = 'Атрибуты в формате Advantshop';
-$_['parser_advantshop_keyvalue_delimiter'] = 'Символ разделитель ключей и значений';
-$_['parser_advantshop_entries_delimiter'] = 'Символ разделитель атрибутов';
+$_['parser_advantshop'] = 'Advantshop attributes format';
+$_['parser_advantshop_keyvalue_delimiter'] = 'Key/value delimiter';
+$_['parser_advantshop_entries_delimiter'] = 'Entries delimiter';
 
 /* CUSTOM PARSER */
