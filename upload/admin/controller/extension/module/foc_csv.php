@@ -183,6 +183,23 @@ class ControllerExtensionModuleFocCsv extends Controller {
     }
   }
 
+  public function saveProfiles () {
+    if ($this->request->server['REQUEST_METHOD'] == 'POST') {
+      $json = json_decode(file_get_contents('php://input'), true);
+
+      if (isset($json['profiles'])) {
+        $this->load->model('extension/module/foc_csv');
+        $this->model_extension_module_foc_csv->saveProfiles($json['profiles']);
+      }
+
+      $profiles = $this->model_extension_module_foc_csv->loadProfiles();
+
+      $this->sendOk(json_encode($profiles));
+    }
+
+    $this->sendFail();
+  }
+
   /*
     Upload files and starting import
   */
