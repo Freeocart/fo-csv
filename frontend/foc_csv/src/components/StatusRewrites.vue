@@ -37,9 +37,6 @@ export default {
     setRewriteRule (data) {
       this.$emit('statusRewriteChange', data)
     }
-  },
-  created () {
-    console.log(this.statuses, this.rules)
   }
 }
 </script>

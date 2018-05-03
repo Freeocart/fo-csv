@@ -29,15 +29,26 @@
 
   <div class="form-group">
     <label class="label label-default">{{ $t('Default attributes group') }}</label>
-    <input type="text" class="form-control" v-model="defaultAttributesGroup">
+    <autocomplete
+      :url="attributesGroupUrl"
+      requestType="get"
+      input-class="form-control"
+      v-model="defaultAttributesGroup"
+    >
+    </autocomplete>
   </div>
 </div>
 </template>
 
 <script>
 import { mapVuexModels } from '@/helpers'
+import Autocomplete from 'autocomplete-vue'
+import { ATTRIBUTES_GROUP_AUTOCOMPLETE_URL } from '@/urls'
 
 export default {
+  components: {
+    Autocomplete
+  },
   computed: {
     ...mapVuexModels([
       'attributeParser',
@@ -45,6 +56,10 @@ export default {
       'defaultAttributesGroup',
       'attributesCSVField'
     ]),
+    attributesGroupUrl () {
+      console.log(this.$store.actionUrl(ATTRIBUTES_GROUP_AUTOCOMPLETE_URL))
+      return this.$store.actionUrl(ATTRIBUTES_GROUP_AUTOCOMPLETE_URL)
+    },
     currentAttributeParser: {
       get () {
         return this.$store.getters.currentAttributeParser

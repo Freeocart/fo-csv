@@ -1,6 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
+import resource from 'vue-resource'
 import App from './App'
 import router from './router'
 import i18n from './i18n'
@@ -10,7 +11,8 @@ import UrlStore from './url-store'
 
 import { validateAppConfig } from './helpers'
 
-Vue.config.productionTip = false
+Vue.use(resource)
+Vue.config.productionTip = true
 
 // let AppConfig = require('./test.json')
 let AppConfig = {}

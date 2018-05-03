@@ -1,3 +1,5 @@
-export default {
+const ATTRIBUTES_GROUP_AUTOCOMPLETE_URL = 'attributesGroupAutocomplete'
 
+export {
+  ATTRIBUTES_GROUP_AUTOCOMPLETE_URL
 }
