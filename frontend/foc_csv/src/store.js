@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 import { genStoreFields } from '@/helpers'
 
-import { SAVE_PROFILE_URL } from '@/urls'
+import { SAVE_PROFILE_URL, SAVE_ALL_PROFILES_URL } from '@/urls'
 
 Vue.use(Vuex)
 
@@ -72,10 +72,15 @@ const store = new Vuex.Store({
         })
 
         commit('SAVE_NEW_PROFILE', name)
+        commit('SET_CURRENT_PROFILE', name)
       }
       catch (e) {
         alert('error on profile saving!')
       }
+    },
+    applyProfile ({ commit }, { name, profile }) {
+      commit('ADD_PROFILE', { name, profile })
+      commit('SET_CURRENT_PROFILE', name)
     },
     setStockStatusRewriteRule ({ commit }, rule) {
       commit('SET_STOCK_STATUS_REWRITE_RULE', rule)
@@ -88,6 +93,16 @@ const store = new Vuex.Store({
     },
     setAttributeParserData ({ commit }, data) {
       commit('SET_ATTRIBUTE_PARSER_DATA', data)
+    },
+    async saveAllProfiles ({ commit }, profiles) {
+      await Vue.http.post(this.actionUrl(SAVE_ALL_PROFILES_URL), {
+        profiles
+      })
+      commit('CLEAR_ALL_PROFILES')
+      commit('SET_PROFILES', profiles)
+    },
+    deleteProfile ({ commit, getters }, name) {
+      commit('DELETE_PROFILE', name)
     },
     ...fields.actions
   },
@@ -110,6 +125,15 @@ const store = new Vuex.Store({
     SET_CURRENT_PROFILE (state, profile) {
       state.currentProfile = profile
       state.profile = this.getters.currentProfile
+    },
+    CLEAR_ALL_PROFILES (state) {
+      Vue.set(state.data, 'profiles', {})
+    },
+    SET_PROFILES (state, profiles) {
+      Vue.set(state.data, 'profiles', profiles)
+    },
+    ADD_PROFILE (state, { name, profile }) {
+      Vue.set(state.data.profiles, name, profile)
     },
     SET_PROCESS_AT_STEP_NUM (state, num) {
       Vue.set(state.profile, 'processAtStepNum', num)
@@ -159,6 +183,11 @@ const store = new Vuex.Store({
     SET_ATTRIBUTE_PARSER_DATA (state, [ key, value ]) {
       let parser = state.profile.attributeParser
       Vue.set(state.profile.attributeParserData[parser], key, value)
+    },
+    DELETE_PROFILE (state, name) {
+      if (state.data.profiles[name]) {
+        delete state.data.profiles[name]
+      }
     },
     ...fields.mutations
   },
