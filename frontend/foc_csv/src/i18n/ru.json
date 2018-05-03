@@ -44,5 +44,21 @@
   "Default attributes group": "Группа по умолчанию для атрибутов",
   "Attributes import": "Импорт атрибутов",
   "Attributes field": "Поле для извлечения атрибутов",
-  "Attributes parser": "Парсер атрибутов"
+  "Attributes parser": "Парсер атрибутов",
+
+  "Backup utils": "Утилиты бэкапирования",
+  "Restore utils": "Утилиты восстановления",
+
+  "Show current profile data": "Показать данные текущего профиля",
+  "Show profiles data": "Показать данные всех профилей",
+  "Show all data state": "Показать состояние",
+
+  "Restore profiles": "Восстановить профили",
+  "Restore state to profile": "Восстановить в профиль",
+  "Profile name": "Название профиля",
+  "Restore": "Восстановить",
+  "Are you sure? This will remove all profiles before trying to add new ones!": "Вы уверены? Это действие удалит все существующие профили перед тем как добавить новые!",
+
+  "Remove utils": "Утилиты удаления",
+  "Are you sure you want remove this item?": "Вы уверены что хотите удалить этот элемент?"
 }
