@@ -1,5 +1,5 @@
 <template>
-  <div class="foc-csv-settings-panel">
+  <div class="foc-csv-import">
     <template v-if="importingCsvProgress">
       <div class="panel panel-primary">
         <div class="panel-heading">
@@ -12,9 +12,15 @@
     </template>
     <div class="row">
       <div class="col-md-12">
-        <div class="form-group text-right">
-          <button @click.prevent="submitImportData" class="btn btn-warning btn-lg"><i class="fa fa-rocket"></i> {{ $t('Start import!') }}</button>
+        <div class="row">
+          <div class="col-md-8">
+            <h1>{{ $t('Import submodule') }}</h1>
+          </div>
+          <div class="col-md-4 text-right">
+            <button @click.prevent="submitImportData" class="btn btn-warning btn-lg"><i class="fa fa-rocket"></i> {{ $t('Start import!') }}</button>
+          </div>
         </div>
+        <hr>
       </div>
       <div class="col-md-4">
         <div class="panel panel-primary">
