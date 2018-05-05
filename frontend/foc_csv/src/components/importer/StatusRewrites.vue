@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import StatusRewriteItem from '@/components/StatusRewritesItem'
+import StatusRewriteItem from './StatusRewritesItem'
 
 export default {
   components: {

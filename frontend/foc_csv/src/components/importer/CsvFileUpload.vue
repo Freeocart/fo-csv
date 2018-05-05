@@ -7,6 +7,10 @@
 <script>
 import { FirstLineReader, parseCsvHeaders } from '@/helpers'
 
+import { createNamespacedHelpers } from 'vuex'
+
+const { mapActions } = createNamespacedHelpers('importer')
+
 export default {
   methods: {
     readBlob (event) {
@@ -20,13 +24,17 @@ export default {
         let reader = new FirstLineReader()
         reader.on('line', (line) => {
           let headers = parseCsvHeaders(line)
-          this.$store.dispatch('setCsvFieldNames', headers)
-          this.$store.dispatch('setCsvFileRef', this.$refs.fileRef)
+          this.setCsvFieldNames(headers)
+          this.setCsvFileRef(this.$refs.fileRef)
         })
 
         reader.read(file)
       }
-    }
+    },
+    ...mapActions([
+      'setCsvFieldNames',
+      'setCsvFileRef'
+    ])
   }
 }
 </script>

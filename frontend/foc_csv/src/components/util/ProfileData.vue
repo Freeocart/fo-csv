@@ -10,19 +10,19 @@
         <div class="form-group">
           <button class="btn btn-default" @click.prevent="showProfileState = !showProfileState">{{ $t('Show current profile data') }}</button>
 
-          <textarea :value="JSON.stringify($store.state.profile)" class="form-control" v-if="showProfileState"></textarea>
+          <textarea :value="JSON.stringify(profile)" class="form-control" v-if="showProfileState"></textarea>
         </div>
 
         <div class="form-group">
           <button class="btn btn-default" @click.prevent="showProfilesState = !showProfilesState">{{ $t('Show profiles data') }}</button>
 
-          <textarea :value="JSON.stringify($store.state.data.profiles)" class="form-control" v-if="showProfilesState"></textarea>
+          <textarea :value="JSON.stringify(data.profiles)" class="form-control" v-if="showProfilesState"></textarea>
         </div>
 
         <div class="form-group">
           <button class="btn btn-default" @click.prevent="showAllDataState = !showAllDataState">{{ $t('Show all data state') }}</button>
 
-          <textarea :value="JSON.stringify($store.state.data)" class="form-control" v-if="showAllDataState"></textarea>
+          <textarea :value="JSON.stringify(data)" class="form-control" v-if="showAllDataState"></textarea>
         </div>
       </div>
     </div>
@@ -71,7 +71,11 @@
 </template>
 
 <script>
-import ProfilesControlList from '@/components/ProfilesControlList'
+import ProfilesControlList from './ProfilesControlList'
+
+import { createNamespacedHelpers } from 'vuex'
+
+const { mapActions, mapState } = createNamespacedHelpers('importer')
 
 export default {
   components: {
@@ -84,13 +88,19 @@ export default {
       showAllDataState: false
     }
   },
+  computed: {
+    ...mapState([
+      'profile',
+      'data'
+    ])
+  },
   methods: {
     restoreToProfile () {
       let name = this.$refs.restore_profile_name.value
       let profile = JSON.parse(this.$refs.restore_profile_data.value)
 
-      this.$store.dispatch('applyProfile', { name, profile })
-      this.$store.dispatch('saveNewProfile', name)
+      this.applyProfile({ name, profile })
+      this.saveNewProfile(name)
     },
     restoreProfiles () {
       if (confirm(this.$t('Are you sure? This will remove all profiles before trying to add new ones!'))) {
@@ -99,20 +109,20 @@ export default {
 
           // keep default profile if user removed it
           if (!profiles['default']) {
-            profiles['default'] = this.$store.state.data.profiles.default
+            profiles['default'] = this.data.profiles.default
           }
-          this.$store.dispatch('saveAllProfiles', profiles)
-          // for (let name in profiles) {
-          //   let profile = profiles[name]
-          //   this.$store.dispatch('applyProfile', { name, profile })
-          //   this.$store.dispatch('saveNewProfile', name)
-          // }
+          this.saveAllProfiles(profiles)
         }
         catch (e) {
           console.error(e)
         }
       }
-    }
+    },
+    ...mapActions([
+      'applyProfile',
+      'saveNewProfile',
+      'saveAllProfiles'
+    ])
   }
 }
 </script>
