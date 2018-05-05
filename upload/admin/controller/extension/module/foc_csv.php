@@ -301,7 +301,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
           $skipFirstLine = $position === 0 ? $profile['skipFirstLine'] : false;
           $delimiter = empty($profile['csvFieldDelimiter']) ? ';' : $profile['csvFieldDelimiter'];
-          $importAtOnce = empty($profile['importAtOnce']) ? 10 : $profile['importAtOnce'];
+          $importAtOnce = empty($profile['processAtStepNum']) ? 10 : $profile['processAtStepNum'];
 
           $mode = $profile['importMode'];
           $this->model_extension_module_foc_csv->setImportMode($mode);
