@@ -112,21 +112,34 @@ const capitalizeFirstLetter = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-const mapVuexModels = (models) => {
+const normalizeNamespace = (namespace = '') => {
+  if (namespace.length > 0) {
+    if (namespace.charAt(namespace.length - 1) !== '/') {
+      namespace += '/'
+    }
+  }
+
+  return namespace
+}
+
+const mapVuexModels = (models, namespace = '') => {
+  namespace = normalizeNamespace(namespace)
+
   return models.reduce(function (prev, key) {
     prev[key] = {
       get () {
         let val = null
         try {
-          val = this.$store.getters[key]
+          val = this.$store.getters[`${namespace}${key}`]
         }
         catch (e) {
-          console.error(`missing getter ${key}`)
+          console.error(e)
+          console.error(`missing getter ${namespace}${key}`)
         }
         return val
       },
       set (val) {
-        this.$store.dispatch(`set${capitalizeFirstLetter(key)}`, val)
+        this.$store.dispatch(`${namespace}set${capitalizeFirstLetter(key)}`, val)
       }
     }
 
