@@ -156,6 +156,7 @@ class ModelExtensionModuleFocCsv extends Model {
   private function productDescriptionTemplate ($data = array()) {
     $tableData = array();
     $tableData[$this->language_id] = array_replace(array(
+      'description' => '',
       'meta_title' => '',
       'tag' => '',
       'meta_description' => '',
@@ -492,7 +493,7 @@ class ModelExtensionModuleFocCsv extends Model {
       return false;
     }
 
-    if (!$this->deleteMode) {
+    if (!$this->deleteMode && isset($tablesData[DB_PREFIX . 'product_image'])) {
       /* IMPORT IMAGES */
       $setPreviewFromGallery = false;
       $image = $this->db->query('SELECT `image` FROM '.DB_PREFIX.'product WHERE product_id = ' . (int)$product_id)->row['image'];
@@ -831,7 +832,7 @@ class ModelExtensionModuleFocCsv extends Model {
   private function createOrUpdateAttributeGroup ($name) {
     $this->load->model('catalog/attribute_group');
 
-    $id = $this->db->query('SELECT IFNULL((SELECT attribute_group_id FROM ' . DB_PREFIX . 'attribute_group_description WHERE `name` LIKE ' . $this->db->escape($name) . ' LIMIT 1), 0) AS id')->row['id'];
+    $id = $this->db->query('SELECT IFNULL((SELECT attribute_group_id FROM ' . DB_PREFIX . 'attribute_group_description WHERE `name` LIKE "' . $this->db->escape($name) . '" LIMIT 1), 0) AS id')->row['id'];
 
     $data = array(
       'sort_order' => 0,
