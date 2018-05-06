@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Import from '@/components/importer/Import'
-import Export from '@/components/Export'
+import Export from '@/components/exporter/Export'
 import BackupRestore from '@/components/util/BackupRestore'
 
 Vue.use(Router)
