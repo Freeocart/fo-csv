@@ -1,18 +1,23 @@
 <template>
-  <ul>
-    <li v-for="(binding, idx) in bindings" :key="idx">
-      <select v-model="binding.field" @change="setDefaultBindingName(binding, csvFields[$event.target.value])">
-        <option v-for="(csvField, idx) in csvFields" :key="idx" :value="idx">{{ csvField }}</option>
-      </select>
+<div>
+  <ul class="list-group">
+    <li v-for="(binding, idx) in bindings" :key="idx" class="list-group-item">
+      <span class="input-group">
+        <select v-model="binding.field" @change="setDefaultBindingName(binding, csvFields[$event.target.value])" class="form-control" :placeholder="$t('Attribute value')">
+          <option :value="undefined">{{ $t('Not selected') }}</option>
+          <option v-for="(csvField, idx) in csvFields" :key="idx" :value="idx">{{ csvField }}</option>
+        </select>
 
-      <input type="text" v-model="binding.name" placeholder="name">
+        <input type="text" v-model="binding.name" :placeholder="$t('Attribute name')" class="form-control">
 
-      <button @click.prevent="removeBinding(binding)"><i class="fa fa-cross"></i> X</button>
-    </li>
-    <li>
-      <button @click.prevent="addBinding">add</button>
+        <span class="input-group-btn">
+          <button @click.prevent="removeBinding(binding)" class="btn btn-danger btn-sm"><i class="fa fa-times"></i></button>
+        </span>
+      </span>
     </li>
   </ul>
+  <button @click.prevent="addBinding" class="btn btn-primary btn-block"><i class="fa fa-plus"></i> {{ $t('Add new column binding') }}</button>
+</div>
 </template>
 
 <script>

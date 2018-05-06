@@ -69,5 +69,8 @@
 
   "Remove utils": "Утилиты удаления",
   "Profile control": "Управление профилями",
-  "Are you sure you want remove this item?": "Вы уверены что хотите удалить этот элемент?"
+  "Are you sure you want remove this item?": "Вы уверены что хотите удалить этот элемент?",
+  "Add new column binding": "Добавить новую привязку к столбцу",
+  "Attribute name": "Название атрибута",
+  "Attribute value": "Значение атрибута"
 }
