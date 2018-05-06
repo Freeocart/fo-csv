@@ -51,6 +51,14 @@
       <input type="text" v-model="removeCharsFromCategory" class="form-control">
     </div>
 
+    <div class="form-group">
+      <label class="label label-default">{{ $t('Default status') }}</label>
+      <select class="form-control" v-model="defaultStatus">
+        <option :value="undefined">{{ $t('Not selected') }}</option>
+        <option v-for="(status, idx) in statuses" :key="idx" :value="status.id">{{ status.name }}</option>
+      </select>
+    </div>
+
     <!-- Статусы продукта -->
     <status-rewrites
       :statuses="statuses"
@@ -95,7 +103,8 @@ export default {
       'fillParentCategories',
       'categoryDelimiter',
       'categoryLevelDelimiter',
-      'removeCharsFromCategory'
+      'removeCharsFromCategory',
+      'defaultStatus'
     ], 'importer')
   },
   methods: {

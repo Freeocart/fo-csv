@@ -16,6 +16,7 @@ let fields = genStoreFields([
   'language',
   'importMode',
   'encoding',
+  'defaultStatus',
   'categoryDelimiter',
   'imagesImportMode',
   'categoryLevelDelimiter',

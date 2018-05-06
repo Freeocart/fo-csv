@@ -451,6 +451,13 @@ class ModelExtensionModuleFocCsv extends Model {
 
     /* IMPORT PRODUCTS */
 
+    // set default status if not presented
+    if (!isset($tablesData[DB_PREFIX.'product']['status'])
+        && isset($profile['defaultStatus'])
+    ) {
+      $tablesData[DB_PREFIX.'product']['status'] = $profile['defaultStatus'];
+    }
+
     $productData = $this->productTemplate($tablesData[DB_PREFIX.'product']);
     $productData['manufacturer_id'] = $manufacturer_id;
     $productData['product_description'] = $this->productDescriptionTemplate($tablesData[DB_PREFIX.'product_description']);
