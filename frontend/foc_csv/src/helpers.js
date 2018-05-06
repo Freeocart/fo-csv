@@ -30,9 +30,15 @@ class FirstLineReader {
 
     this.reader.onload = () => {
       this.chunk += this.reader.result
-      console.log(this.chunk)
       this.process()
     }
+  }
+
+  /*
+    Remove non printable characters
+  */
+  _fixString (str) {
+    return str.replace(/\uFFFD/g, '')
   }
 
   on (event, cb) {
@@ -48,10 +54,11 @@ class FirstLineReader {
   process () {
     if (/\n/.test(this.chunk)) {
       let lines = this.chunk.split('\n')
-      this._emit('line', [lines[0]])
+      let line = this._fixString(lines[0])
+      this._emit('line', [line])
     }
     else {
-      if (this.readPos < this.file.fileLength) {
+      if (this.readPos < this.file.size) {
         this.step()
       }
       else {
@@ -60,11 +67,12 @@ class FirstLineReader {
     }
   }
 
-  read (file) {
+  read (file, encoding) {
     this.file = file
     this.lines = []
     this.chunk = ''
     this.readPos = 0
+    this.encoding = encoding || 'UTF8'
 
     this.step()
   }
@@ -72,11 +80,12 @@ class FirstLineReader {
   step () {
     let blob = this.file.slice(
       this.readPos,
-      this.readPos + this.chunkSize
+      this.readPos + this.chunkSize + 1
     )
+
     this.readPos += this.chunkSize
 
-    this.reader.readAsText(blob)
+    this.reader.readAsText(blob, this.encoding)
   }
 }
 
