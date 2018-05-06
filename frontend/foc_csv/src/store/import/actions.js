@@ -39,7 +39,7 @@ export default {
   },
   applyProfile ({ commit }, { name, profile }) {
     commit('ADD_PROFILE', { name, profile })
-    commit('SET_CURRENT_PROFILE', name)
+    commit('SET_CURRENT_PROFILE_NAME', name)
   },
   setStockStatusRewriteRule ({ commit }, rule) {
     commit('SET_STOCK_STATUS_REWRITE_RULE', rule)
