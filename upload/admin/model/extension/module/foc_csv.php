@@ -41,6 +41,23 @@ class ModelExtensionModuleFocCsv extends Model {
         )
       )
     );
+
+    $this->attributeParsers['column'] = array(
+      'title' => $this->language->get('parser_column'),
+      'options' => array(
+        'columns' => array(
+          'title' => $this->language->get('parser_column_column'),
+          'default' => '',
+          'type' => 'column'
+        )
+      )
+    );
+
+    /*
+      Parser option "type" - is text by default
+      use csvfield to get json with selected fields
+    */
+
     /*
       use this section to describe your attribute parsers via vq/ocmod
       please see advantshop parser as reference
@@ -420,11 +437,15 @@ class ModelExtensionModuleFocCsv extends Model {
     $tablesData[DB_PREFIX . 'product']['manufacturer_id'] = $manufacturer_id;
 
     /* IMPORT ATTRIBUTES */
-    $attributes = null;
-    $attributesIdx = isset($profile['attributesCSVField']) ? $profile['attributesCSVField'] : null;
+    if (!isset($profile['defaultAttributesGroup'])) {
+      $profile['defaultAttributesGroup'] = 'FOC';
+    }
 
-    if ($attributesIdx) {
-      $attributes = $this->parseAttributes($profile, $csv_row[$attributesIdx]);
+    $attributes = null;
+    $parserEnabled = isset($profile['attributeParser']) && !is_null($profile['attributeParser']);
+
+    if ($parserEnabled) {
+      $attributes = $this->parseAttributes($profile, $csv_row);
     }
 
     /* IMPORT PRODUCTS */
@@ -922,7 +943,8 @@ class ModelExtensionModuleFocCsv extends Model {
       $parserObj = array(
         'name' => $parser,
         'options' => $parserOptions,
-        'defaultGroup'=> $profile['defaultAttributesGroup']
+        'defaultGroup'=> $profile['defaultAttributesGroup'],
+        'CSVFieldIdx' => isset($profile['attributesCSVField']) ? $profile['attributesCSVField'] : null
       );
 
       list ($valid, $parser, $parserMethod) = $this->normalizeParser($parserObj);
@@ -939,23 +961,56 @@ class ModelExtensionModuleFocCsv extends Model {
     return $result;
   }
 
+  private function parser_column ($parser, $atts) {
+    $result = array();
+
+    try {
+      $options = json_decode($parser['options']['columns'], true);
+      $group_id = $this->createOrUpdateAttributeGroup($parser['defaultGroup']);
+
+      foreach ($options as $option) {
+        $csvIdx = $option['field'];
+        $name = $option['name'];
+
+        if (!isset($atts[$csvIdx]) || trim($atts[$csvIdx]) === '') {
+          continue;
+        }
+
+        $result[] = array(
+          'name' => $name,
+          'value'=> $atts[$csvIdx],
+          'group'=> $group_id
+        );
+      }
+    }
+    catch (Exception $e) {
+      var_dump($e->getMessage());
+      die('err');
+    }
+      // var_dump($result);
+      // die;
+    return $result;
+  }
+
   /*
     Advantshop attributes format parser
   */
   private function parser_advantshop ($parser, $atts) {
     $result = array();
+    $attributesIdx = $parser['CSVFieldIdx'];
 
     if (trim($atts) !== ''
         && isset($parser['options'])
         && !empty($parser['options'])
         && isset($parser['defaultGroup'])
+        && isset($atts[$attributesIdx])
     ) {
       $options = $parser['options'];
 
       $keyValueDelimiter = $options['keyvalue_delimiter'];
       $entriesDelimiter = $options['entries_delimiter'];
 
-      $entries = array_filter(explode($entriesDelimiter, $atts));
+      $entries = array_filter(explode($entriesDelimiter, $atts[$attributesIdx]));
 
       $group_id = $this->createOrUpdateAttributeGroup($parser['defaultGroup']);
 
