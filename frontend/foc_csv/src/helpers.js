@@ -143,7 +143,6 @@ const mapVuexModels = (models, namespace = '') => {
   models = normalizeMap(models)
 
   return models.reduce(function (prev, {key, val}) {
-    console.log(key, val)
     prev[key] = {
       get () {
         let value = null
