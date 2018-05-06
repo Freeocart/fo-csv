@@ -1,12 +1,12 @@
 <template>
   <div class="foc-csv-import">
-    <template v-if="importingCsvProgress">
+    <template v-if="working">
       <div class="panel panel-primary">
         <div class="panel-heading">
           {{ $t('Import in progress') }}
         </div>
         <div class="panel-body">
-          <import-progress :progress="csvImportProgress"></import-progress>
+          <import-progress :progress="{ current, total }"></import-progress>
         </div>
       </div>
     </template>
@@ -17,7 +17,7 @@
             <h1>{{ $t('Import submodule') }}</h1>
           </div>
           <div class="col-md-4 text-right">
-            <button @click.prevent="submitImportData" class="btn btn-warning btn-lg"><i class="fa fa-rocket"></i> {{ $t('Start import!') }}</button>
+            <button @click.prevent="submitImportData" :disabled="working" class="btn btn-warning btn-lg"><i class="fa fa-rocket"></i> {{ $t('Start import!') }}</button>
           </div>
         </div>
         <hr>
@@ -131,7 +131,12 @@ export default {
       'processAtStepNum',
       'skipFirstLine',
       'keyField'
-    ], 'importer')
+    ], 'importer'),
+    ...mapVuexModels({
+      total: 'importJobTotal',
+      current: 'importJobCurrent',
+      working: 'importJobWorking'
+    }, 'importer')
   },
   methods: {
     async submitImportPart ({ importUrl, key, position }) {
@@ -144,13 +149,13 @@ export default {
         let response = await this.$http.post(decodeURIComponent(importUrl), data)
 
         position = response.data.message.position
-        this.csvImportProgress.current = position
+        this.current = position
 
-        if (position < this.csvImportProgress.total) {
+        if (position < this.total) {
           this.submitImportPart({ importUrl, key, position })
         }
         else {
-          this.importingCsvProgress = false
+          this.working = false
         }
       }
       catch (e) {
@@ -165,8 +170,8 @@ export default {
           let response = await submitData(this.$store.actionUrl(IMPORT_URL), data)
 
           if (response.data.status === 'ok') {
-            this.csvImportProgress.total = response.data.message.csvTotal
-            this.importingCsvProgress = true
+            this.total = response.data.message.csvTotal
+            this.working = true
             this.submitImportPart(response.data.message)
           }
         }

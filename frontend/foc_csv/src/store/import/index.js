@@ -32,19 +32,29 @@ let fields = genStoreFields([
   'attributesCSVField'
 ], 'profile')
 
+let importProgress = genStoreFields([
+  'importJobTotal',
+  'importJobCurrent',
+  'importJobWorking'
+], 'importJob')
+console.log(importProgress)
+
 export default {
   namespaced: true,
   state,
   mutations: {
     ...fields.mutations,
+    ...importProgress.mutations,
     ...mutations
   },
   actions: {
     ...fields.actions,
+    ...importProgress.actions,
     ...actions
   },
   getters: {
     ...fields.getters,
+    ...importProgress.getters,
     ...getters
   }
 }
