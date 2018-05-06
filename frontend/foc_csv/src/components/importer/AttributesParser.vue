@@ -21,10 +21,11 @@
 
   <div class="form-group" v-if="showAttributeParserSettings" v-for="(option, key) in attributeParserOptions" :key="key">
     <label for="" class="label label-default">{{ option.title }}</label>
-    <input type="text"
+    <component
+      :is="getAttributeParserControl(option)"
       :value="attributeParserOptionData[key]"
-      @change="setAttributeParserData([key, $event.target.value])"
-      class="form-control">
+      @change="setAttributeParserData([key, $event])"
+    ></component>
   </div>
 
   <div class="form-group">
@@ -46,11 +47,14 @@ import { createNamespacedHelpers } from 'vuex'
 import Autocomplete from 'autocomplete-vue'
 import { ATTRIBUTES_GROUP_AUTOCOMPLETE_URL } from '@/config'
 
+import AttributeParserSettingsWidgets from './attributeParserSettingsWidgets'
+
 const { mapActions, mapGetters } = createNamespacedHelpers('importer')
 
 export default {
   components: {
-    Autocomplete
+    Autocomplete,
+    ...AttributeParserSettingsWidgets
   },
   computed: {
     ...mapVuexModels([
@@ -87,6 +91,12 @@ export default {
     }
   },
   methods: {
+    getAttributeParserControl (attribute) {
+      if (attribute.type) {
+        return `${attribute.type}-attribute`
+      }
+      return 'text-attribute'
+    },
     ...mapActions([
       'setAttributeParserData',
       'setAttributeParser'
