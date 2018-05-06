@@ -121,11 +121,11 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $initial['statuses'] = array(
       array(
         'id' => 0,
-        'name' => 'Включен'
+        'name' => $this->language->get('text_disabled')
       ),
       array(
         'id' => 1,
-        'name' => 'Выключен'
+        'name' => $this->language->get('text_enabled')
       )
     );
 
