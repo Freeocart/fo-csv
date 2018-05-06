@@ -55,6 +55,7 @@ class FirstLineReader {
     if (/\n/.test(this.chunk)) {
       let lines = this.chunk.split('\n')
       let line = this._fixString(lines[0])
+      console.log(line)
       this._emit('line', [line])
     }
     else {
@@ -80,7 +81,7 @@ class FirstLineReader {
   step () {
     let blob = this.file.slice(
       this.readPos,
-      this.readPos + this.chunkSize + 1
+      this.readPos + this.chunkSize
     )
 
     this.readPos += this.chunkSize
