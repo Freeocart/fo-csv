@@ -131,24 +131,33 @@ const normalizeNamespace = (namespace = '') => {
   return namespace
 }
 
+// code from Vuex source
+const normalizeMap = (map) => {
+  return Array.isArray(map)
+    ? map.map(function (key) { return ({ key: key, val: key }) })
+    : Object.keys(map).map(function (key) { return ({ key: key, val: map[key] }) })
+}
+
 const mapVuexModels = (models, namespace = '') => {
   namespace = normalizeNamespace(namespace)
+  models = normalizeMap(models)
 
-  return models.reduce(function (prev, key) {
+  return models.reduce(function (prev, {key, val}) {
+    console.log(key, val)
     prev[key] = {
       get () {
-        let val = null
+        let value = null
         try {
-          val = this.$store.getters[`${namespace}${key}`]
+          value = this.$store.getters[`${namespace}${val}`]
         }
         catch (e) {
           console.error(e)
-          console.error(`missing getter ${namespace}${key}`)
+          console.error(`missing getter ${namespace}${val}`)
         }
-        return val
+        return value
       },
-      set (val) {
-        this.$store.dispatch(`${namespace}set${capitalizeFirstLetter(key)}`, val)
+      set (value) {
+        this.$store.dispatch(`${namespace}set${capitalizeFirstLetter(val)}`, value)
       }
     }
 
