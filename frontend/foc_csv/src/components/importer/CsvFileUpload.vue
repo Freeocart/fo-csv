@@ -9,9 +9,15 @@ import { FirstLineReader, parseCsvHeaders } from '@/helpers'
 
 import { createNamespacedHelpers } from 'vuex'
 
-const { mapActions } = createNamespacedHelpers('importer')
+const { mapActions, mapGetters } = createNamespacedHelpers('importer')
 
 export default {
+  computed: {
+    ...mapGetters([
+      'encoding',
+      'csvFieldDelimiter'
+    ])
+  },
   methods: {
     readBlob (event) {
       let file = null
@@ -23,12 +29,12 @@ export default {
       if (file !== null && file.type === 'text/csv') {
         let reader = new FirstLineReader()
         reader.on('line', (line) => {
-          let headers = parseCsvHeaders(line)
+          let headers = parseCsvHeaders(line, this.csvFieldDelimiter)
           this.setCsvFieldNames(headers)
           this.setCsvFileRef(this.$refs.fileRef)
         })
 
-        reader.read(file)
+        reader.read(file, this.encoding)
       }
     },
     ...mapActions([
