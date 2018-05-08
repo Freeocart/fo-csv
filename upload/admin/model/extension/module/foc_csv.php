@@ -420,7 +420,7 @@ class ModelExtensionModuleFocCsv extends Model {
   */
   public function import ($profile, $csv_row) {
 
-    $skipOnEmpty = $profile['skipLineOnEmptyFields'];
+    $skipOnEmpty = isset($profile['skipLineOnEmptyFields']) ? $profile['skipLineOnEmptyFields'] : array();
 
     if (!is_null($skipOnEmpty) && count($skipOnEmpty) > 0) {
       foreach ($skipOnEmpty as $item) {
