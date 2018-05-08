@@ -156,10 +156,13 @@ export default {
         }
         else {
           this.working = false
+          this.current = 0
         }
       }
       catch (e) {
         console.error(e)
+        this.current = 0
+        this.working = false
       }
     },
     async submitImportData () {
@@ -176,6 +179,8 @@ export default {
           }
         }
         catch (e) {
+          this.working = false
+          this.current = 0
           alert('Ошибка при отправке!')
           console.error(e)
         }

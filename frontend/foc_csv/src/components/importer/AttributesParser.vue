@@ -1,8 +1,9 @@
 <template>
 <div>
   <div class="form-group">
-    <label for="" class="label label-default">{{ $t('Attributes field') }}</label>
+    <label class="label label-default">{{ $t('Attributes field') }}</label>
     <select class="form-control" v-model="attributesCSVField">
+      <option :value="undefined">{{ $t('Not selected') }}</option>
       <option v-for="(csvField, idx) in csvFields" :key="idx" :value="idx">
         {{ csvField }}
       </option>
@@ -10,7 +11,7 @@
   </div>
 
   <div class="form-group">
-    <label for="" class="label label-default">{{ $t('Attributes parser') }}</label>
+    <label class="label label-default">{{ $t('Attributes parser') }}</label>
     <select class="form-control" v-model="currentAttributeParserName">
       <option :value="null">{{ $t('Not selected') }}</option>
       <option v-for="(parser, key, idx) in attributeParsers" :key="idx" :value="key">
@@ -20,7 +21,7 @@
   </div>
 
   <div class="form-group" v-if="showAttributeParserSettings" v-for="(option, key) in attributeParserOptions" :key="key">
-    <label for="" class="label label-default">{{ option.title }}</label>
+    <label class="label label-default">{{ option.title }}</label>
     <component
       :is="getAttributeParserControl(option)"
       :value="attributeParserOptionData[key]"
