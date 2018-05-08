@@ -17,6 +17,7 @@ let fields = genStoreFields([
   'importMode',
   'encoding',
   'defaultStatus',
+  'defaultStockStatus',
   'categoryDelimiter',
   'imagesImportMode',
   'categoryLevelDelimiter',
@@ -29,7 +30,8 @@ let fields = genStoreFields([
   'removeCharsFromCategory',
   'removeManufacturersBeforeImport',
   'defaultAttributesGroup',
-  'attributesCSVField'
+  'attributesCSVField',
+  'skipLineOnEmptyFields'
 ], 'profile')
 
 let importProgress = genStoreFields([

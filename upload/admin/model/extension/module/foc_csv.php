@@ -97,7 +97,8 @@ class ModelExtensionModuleFocCsv extends Model {
       'stockStatusRewrites' => array(),
       'downloadImages' => false,
       'attributeParser' => null,
-      'attributeParserData' => array()
+      'attributeParserData' => array(),
+      'skipLineOnEmptyFields' => array()
     );
   }
 
@@ -418,6 +419,18 @@ class ModelExtensionModuleFocCsv extends Model {
     Import entry point
   */
   public function import ($profile, $csv_row) {
+
+    $skipOnEmpty = $profile['skipLineOnEmptyFields'];
+
+    if (!is_null($skipOnEmpty) && count($skipOnEmpty) > 0) {
+      foreach ($skipOnEmpty as $item) {
+        if (!isset($csv_row[$item['idx']]) || trim($csv_row[$item['idx']]) == '') {
+          $this->log->write('[SKIP_EMPTY] {' . $item['name'] . '}');
+          return false;
+        }
+      }
+    }
+
     $bindings = $profile['bindings'];
 
     $tablesData = $this->getCsvToDBFields($bindings, $csv_row);
@@ -484,6 +497,9 @@ class ModelExtensionModuleFocCsv extends Model {
       $productData['status'] = array_search($productData['status'], $profile['statusRewrites']);
     }
 
+    if (isset($profile['defaultStockStatus'])) {
+      $productData['stock_status_id'] = $profile['defaultStockStatus'];
+    }
     // stock_status rewrites processing
     if (isset($profile['stockStatusRewrites']) && in_array($productData['stock_status_id'], $profile['stockStatusRewrites'])) {
       $productData['stock_status_id'] = array_search($productData['stock_status_id'], $profile['stockStatusRewrites']);
@@ -1007,8 +1023,7 @@ class ModelExtensionModuleFocCsv extends Model {
     $result = array();
     $attributesIdx = $parser['CSVFieldIdx'];
 
-    if (trim($atts) !== ''
-        && isset($parser['options'])
+    if (isset($parser['options'])
         && !empty($parser['options'])
         && isset($parser['defaultGroup'])
         && isset($atts[$attributesIdx])

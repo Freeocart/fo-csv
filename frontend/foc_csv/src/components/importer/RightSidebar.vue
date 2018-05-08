@@ -51,6 +51,7 @@
       <input type="text" v-model="removeCharsFromCategory" class="form-control">
     </div>
 
+    <!-- Статусы продукта -->
     <div class="form-group">
       <label class="label label-default">{{ $t('Default status') }}</label>
       <select class="form-control" v-model="defaultStatus">
@@ -59,25 +60,42 @@
       </select>
     </div>
 
-    <!-- Статусы продукта -->
     <status-rewrites
       :statuses="statuses"
       :rules="statusRewrites"
       @statusRewriteChange="setStatusRewriteRule($event)"
     ></status-rewrites>
 
+    <hr>
+
     <!-- Статусы наличия -->
+    <div class="form-group">
+      <label class="label label-default">{{ $t('Default stock status') }}</label>
+      <select class="form-control" v-model="defaultStockStatus">
+        <option :value="undefined">{{ $t('Not selected') }}</option>
+        <option v-for="(status, idx) in stock_statuses" :key="idx" :value="status.id">{{ status.name }}</option>
+      </select>
+    </div>
+
     <status-rewrites
       :statuses="stock_statuses"
       :rules="stockStatusRewrites"
       @statusRewriteChange="setStockStatusRewriteRule($event)"
     ></status-rewrites>
+
+    <!-- Пропуск строк -->
+    <line-skip-settings
+      :csvFields="csvFields"
+      v-model="skipLineOnEmptyFields"
+    ></line-skip-settings>
   </div>
 </div>
 </template>
 
 <script>
 import StatusRewrites from './StatusRewrites'
+import LineSkipSettings from './LineSkipSettings'
+
 import { mapVuexModels } from '@/helpers'
 import { createNamespacedHelpers } from 'vuex'
 
@@ -85,7 +103,8 @@ const { mapGetters, mapActions } = createNamespacedHelpers('importer')
 
 export default {
   components: {
-    StatusRewrites
+    StatusRewrites,
+    LineSkipSettings
   },
   computed: {
     ...mapGetters([
@@ -104,7 +123,10 @@ export default {
       'categoryDelimiter',
       'categoryLevelDelimiter',
       'removeCharsFromCategory',
-      'defaultStatus'
+      'defaultStatus',
+      'defaultStockStatus',
+      'csvFields',
+      'skipLineOnEmptyFields'
     ], 'importer')
   },
   methods: {

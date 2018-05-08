@@ -72,5 +72,8 @@
   "Are you sure you want remove this item?": "Вы уверены что хотите удалить этот элемент?",
   "Add new column binding": "Добавить новую привязку к столбцу",
   "Attribute name": "Название атрибута",
-  "Attribute value": "Значение атрибута"
+  "Attribute value": "Значение атрибута",
+  "Skip line if fields empty": "Пропустить строку если поля пустые",
+  "Default status": "Статус по умолчанию",
+  "Default stock status": "Складской статус"
 }
