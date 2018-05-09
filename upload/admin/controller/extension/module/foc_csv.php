@@ -319,8 +319,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
           $i = 0;
 
-          while (($line = fgetcsv($csv_fid, 0, $delimiter)) !== false && $i < $importAtOnce) {
-            if ($i++ === 0 && $skipFirstLine) {
+          while ($i < $importAtOnce && ($line = fgetcsv($csv_fid, 0, $delimiter)) !== false) {
+            if ($i++ === 0 && $skipFirstLine && $position === 0) {
               continue;
             }
             // import stuff..
