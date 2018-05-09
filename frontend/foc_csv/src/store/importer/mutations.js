@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 export default {
   SET_INITIAL_DATA (state, initial) {
-    Vue.set(state, 'data', initial.data)
+    Vue.set(state, 'data', initial)
   },
   SET_STOCK_STATUS_REWRITE_RULE (state, { value, id }) {
     if (!state.profile.stockStatusRewrites) {

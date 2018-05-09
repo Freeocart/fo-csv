@@ -25,7 +25,7 @@ if (validateAppConfig(AppConfig.requestConfig)) {
   let urlManager = new UrlStore(AppConfig.requestConfig)
   store.actionUrl = (action) => urlManager.actionUrl(action)
 
-  store.dispatch('importer/setInitialData', AppConfig.initial)
+  store.dispatch('importer/setInitialData', AppConfig.initial.data)
 
   const language = AppConfig.language || 'en'
 
