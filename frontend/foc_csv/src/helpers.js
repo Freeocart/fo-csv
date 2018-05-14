@@ -115,7 +115,8 @@ const submitData = async function (url, { data, profile }) {
 
 const validateProfile = (profile) => {
   // validate key field
-  return profile.keyField && profile.bindings.findIndex(val => val === profile.keyField) !== -1
+  // findIndex(val => val === profile.keyField) !== -1
+  return profile.keyField && profile.bindings[profile.keyField]
 }
 
 const capitalizeFirstLetter = (str) => {
