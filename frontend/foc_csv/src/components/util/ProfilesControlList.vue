@@ -8,7 +8,12 @@
             <strong>{{ name }}</strong>
           </td>
           <td class="text-right">
-            <span :disabled="name === 'default'" class="btn btn-danger" @click.prevent="removeProfile(name)"><i class="fa fa-trash"></i></span>
+            <span v-if="name !== 'default'" class="btn btn-danger" @click.prevent="removeProfile(name)">
+              <i class="fa fa-trash"></i>
+            </span>
+            <span v-else :disabled="true" class="btn btn-danger">
+              <i class="fa fa-trash"></i>
+            </span>
           </td>
         </tr>
       </tbody>
