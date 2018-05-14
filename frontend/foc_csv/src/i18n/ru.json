@@ -87,5 +87,10 @@
   "Attention! You chosed a danger import mode!": "Внимание! Вы выбрали опасный режим импорта!",
   "Before import from CSV, we will remove all product related data from your database!": "Перед импортом данных из CSV, будут удалены все данные о продуктах из вашей базы данных!",
   "Please, make sure you have working backup before you continue!": "Пожалуйста, убедитесь что у вас есть рабочий бэкап перед тем как продолжать!",
-  "Are you totally sure you want do this???! With this import method you can lose your data!": "Вы абсолютно уверены, что хотите продолжить???! Этот режим импорта может привести к потере всех ваших данных!"
+  "Are you totally sure you want do this???! With this import method you can lose your data!": "Вы абсолютно уверены, что хотите продолжить???! Этот режим импорта может привести к потере всех ваших данных!",
+
+  "Dump parent categories": "Выгружать родительские категории",
+  "Export images mode": "Режим экспорта изображений",
+  "Create images ZIP": "Создать ZIP архив с изображениями",
+  "Render CSV header": "Добавить CSV заголовки"
 }

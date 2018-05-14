@@ -2,16 +2,28 @@
   <div>
     <div class="panel panel-primary">
       <div class="panel-heading">
-        {{ $t('Category control') }}
+        {{ $t('Processing settings') }}
       </div>
       <div class="panel-body">
+        <div class="form-group">
+          <label for="" class="label label-default">{{ $t('Field delimiter') }}</label>
+          <input type="text" placeholder="Разделитель полей" v-model="csvFieldDelimiter" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label class="label label-default">{{ $t('Encoding') }}</label>
+          <select class="form-control" v-model="encoding">
+            <option v-for="(encodingName, idx) in encodings" :key="idx" :value="encodingName">{{ encodingName }}</option>
+          </select>
+        </div>
+
         <div class="form-group">
           <label class="label label-default">{{ $t('Dump parent categories') }}</label>
           <input type="checkbox" class="form-control" v-model="dumpParentCategories">
         </div>
 
         <div class="form-group">
-          <label class="label label-default">{{ $t('Categories nesting delimiter') }}</label>
+          <label class="label label-default">{{ $t('Category level delimiter') }}</label>
           <input type="text" class="form-control" v-model="categoriesNestingDelimiter">
         </div>
 
@@ -32,7 +44,9 @@ export default {
     ...mapVuexModels([
       'dumpParentCategories',
       'categoriesNestingDelimiter',
-      'categoriesDelimiter'
+      'categoriesDelimiter',
+      'csvFieldDelimiter',
+      'encoding'
     ], 'exporter')
   }
 }
