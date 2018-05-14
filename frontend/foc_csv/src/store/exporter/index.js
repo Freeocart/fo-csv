@@ -16,7 +16,9 @@ let fields = genStoreFields([
   'galleryImagesDelimiter',
   'csvFieldDelimiter',
   'store',
-  'language'
+  'language',
+  'csvFieldDelimiter',
+  'csvHeader'
 ], 'profile')
 
 export default {

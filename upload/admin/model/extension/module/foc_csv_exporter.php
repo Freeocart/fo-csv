@@ -34,6 +34,7 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
       'exportImagesMode' => null,
       'createImagesZIP' => false,
       'csvFieldDelimiter' => ';',
+      'csvHeader' => true,
       'galleryImagesDelimiter' => ',',
       'store' => $this->config->get('config_store_id'),
       'language' => $this->config->get('config_language_id'),
