@@ -86,7 +86,7 @@ class ModelExtensionModuleFocCsv extends Model {
       'categoryDelimiter' => '/',
       'categoryLevelDelimiter' => '>>',
       'keyField' => 'product_id',
-      'skipFirstLine' => true,
+      'skipLines' => 1,
       'bindings' => new stdclass,
       'importMode' => 'updateCreate',
       'imagesImportMode' => 'add',
