@@ -15,7 +15,7 @@
       <button @click.prevent="savingProfile = true" class="btn btn-default"><i class="fa fa-save"></i> {{ $t('Save profile as') }}</button>
 
       <div v-if="savingProfile" class="input-group">
-        <input type="text" placeholder="Название профиля" ref="newProfileName" :value="currentProfileName" class="form-control">
+        <input type="text" :placeholder="$t('Profile name')" ref="newProfileName" :value="currentProfileName" class="form-control">
         <span class="input-group-btn">
           <button @click.prevent="saveNewProfile($refs.newProfileName.value)" class="btn btn-success"><i class="fa fa-check"></i> {{ $t('Save profile') }}</button>
         </span>
