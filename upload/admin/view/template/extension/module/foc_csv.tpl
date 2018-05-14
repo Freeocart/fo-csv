@@ -32,9 +32,7 @@ window.FOC_CSV_PARAMS = {
     'baseUrl': '<?php echo $baseUrl; ?>',
   },
   'language': '<?php echo $language; ?>',
-  'initial' : {
-    data: <?php echo $initial; ?>
-  }
+  'initial' : <?php echo $initial; ?>
 };
 </script>
 <?php foreach ($scripts as $script) { ?>

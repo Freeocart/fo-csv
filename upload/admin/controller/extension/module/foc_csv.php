@@ -17,6 +17,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
       unlink($templatePath . $viewFile);
     }
 
+    $this->load->model('extension/module/foc_csv_common');
     $this->load->model('extension/module/foc_csv');
     $this->model_extension_module_foc_csv->install();
   }
@@ -38,9 +39,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
   }
 
   private function getTokenName () {
-    $this->load->model('extension/module/foc_csv');
-
-    if ($this->model_extension_module_foc_csv->isOpencart3()) {
+    $this->load->model('extension/module/foc_csv_common');
+    if ($this->model_extension_module_foc_csv_common->isOpencart3()) {
       return 'user_token';
     }
     return 'token';
@@ -67,7 +67,9 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $data['baseUrl'] = $this->url->link('');
     $data['language'] = $this->language->get('code');
 
+    $this->load->model('extension/module/foc_csv_common');
     $this->load->model('extension/module/foc_csv');
+    $this->load->model('extension/module/foc_csv_exporter');
     $this->load->model('setting/store');
     $this->load->model('localisation/language');
     $this->load->model('localisation/stock_status');
@@ -85,40 +87,44 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
     $data['scripts'] = $this->document->getScripts('foc_csv_js');
 
-    $initial = array();
-    $initial['profiles'] = $this->model_extension_module_foc_csv->loadProfiles();
-    $initial['keyFields'] = $this->model_extension_module_foc_csv->getKeyFields();
-    $initial['encodings'] = array('UTF8', 'cp1251');
-    $initial['dbFields'] = $this->model_extension_module_foc_csv->getDbFields();
+    $common = array();
+    $importer = array();
+    $exporter = array();
+
+    $importer['profiles'] = $this->model_extension_module_foc_csv->loadProfiles();
+    $importer['keyFields'] = $this->model_extension_module_foc_csv->getKeyFields();
+    $common['encodings'] = array('UTF8', 'cp1251');
+    $common['dbFields'] = $this->model_extension_module_foc_csv->getDbFields();
+
+    $exporter['profiles'] = $this->model_extension_module_foc_csv_exporter->loadProfiles();
 
     /* stores */
-    $initial['stores'] = array();
-    $initial['stores'][] = array(
+    $common['stores'] = array();
+    $common['stores'][] = array(
       'name' => $this->config->get('config_name'),
-      'id'   => $this->config->get('config_store_id'),
-      'current' => true
+      'id'   => $this->config->get('config_store_id')
     );
 
     $stores = $this->model_setting_store->getStores();
     foreach ($stores as $store) {
-      $initial['stores'][] = array(
+      $common['stores'][] = array(
         'name' => $store['name'],
         'id'   => $store['store_id']
       );
     }
 
     /* available statuses */
-    $initial['stock_statuses'] = array();
+    $common['stock_statuses'] = array();
     $statuses = $this->model_localisation_stock_status->getStockStatuses();
 
     foreach ($statuses as $status) {
-      $initial['stock_statuses'][] = array(
+      $common['stock_statuses'][] = array(
         'id' => $status['stock_status_id'],
         'name' => $status['name']
       );
     }
 
-    $initial['statuses'] = array(
+    $common['statuses'] = array(
       array(
         'id' => 0,
         'name' => $this->language->get('text_disabled')
@@ -129,18 +135,22 @@ class ControllerExtensionModuleFocCsv extends Controller {
       )
     );
 
-    $initial['languages'] = array();
+    $common['languages'] = array();
     $languages = $this->model_localisation_language->getLanguages();
     foreach ($languages as $lang) {
-      $initial['languages'][] = array(
+      $common['languages'][] = array(
         'name' => $lang['name'],
         'id'   => $lang['language_id']
       );
     }
 
-    $initial['attributeParsers'] = $this->model_extension_module_foc_csv->getAttributeParsers();
+    $importer['attributeParsers'] = $this->model_extension_module_foc_csv->getAttributeParsers();
 
-    $data['initial'] = json_encode($initial);
+    $data['initial'] = json_encode(array(
+      'importer' => $importer,
+      'exporter' => $exporter,
+      'common' => $common
+    ));
 
     return $this->response->setOutput($this->load->view('extension/module/foc_csv', $data));
   }
@@ -149,6 +159,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
     Load profile settings from DB
   */
   public function loadProfile () {
+    $this->load->model('extension/module/foc_csv_common');
     $this->load->model('extension/module/foc_csv');
 
     $name = 'default';
@@ -171,6 +182,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
       $json = json_decode(file_get_contents('php://input'), true);
 
       if (isset($json['name']) && isset($json['profile'])) {
+        $this->load->model('extension/module/foc_csv_common');
         $this->load->model('extension/module/foc_csv');
         $name = $json['name'];
         $profile = $json['profile'];
@@ -188,6 +200,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
       $json = json_decode(file_get_contents('php://input'), true);
 
       if (isset($json['profiles'])) {
+        $this->load->model('extension/module/foc_csv_common');
         $this->load->model('extension/module/foc_csv');
         $this->model_extension_module_foc_csv->saveProfiles($json['profiles']);
       }
@@ -200,15 +213,27 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $this->sendFail();
   }
 
+  public function export () {
+    if (isset($_POST['profile-json'])) {
+      $this->load->model('extension/module/foc_csv_common');
+      $this->load->model('extension/module/foc_csv_exporter');
+
+      $key = $this->model_extension_module_foc_csv_exporter->prepareUploadPath();
+
+      var_dump($key);
+    }
+  }
+
   /*
     Upload files and starting import
   */
   public function import () {
     if (!empty($_FILES) && isset($_POST['profile-json'])) {
+      $this->load->model('extension/module/foc_csv_common');
       $this->load->model('extension/module/foc_csv');
 
       // первый вызов и заливка файлов - генерим ключ
-      $key = $this->model_extension_module_foc_csv->prepareImportPath();
+      $key = $this->model_extension_module_foc_csv->prepareUploadPath();
       $importFile = $this->model_extension_module_foc_csv->getImportCsvFilePath($key);
       $imagesFile = $this->model_extension_module_foc_csv->getImportImagesZipPath($key);
 
@@ -307,6 +332,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
       if ($this->request->server['REQUEST_METHOD'] == 'POST') {
         $json = json_decode(file_get_contents('php://input'), true);
 
+        $this->load->model('extension/module/foc_csv_common');
         $this->load->model('extension/module/foc_csv');
 
         if (isset($json['position']) && isset($json['key']) && isset($json['profile'])) {
@@ -320,7 +346,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
           $profile = $this->model_extension_module_foc_csv->fillProfileEmptyValues($profile);
 
-          $this->model_extension_module_foc_csv->setImportKey($import_key);
+          $this->model_extension_module_foc_csv->setUploadKey($import_key);
 
           $skipLines = $profile['skipLines'];
           $delimiter = empty($profile['csvFieldDelimiter']) ? ';' : $profile['csvFieldDelimiter'];

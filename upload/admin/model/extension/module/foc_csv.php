@@ -1,26 +1,20 @@
 <?php
 /*
-  Model for FOC_CSV
-
-  TODO:
-    Refactor code (>900 loc is abnormal)
+  Model for FOC CSV Importer
 */
-class ModelExtensionModuleFocCsv extends Model {
 
-  private $profiles_code = 'foc_csv';
-  private $profiles_key = 'foc_csv_profiles';
+class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
+
   private $csvImportFileName = 'import.csv';
   private $imagesZipImportFileName = 'images.zip';
   private $imagesZipExtractPath = 'images';
   private $imageSavePath = 'catalog/import';
-  private $tableFieldDelimiter = ':';
   private $importMode = 'updateCreate';
 
   private $attributeParsers = array();
 
   public function __construct ($registry) {
-    parent::__construct($registry);
-    $this->log = new Log('foc_csv.txt');
+    parent::__construct($registry, 'importer');
 
     if (!is_dir(DIR_IMAGE . $this->imageSavePath)) {
       $this->writeLog('Creating image save path [' . $this->imageSavePath . ']');
@@ -68,22 +62,10 @@ class ModelExtensionModuleFocCsv extends Model {
   }
 
   public function install () {
-    $this->load->model('setting/setting');
-    $this->model_setting_setting->editSetting($this->profiles_code, array($this->profiles_key => array()));
-    $this->saveProfiles($this->getDefaultProfiles());
-  }
-
-  public function writeLog ($msg, $group = 'info') {
-    switch ($group) {
-      case 'error': $msg = '[ERROR] ' . $msg;
-                    break;
-      case 'warn' : $msg = '[WARN] ' . $msg;
-                    break;
-      default     : $msg = '[INFO] ' . $msg;
-                    break;
-    }
-
-    $this->log->write($msg);
+    // $this->load->model('setting/setting');
+    // $this->model_setting_setting->editSetting($this->profiles_code, array($this->profiles_key => array()));
+    // $this->saveProfiles($this->getDefaultProfiles());
+    parent::install();
   }
 
   /*
@@ -106,8 +88,8 @@ class ModelExtensionModuleFocCsv extends Model {
       'processAtStepNum' => 20,
       'removeCharsFromCategory' => '[]{}',
       'removeManufacturersBeforeImport' => false,
-      'storeId' => $this->config->get('config_store_id'),
-      'languageId' => $this->config->get('language_id'),
+      // 'storeId' => $this->config->get('config_store_id'),
+      // 'languageId' => $this->config->get('language_id'),
       'statusRewrites' => array(),
       'stockStatusRewrites' => array(),
       'downloadImages' => false,
@@ -117,54 +99,6 @@ class ModelExtensionModuleFocCsv extends Model {
       'attributeParserData' => array(),
       'skipLineOnEmptyFields' => array()
     );
-  }
-
-  /*
-    Default profiles list
-  */
-  public function getDefaultProfiles () {
-    return array(
-      'default' => $this->getDefaultProfile()
-    );
-  }
-
-  /*
-    Key fields
-  */
-  public function getKeyFields () {
-    return array(
-      'product:product_id',
-      'product:sku',
-      'product:model',
-      'product_description:name',
-      'product:ean',
-      'product:mpn',
-      'product:jan',
-      'product:isbn'
-    );
-  }
-
-  /*
-    Generate DB fields list
-  */
-  public function getDbFields () {
-    $tables = array(
-      'product',
-      'product_description',
-      'product_image',
-      'manufacturer',
-      'category',
-      'category_description'
-    );
-
-    $result = array();
-
-    foreach ($tables as $table) {
-      $data = $this->db->query('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = "' . DB_DATABASE . '" AND TABLE_NAME = "' . DB_PREFIX . $table . '"');
-      $result[$table] = array_column($data->rows, 'COLUMN_NAME');
-    }
-
-    return $result;
   }
 
   /*
@@ -225,75 +159,14 @@ class ModelExtensionModuleFocCsv extends Model {
   public function fillProfileEmptyValues ($profile) {
     return array_replace_recursive($this->getDefaultProfile(), $profile);
   }
-  /*
-    Load all profiles
-  */
-  public function loadProfiles () {
-    $this->load->model('setting/setting');
-
-    $profiles = json_decode($this->model_setting_setting->getSettingValue($this->profiles_key), true);
-
-    if (count($profiles) === 0) {
-      $profiles = $this->getDefaultProfiles();
-    }
-    else {
-      foreach ($profiles as $key => $profile) {
-        $profiles[$key] = $this->fillProfileEmptyValues($profile);
-      }
-    }
-
-    return $profiles;
-  }
-
-  /*
-    Save profiles list
-  */
-  public function saveProfiles ($profiles) {
-    $this->load->model('setting/setting');
-
-    foreach ($profiles as $key => $profile) {
-      $profiles[$key] = $this->fillProfileEmptyValues($profile);
-    }
-
-    $this->model_setting_setting->editSettingValue($this->profiles_code, $this->profiles_key, $profiles);
-  }
-
-  /*
-    Load profile by name
-  */
-  public function loadProfile ($name) {
-    $profiles = $this->loadProfiles();
-
-    if (isset($profiles[$name])) {
-      return $profiles[$name];
-    }
-
-    return null;
-  }
-
-  /*
-    Save profile by name
-  */
-  public function setProfile ($name, $data) {
-    $profiles = $this->loadProfiles();
-    $profiles[$name] = $data;
-    $this->saveProfiles($profiles);
-  }
 
   /* FILE MANIPULATION METHODS */
-
-  /*
-    Return path to file by key
-  */
-  public function getImportCsvPath ($key) {
-    return DIR_CACHE . $this->profiles_code . '/' . $key . '/import/';
-  }
 
   /*
     Returns import storage path for csv file
   */
   public function getImportCsvFilePath ($key) {
-    $path = $this->getImportCsvPath($key);
+    $path = $this->getUploadPath($key);
     return $path . $this->csvImportFileName;
   }
 
@@ -301,7 +174,7 @@ class ModelExtensionModuleFocCsv extends Model {
     Returns import storage path for images zip file
   */
   public function getImportImagesZipPath ($key) {
-    $path = $this->getImportCsvPath($key);
+    $path = $this->getUploadPath($key);
     return $path . $this->imagesZipImportFileName;
   }
 
@@ -309,30 +182,8 @@ class ModelExtensionModuleFocCsv extends Model {
     Returns images extract path
   */
   public function getImportImagesPath ($key) {
-    $path = $this->getImportCsvPath($key);
+    $path = $this->getUploadPath($key);
     return $path . $this->imagesZipExtractPath;
-  }
-
-  /*
-    Prepare import storage
-    Returns storage key
-  */
-  public function prepareImportPath () {
-    $key = md5(rand() . time());
-    $path = $this->getImportCsvPath($key);
-
-    if (is_dir($path)) {
-      return $this->prepareImportPath();
-    }
-
-    $this->model_extension_module_foc_csv->writeLog('Trying to create import path [' . $path . ']');
-    mkdir($path, 0755, true);
-
-    return $key;
-  }
-
-  public function setImportKey ($key) {
-    $this->importKey = $key;
   }
 
   /*
@@ -341,11 +192,11 @@ class ModelExtensionModuleFocCsv extends Model {
   private function filterCsvToDBBindings ($bindings) {
     $cleared = array();
 
-    foreach ($bindings as $csv_idx => $db_field) {
+    foreach ($bindings as $db_field => $csv_idx) {
       if ($db_field === 'nothing' || trim($db_field) === '') {
         continue;
       }
-      $cleared[$csv_idx] = $db_field;
+      $cleared[$db_field] = $csv_idx;
     }
 
     return $cleared;
@@ -358,9 +209,10 @@ class ModelExtensionModuleFocCsv extends Model {
     $cleared = $this->filterCsvToDBBindings($bindings);
     $data = array();
 
-    foreach ($cleared as $csv_idx => $db_field) {
+    foreach ($cleared as $db_field => $csv_idx) {
       if (isset($csv_row[$csv_idx])) {
         list($table, $field) = explode(':', $db_field);
+
         if (!isset($data[$table])) {
           $data[$table] = array();
         }
@@ -450,10 +302,13 @@ class ModelExtensionModuleFocCsv extends Model {
       $this->store_id = (int) $profile['storeId'];
     }
 
-    $manufacturer_id = $this->importManufacturer($tablesData['manufacturer']);
+    $manufacturer_id = 0;
+    if (isset($tablesData['manufacturer'])) {
+      $manufacturer_id = $this->importManufacturer($tablesData['manufacturer']);
 
-    // set manufacturer id to product fields
-    $tablesData['product']['manufacturer_id'] = $manufacturer_id;
+      // set manufacturer id to product fields
+      $tablesData['product']['manufacturer_id'] = $manufacturer_id;
+    }
 
     /* IMPORT ATTRIBUTES */
     if (!isset($profile['defaultAttributesGroup'])) {
@@ -547,30 +402,34 @@ class ModelExtensionModuleFocCsv extends Model {
     }
 
     /* IMPORT CATEGORIES */
-    $cleanCategoryNames = isset($profile['removeCharsFromCategory']) ? $profile['removeCharsFromCategory'] : '';
+    if (isset($tablesData['category_description'])) {
 
-    $category_ids = $this->importProductCategories($tablesData['category_description'], $profile['categoryDelimiter'], $profile['categoryLevelDelimiter'], $cleanCategoryNames, $this->language_id, $this->store_id);
+      $cleanCategoryNames = isset($profile['removeCharsFromCategory']) ? $profile['removeCharsFromCategory'] : '';
 
-    $fillParentCategories = isset($profile['fillParentCategories']) ? $profile['fillParentCategories'] : false;
-    $clearCategoriesBeforeImport = isset($profile['clearCategoriesBeforeImport']) ? $profile['clearCategoriesBeforeImport'] : false;
+      $category_ids = $this->importProductCategories($tablesData['category_description'], $profile['categoryDelimiter'], $profile['categoryLevelDelimiter'], $cleanCategoryNames, $this->language_id, $this->store_id);
 
-    if ($clearCategoriesBeforeImport) {
-      $this->db->query('DELETE FROM ' . DB_PREFIX . 'product_to_category WHERE product_id = ' . (int)$product_id);
-    }
+      $fillParentCategories = isset($profile['fillParentCategories']) ? $profile['fillParentCategories'] : false;
+      $clearCategoriesBeforeImport = isset($profile['clearCategoriesBeforeImport']) ? $profile['clearCategoriesBeforeImport'] : false;
 
-    if (!$this->deleteMode) {
-      foreach ($category_ids as $path => $ids) {
-        if ($fillParentCategories) {
-          foreach ($ids as $category_id) {
+      if ($clearCategoriesBeforeImport) {
+        $this->db->query('DELETE FROM ' . DB_PREFIX . 'product_to_category WHERE product_id = ' . (int)$product_id);
+      }
+
+      if (!$this->deleteMode) {
+        foreach ($category_ids as $path => $ids) {
+          if ($fillParentCategories) {
+            foreach ($ids as $category_id) {
+              $this->bindProductToCategory($product_id, $category_id);
+            }
+          }
+          else {
+            $category_id = array_pop($ids);
             $this->bindProductToCategory($product_id, $category_id);
           }
         }
-        else {
-          $category_id = array_pop($ids);
-          $this->bindProductToCategory($product_id, $category_id);
-        }
       }
     }
+
 
     return true;
   }
@@ -673,13 +532,6 @@ class ModelExtensionModuleFocCsv extends Model {
     $count = $this->db->query('SELECT COUNT(product_id) AS `count` FROM ' . DB_PREFIX . 'product_image WHERE product_id = ' . (int)$product_id)->row['count'];
 
     return $count > 0;
-  }
-
-  /*
-    Check if url is url:)
-  */
-  private function isUrl ($url) {
-    return preg_match('/^https?\:\/\//', $url);
   }
 
   /*
@@ -1093,21 +945,6 @@ class ModelExtensionModuleFocCsv extends Model {
 
     return $query->rows;
 
-  }
-
-  /*
-    Get database charset
-  */
-  public function getDBCharset () {
-    return $this->db->query('SELECT @@character_set_database AS `charset`')->row['charset'];
-  }
-
-  /*
-    Just OC version checker used to provide forward/backward compatibility
-  */
-  public function isOpencart3 () {
-    $version = (int)preg_replace('/\./', '', VERSION);
-    return $version > 2999;
   }
 
 }
