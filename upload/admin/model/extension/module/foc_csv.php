@@ -209,6 +209,9 @@ class ModelExtensionModuleFocCsv extends Model {
     ), $data);
   }
 
+  public function fillProfileEmptyValues ($profile) {
+    return array_replace_recursive($this->getDefaultProfile(), $profile);
+  }
   /*
     Load all profiles
   */
@@ -220,6 +223,11 @@ class ModelExtensionModuleFocCsv extends Model {
     if (count($profiles) === 0) {
       $profiles = $this->getDefaultProfiles();
     }
+    else {
+      foreach ($profiles as $key => $profile) {
+        $profiles[$key] = $this->fillProfileEmptyValues($profile);
+      }
+    }
 
     return $profiles;
   }
@@ -229,6 +237,11 @@ class ModelExtensionModuleFocCsv extends Model {
   */
   public function saveProfiles ($profiles) {
     $this->load->model('setting/setting');
+
+    foreach ($profiles as $key => $profile) {
+      $profiles[$key] = $this->fillProfileEmptyValues($profile);
+    }
+
     $this->model_setting_setting->editSettingValue($this->profiles_code, $this->profiles_key, $profiles);
   }
 
