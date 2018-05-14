@@ -23,6 +23,7 @@ class ModelExtensionModuleFocCsv extends Model {
     $this->log = new Log('foc_csv.txt');
 
     if (!is_dir(DIR_IMAGE . $this->imageSavePath)) {
+      $this->writeLog('Creating image save path [' . $this->imageSavePath . ']');
       mkdir(DIR_IMAGE . $this->imageSavePath, 0755, true);
     }
 
@@ -72,7 +73,16 @@ class ModelExtensionModuleFocCsv extends Model {
     $this->saveProfiles($this->getDefaultProfiles());
   }
 
-  public function writeLog ($msg) {
+  public function writeLog ($msg, $group = 'info') {
+    switch ($group) {
+      case 'error': $msg = '[ERROR] ' . $msg;
+                    break;
+      case 'warn' : $msg = '[WARN] ' . $msg;
+                    break;
+      default     : $msg = '[INFO] ' . $msg;
+                    break;
+    }
+
     $this->log->write($msg);
   }
 
@@ -312,6 +322,7 @@ class ModelExtensionModuleFocCsv extends Model {
       return $this->prepareImportPath();
     }
 
+    $this->model_extension_module_foc_csv->writeLog('Trying to create import path [' . $path . ']');
     mkdir($path, 0755, true);
 
     return $key;
@@ -435,14 +446,16 @@ class ModelExtensionModuleFocCsv extends Model {
   /*
     Import entry point
   */
-  public function import ($profile, $csv_row) {
+  public function import ($profile, $csv_row, $csv_row_num = 0) {
+
+    $this->csv_row_num = $csv_row_num;
 
     $skipOnEmpty = isset($profile['skipLineOnEmptyFields']) ? $profile['skipLineOnEmptyFields'] : array();
 
     if (!is_null($skipOnEmpty) && count($skipOnEmpty) > 0) {
       foreach ($skipOnEmpty as $item) {
         if (!isset($csv_row[$item['idx']]) || trim($csv_row[$item['idx']]) == '') {
-          $this->log->write('[SKIP_EMPTY] {' . $item['name'] . '}');
+          $this->writeLog('Skip empty {' . $item['name'] . '} on ' . $csv_row_num);
           return false;
         }
       }
@@ -748,7 +761,7 @@ class ModelExtensionModuleFocCsv extends Model {
     }
 
     if (is_null($key_value) || empty($key_value)) {
-      $this->log->write('[ERR] Empty key field [' . $key_field . '] value on [' . print_r($fields, true) . ']');
+      $this->writeLog('Empty key field [' . $key_field . '] value on [' . $this->csv_row_num . ']', 'error');
       return null;
     }
 
@@ -758,7 +771,7 @@ class ModelExtensionModuleFocCsv extends Model {
       @$id = $this->db->query('SELECT IFNULL((SELECT product_id FROM ' . DB_PREFIX . $key_table . ' WHERE ' . $key_field . ' LIKE "' . $this->db->escape($key_value).'"), 0) AS `id`')->row['id'];
     }
     else {
-      $this->log->write('[ERR] Product has empty key field [' . $key_field . ']!');
+      $this->writeLog('Product has empty key field [' . $key_field . '] on [' . $this->csv_row_num . '] !', 'error');
     }
 
     if (!$this->checkBeforeInsert || $this->checkerValue === ($id > 0)) {
@@ -797,7 +810,7 @@ class ModelExtensionModuleFocCsv extends Model {
       $id = $this->db->query('SELECT IFNULL((SELECT manufacturer_id FROM '. DB_PREFIX .'manufacturer WHERE name LIKE "' . $fields['name'] . '" LIMIT 1), 0) AS `id`')->row['id'];
     }
     else {
-      $this->log->write('[WARN] Manufacturer [' . $fields['name'] . '] has wrong name, so skipping...');
+      $this->writeLog('Manufacturer [' . $fields['name'] . '] has wrong name on [' . $this->csv_row_num . '], so skipping...', 'warn');
       return 0;
     }
 
@@ -951,7 +964,7 @@ class ModelExtensionModuleFocCsv extends Model {
               $valid = true;
             }
             else {
-              $this->log->write('[OPTION_ERROR] (' . $name . ') is not presented!');
+              $this->writeLog('[OPTION_ERROR] (' . $name . ') is not presented on [' . $this->csv_row_num . ']!', 'warn');
 
               $valid = false;
             }
@@ -1025,11 +1038,9 @@ class ModelExtensionModuleFocCsv extends Model {
       }
     }
     catch (Exception $e) {
-      var_dump($e->getMessage());
-      die('err');
+      $this->writeLog('Column parser error [' . $e->getMessage() . '] on [' . $this->csv_row_num . ']', 'error');
     }
-      // var_dump($result);
-      // die;
+
     return $result;
   }
 

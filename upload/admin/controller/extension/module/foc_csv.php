@@ -217,12 +217,17 @@ class ControllerExtensionModuleFocCsv extends Controller {
       // цсвэшник - просто перемещаем
       if (isset($_FILES['csv-file'])) {
 
+        $this->model_extension_module_foc_csv->writeLog('CSV file uploaded');
+
         $charset = strtolower($this->model_extension_module_foc_csv->getDBCharset());
         $encoding = strtolower($profile['encoding']);
 
         // try change file encoding
         if ($charset !== $encoding) {
+          $this->model_extension_module_foc_csv->writeLog('Trying to convert character encoding from [' . $encoding . '] to [' . $charset . ']');
+
           if (!function_exists('iconv')) {
+            $this->model_extension_module_foc_csv->writeLog('Please install iconv or convert csv file to [' . $charset . ']', 'error');
             $this->sendFail('Please install iconv or convert csv file to [' . $charset . ']');
           }
 
@@ -235,6 +240,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
           fclose($src);
           fclose($out);
+
+          $this->model_extension_module_foc_csv->writeLog('File [' . $src . '] encoded successfully!');
         }
         else {
           move_uploaded_file($_FILES['csv-file']['tmp_name'], $importFile);
@@ -242,6 +249,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
       }
       // архив картинок - перемещаем и распаковываем
       if (isset($_FILES['images-zip'])) {
+        $this->model_extension_module_foc_csv->writeLog('Images ZIP file uploaded');
+
         move_uploaded_file($_FILES['images-zip']['tmp_name'], $imagesFile);
 
         // unzip...unset
@@ -295,8 +304,11 @@ class ControllerExtensionModuleFocCsv extends Controller {
         if (isset($json['position']) && isset($json['key']) && isset($json['profile'])) {
           $import_key = $json['key'];
           $position = $json['position'];
+          $errors = isset($json['errors']) ? intval($json['errors']) : 0;
           $lines = isset($json['lines']) ? $json['lines'] : 0;
           $profile = $json['profile'];
+
+          $this->model_extension_module_foc_csv->writeLog('Import part start [' . $lines . ']');
 
           $profile = $this->model_extension_module_foc_csv->fillProfileEmptyValues($profile);
 
@@ -326,14 +338,17 @@ class ControllerExtensionModuleFocCsv extends Controller {
             $i++;
 
             if (($lines + $i) <= $skipLines) {
-              $this->model_extension_module_foc_csv->writeLog('[SKIP_LINE] Line:' . ($lines+$i) . ' To skip:' . $skipLines);
+              $this->model_extension_module_foc_csv->writeLog('Skip line:' . ($lines + $i) . ', lines to skip:' . $skipLines);
               continue;
             }
             // import stuff..
             try {
-              $this->model_extension_module_foc_csv->import($profile, $line);
+              if (!$this->model_extension_module_foc_csv->import($profile, $line, $lines + $i)) {
+                $errors++;
+              }
             }
             catch (Exception $e) {
+              $this->model_extension_module_foc_csv->writeLog('Error on import at [' . ($lines + $i) . '] (' . $e->getMessage() . ')', 'error');
               $this->sendFail($e->getMessage());
             }
           }
@@ -341,15 +356,19 @@ class ControllerExtensionModuleFocCsv extends Controller {
           $position = ftell($csv_fid);
           fclose($csv_fid);
 
+          $this->model_extension_module_foc_csv->writeLog('Import part end at [' . ($lines + $i) . ']');
+
           $this->sendOk(array(
             'key' => $import_key,
             'position' => $position,
+            'errors' => $errors,
             'lines' => $i + $lines
           ));
         }
       }
     }
 
+    $this->model_extension_module_foc_csv->writeLog('Missing required fields! Fields are $key: [' . $key .'], $position: [' . $position . '] and $profile: [' . print_r($profile, true) . ']', 'error');
     $this->sendFail();
   }
 
