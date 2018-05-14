@@ -72,6 +72,10 @@ class ModelExtensionModuleFocCsv extends Model {
     $this->saveProfiles($this->getDefaultProfiles());
   }
 
+  public function writeLog ($msg) {
+    $this->log->write($msg);
+  }
+
   /*
     Default profile data
   */
