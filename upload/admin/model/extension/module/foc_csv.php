@@ -398,6 +398,7 @@ class ModelExtensionModuleFocCsv extends Model {
         $this->updateExisting = false;
       break;
       case 'updateCreate':
+      case 'removeOthers': // removeOthers is loike updateCreate but before this - we have empty db!
         // default settings...
       break;
       case 'addIfNotFound':
@@ -405,12 +406,6 @@ class ModelExtensionModuleFocCsv extends Model {
         $this->updateExisting = false;
       break;
       case 'removeByList':
-        $this->deleteMode = true;
-        $this->insertNew = false;
-        $this->updateExisting = false;
-      break;
-      case 'removeOthers':
-        $this->checkerValue = false;
         $this->deleteMode = true;
         $this->insertNew = false;
         $this->updateExisting = false;
@@ -768,6 +763,31 @@ class ModelExtensionModuleFocCsv extends Model {
     if ($this->insertNew) {
       return $this->model_catalog_product->addProduct($fields);
     }
+  }
+
+  /*
+    Remove all products and related data
+  */
+  public function clearProducts () {
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_attribute");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_description");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_discount");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_filter");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_image");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_option");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_option_value");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_related");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_reward");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_special");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_download");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_layout");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_store");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_recurring");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "review");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "url_alias");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "coupon_product");
   }
 
   /* MANUFACTURER METHODS */

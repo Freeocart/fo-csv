@@ -277,7 +277,15 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
       // remove manufacturers if necessary
       if (isset($profile['removeManufacturersBeforeImport']) && $profile['removeManufacturersBeforeImport']) {
+        $this->model_extension_module_foc_csv->writeLog('Clearing manufacturers table');
         $this->model_extension_module_foc_csv->clearManufacturers();
+      }
+
+      // removeOthers importMode handler:
+      // before importData we remove all products from database
+      // on importPart this mode === updateCreate mode
+      if ($profile['importMode'] == 'removeOthers') {
+        $this->model_extension_module_foc_csv->clearProducts();
       }
 
       // urlencode()
