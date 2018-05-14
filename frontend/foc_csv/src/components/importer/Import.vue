@@ -10,6 +10,12 @@
         </div>
       </div>
     </template>
+    <div v-if="errors > 0">
+      <div class="alert alert-danger" role="alert">
+        <p>{{ $t('During import we had errors, please check foc logs!') }}</p>
+        <p>{{ $t('Errors count') }} - <strong>{{ errors }}</strong></p>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-12">
         <div class="row">
@@ -120,7 +126,8 @@ export default {
       csvImportProgress: {
         current: 0,
         total: 0
-      }
+      },
+      errors: 0
     }
   },
   computed: {
@@ -130,7 +137,8 @@ export default {
       'profile',
       'keyFields',
       'currentProfile',
-      'submittableData'
+      'submittableData',
+      'importMode'
     ]),
     ...mapVuexModels([
       'processAtStepNum',
@@ -144,37 +152,39 @@ export default {
     }, 'importer')
   },
   methods: {
-    async submitImportPart ({ importUrl, key, lines, position }) {
+    async submitImportPart (importUrl, obj) {
       try {
-        let data = {
-          key,
-          position,
-          lines,
-          profile: this.profile
-        }
-        let response = await this.$http.post(decodeURIComponent(importUrl), data)
-
-        position = response.data.message.position
-        lines = response.data.message.lines
+        obj.profile = this.profile
+        let response = await this.$http.post(decodeURIComponent(importUrl), obj)
+        let position = response.data.message.position
 
         this.current = position
 
-        if (position < this.total) {
-          this.submitImportPart({ importUrl, key, lines, position })
+        if (this.current < this.total) {
+          this.submitImportPart(importUrl, response.data.message)
         }
         else {
           this.working = false
           this.current = 0
+          this.errors = response.data.message.errors
         }
       }
       catch (e) {
         console.error(e)
         this.current = 0
         this.working = false
+        this.errors = this.errors || 1
       }
     },
     async submitImportData () {
       let data = this.submittableData
+      // reset errors counter
+      this.errors = 0
+
+      if (!this.checkIfDestructive(data.profile)) {
+        alert(this.$t('Import canceled!'))
+        return false
+      }
 
       if (validateProfile(data.profile)) {
         try {
@@ -183,20 +193,26 @@ export default {
           if (response.data.status === 'ok') {
             this.total = response.data.message.csvTotal
             this.working = true
-            console.log(response.data.message)
-            this.submitImportPart(response.data.message)
+            this.submitImportPart(response.data.message.importUrl, response.data.message)
           }
         }
         catch (e) {
           this.working = false
           this.current = 0
-          alert('Ошибка при отправке!')
+          alert(this.$t('Error during sending!'))
           console.error(e)
         }
       }
       else {
-        alert('Error in profile!')
+        alert(this.$t('Invalid profile!'))
       }
+    },
+    checkIfDestructive (profile) {
+      if (profile.importMode === 'removeByList' || profile.importMode === 'removeOthers') {
+        return confirm(this.$t('Are you totally sure you want do this???! With this import method you can lose your data!'))
+      }
+
+      return true
     },
     ...mapActions([
       'bindDBToCsvField'

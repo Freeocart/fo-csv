@@ -75,5 +75,17 @@
   "Attribute value": "Значение атрибута",
   "Skip line if fields empty": "Пропустить строку если поля пустые",
   "Default status": "Статус по умолчанию",
-  "Default stock status": "Складской статус"
+  "Default stock status": "Складской статус",
+
+  "During import we had errors, please check foc logs!": "Во время импорта произошли ошибки, пожалуйста, проверьте логи foc!",
+  "Errors count": "Количество ошибок",
+
+  "Error during sending!": "Ошибка во время отправки данных!",
+  "Invalid profile!": "Ошибки в профиле!",
+  "Import canceled!": "Импорт отменён!",
+
+  "Attention! You chosed a danger import mode!": "Внимание! Вы выбрали опасный режим импорта!",
+  "Before import from CSV, we will remove all product related data from your database!": "Перед импортом данных из CSV, будут удалены все данные о продуктах из вашей базы данных!",
+  "Please, make sure you have working backup before you continue!": "Пожалуйста, убедитесь что у вас есть рабочий бэкап перед тем как продолжать!",
+  "Are you totally sure you want do this???! With this import method you can lose your data!": "Вы абсолютно уверены, что хотите продолжить???! Этот режим импорта может привести к потере всех ваших данных!"
 }

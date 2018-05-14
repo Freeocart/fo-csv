@@ -32,6 +32,16 @@
         <option value="removeByList">{{ $t('Remove all matched') }}</option>
         <option value="removeOthers">{{ $t('Remove all unmatched') }}</option>
       </select>
+
+      <div v-if="importMode === 'removeOthers'" class="alert alert-danger">
+        <h3>{{ $t('Attention! You chosed a danger import mode!') }}</h3>
+        <p>
+          {{ $t('Before import from CSV, we will remove all product related data from your database!') }}
+        </p>
+        <p>
+          {{ $t('Please, make sure you have working backup before you continue!') }}
+        </p>
+      </div>
     </div>
 
     <div class="form-group">
