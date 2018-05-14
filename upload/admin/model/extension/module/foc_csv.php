@@ -120,14 +120,14 @@ class ModelExtensionModuleFocCsv extends Model {
   */
   public function getKeyFields () {
     return array(
-      DB_PREFIX . 'product:product_id',
-      DB_PREFIX . 'product:sku',
-      DB_PREFIX . 'product:model',
-      DB_PREFIX . 'product_description:name',
-      DB_PREFIX . 'product:ean',
-      DB_PREFIX . 'product:mpn',
-      DB_PREFIX . 'product:jan',
-      DB_PREFIX . 'product:isbn'
+      'product:product_id',
+      'product:sku',
+      'product:model',
+      'product_description:name',
+      'product:ean',
+      'product:mpn',
+      'product:jan',
+      'product:isbn'
     );
   }
 
@@ -136,18 +136,18 @@ class ModelExtensionModuleFocCsv extends Model {
   */
   public function getDbFields () {
     $tables = array(
-      DB_PREFIX . 'product',
-      DB_PREFIX . 'product_description',
-      DB_PREFIX . 'product_image',
-      DB_PREFIX . 'manufacturer',
-      DB_PREFIX . 'category',
-      DB_PREFIX . 'category_description'
+      'product',
+      'product_description',
+      'product_image',
+      'manufacturer',
+      'category',
+      'category_description'
     );
 
     $result = array();
 
     foreach ($tables as $table) {
-      $data = $this->db->query('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = "' . DB_DATABASE . '" AND TABLE_NAME = "' . $table . '"');
+      $data = $this->db->query('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = "' . DB_DATABASE . '" AND TABLE_NAME = "' . DB_PREFIX . $table . '"');
       $result[$table] = array_column($data->rows, 'COLUMN_NAME');
     }
 
@@ -462,10 +462,10 @@ class ModelExtensionModuleFocCsv extends Model {
       $this->store_id = (int) $profile['storeId'];
     }
 
-    $manufacturer_id = $this->importManufacturer($tablesData[DB_PREFIX . 'manufacturer']);
+    $manufacturer_id = $this->importManufacturer($tablesData['manufacturer']);
 
     // set manufacturer id to product fields
-    $tablesData[DB_PREFIX . 'product']['manufacturer_id'] = $manufacturer_id;
+    $tablesData['product']['manufacturer_id'] = $manufacturer_id;
 
     /* IMPORT ATTRIBUTES */
     if (!isset($profile['defaultAttributesGroup'])) {
@@ -482,15 +482,15 @@ class ModelExtensionModuleFocCsv extends Model {
     /* IMPORT PRODUCTS */
 
     // set default status if not presented
-    if (!isset($tablesData[DB_PREFIX.'product']['status'])
+    if (!isset($tablesData['product']['status'])
         && isset($profile['defaultStatus'])
     ) {
-      $tablesData[DB_PREFIX.'product']['status'] = $profile['defaultStatus'];
+      $tablesData['product']['status'] = $profile['defaultStatus'];
     }
 
-    $productData = $this->productTemplate($tablesData[DB_PREFIX.'product']);
+    $productData = $this->productTemplate($tablesData['product']);
     $productData['manufacturer_id'] = $manufacturer_id;
-    $productData['product_description'] = $this->productDescriptionTemplate($tablesData[DB_PREFIX.'product_description']);
+    $productData['product_description'] = $this->productDescriptionTemplate($tablesData['product_description']);
 
     // set attributes to product bindings
     if ($attributes) {
@@ -533,7 +533,7 @@ class ModelExtensionModuleFocCsv extends Model {
       return false;
     }
 
-    if (!$this->deleteMode && isset($tablesData[DB_PREFIX . 'product_image'])) {
+    if (!$this->deleteMode && isset($tablesData['product_image'])) {
       /* IMPORT IMAGES */
       $setPreviewFromGallery = false;
       $image = $this->db->query('SELECT `image` FROM '.DB_PREFIX.'product WHERE product_id = ' . (int)$product_id)->row['image'];
@@ -554,14 +554,14 @@ class ModelExtensionModuleFocCsv extends Model {
           $this->db->query('DELETE FROM ' . DB_PREFIX . 'product_image WHERE product_id=' . (int)$product_id);
         }
 
-        $this->importGallery($tablesData[DB_PREFIX . 'product_image'], $profile['csvImageFieldDelimiter'], $profile['downloadImages'], $setPreviewFromGallery, $product_id);
+        $this->importGallery($tablesData['product_image'], $profile['csvImageFieldDelimiter'], $profile['downloadImages'], $setPreviewFromGallery, $product_id);
       }
     }
 
     /* IMPORT CATEGORIES */
     $cleanCategoryNames = isset($profile['removeCharsFromCategory']) ? $profile['removeCharsFromCategory'] : '';
 
-    $category_ids = $this->importProductCategories($tablesData[DB_PREFIX . 'category_description'], $profile['categoryDelimiter'], $profile['categoryLevelDelimiter'], $cleanCategoryNames, $this->language_id, $this->store_id);
+    $category_ids = $this->importProductCategories($tablesData['category_description'], $profile['categoryDelimiter'], $profile['categoryLevelDelimiter'], $cleanCategoryNames, $this->language_id, $this->store_id);
 
     $fillParentCategories = isset($profile['fillParentCategories']) ? $profile['fillParentCategories'] : false;
     $clearCategoriesBeforeImport = isset($profile['clearCategoriesBeforeImport']) ? $profile['clearCategoriesBeforeImport'] : false;
@@ -755,7 +755,7 @@ class ModelExtensionModuleFocCsv extends Model {
     $id = 0;
 
     if ($this->checkBeforeInsert && !empty($key_value)) {
-      @$id = $this->db->query('SELECT IFNULL((SELECT product_id FROM ' . $key_table . ' WHERE ' . $key_field . ' LIKE "' . $this->db->escape($key_value).'"), 0) AS `id`')->row['id'];
+      @$id = $this->db->query('SELECT IFNULL((SELECT product_id FROM ' . DB_PREFIX . $key_table . ' WHERE ' . $key_field . ' LIKE "' . $this->db->escape($key_value).'"), 0) AS `id`')->row['id'];
     }
     else {
       $this->log->write('[ERR] Product has empty key field [' . $key_field . ']!');
