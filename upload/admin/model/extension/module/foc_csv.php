@@ -95,6 +95,7 @@ class ModelExtensionModuleFocCsv extends Model {
       'csvFieldDelimiter' => ';',
       'categoryDelimiter' => '/',
       'categoryLevelDelimiter' => '>>',
+      'defaultAttributesGroup' => 'FOC',
       'keyField' => 'product_id',
       'skipLines' => 1,
       'bindings' => new stdclass,
@@ -111,6 +112,8 @@ class ModelExtensionModuleFocCsv extends Model {
       'stockStatusRewrites' => array(),
       'downloadImages' => false,
       'attributeParser' => null,
+      'store' => $this->config->get('config_store_id'),
+      'language' => $this->config->get('config_language_id'),
       'attributeParserData' => array(),
       'skipLineOnEmptyFields' => array()
     );
