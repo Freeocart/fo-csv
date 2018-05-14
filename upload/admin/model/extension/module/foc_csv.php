@@ -421,29 +421,6 @@ class ModelExtensionModuleFocCsv extends Model {
   }
 
   /*
-    Helper to create SQL queries
-  */
-  private function fieldsToSQL ($fields) {
-    $keys = implode(',', array_keys($fields));
-    $update = '';
-
-    foreach ($fields as $key => $value) {
-      if (is_numeric($value)) {
-        $fields[$key] = $this->db->escape($value);
-      }
-      else {
-        $fields[$key] = '"' . $this->db->escape($value) . '"';
-      }
-      $update .= $key . '=' . $fields[$key] . ',';
-    }
-    return array(
-      'keys' => $keys,
-      'values' => implode(',', array_values($fields)),
-      'update' => rtrim($update, ',')
-    );
-  }
-
-  /*
     Import entry point
   */
   public function import ($profile, $csv_row, $csv_row_num = 0) {
