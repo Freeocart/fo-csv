@@ -295,11 +295,14 @@ class ControllerExtensionModuleFocCsv extends Controller {
         if (isset($json['position']) && isset($json['key']) && isset($json['profile'])) {
           $import_key = $json['key'];
           $position = $json['position'];
+          $lines = isset($json['lines']) ? $json['lines'] : 0;
           $profile = $json['profile'];
+
+          $profile = $this->model_extension_module_foc_csv->fillProfileEmptyValues($profile);
 
           $this->model_extension_module_foc_csv->setImportKey($import_key);
 
-          $skipFirstLine = $position === 0 ? $profile['skipFirstLine'] : false;
+          $skipLines = $profile['skipLines'];
           $delimiter = empty($profile['csvFieldDelimiter']) ? ';' : $profile['csvFieldDelimiter'];
           $importAtOnce = empty($profile['processAtStepNum']) ? 10 : $profile['processAtStepNum'];
 
@@ -320,7 +323,10 @@ class ControllerExtensionModuleFocCsv extends Controller {
           $i = 0;
 
           while ($i < $importAtOnce && ($line = fgetcsv($csv_fid, 0, $delimiter)) !== false) {
-            if ($i++ === 0 && $skipFirstLine && $position === 0) {
+            $i++;
+
+            if (($lines + $i) <= $skipLines) {
+              $this->model_extension_module_foc_csv->writeLog('[SKIP_LINE] Line:' . ($lines+$i) . ' To skip:' . $skipLines);
               continue;
             }
             // import stuff..
@@ -338,7 +344,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
           $this->sendOk(array(
             'key' => $import_key,
             'position' => $position,
-            'lines' => $i
+            'lines' => $i + $lines
           ));
         }
       }
