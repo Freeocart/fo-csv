@@ -1,3 +1,5 @@
+import { DEFAULT_PROFILE_NAME } from '@/config'
+
 export default {
   importJob: {
     importJobWorking: false,
@@ -7,7 +9,7 @@ export default {
   urls: {
     import: ''
   },
-  currentProfile: 'default',
+  currentProfile: DEFAULT_PROFILE_NAME,
   data: {},
   profile: {
     statusRewrites: {},

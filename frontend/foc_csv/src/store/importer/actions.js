@@ -1,12 +1,9 @@
 import Vue from 'vue'
-import { DEFAULT_PROFILE_NAME, SAVE_PROFILE_URL, SAVE_ALL_PROFILES_URL } from '@/config'
+import { SAVE_PROFILE_URL, SAVE_ALL_PROFILES_URL } from '@/config'
+import commonActions from '@/store/common/actions'
 
 export default {
-  setInitialData ({ commit, getters }, data) {
-    commit('SET_INITIAL_DATA', data)
-    commit('SET_CURRENT_PROFILE_NAME', DEFAULT_PROFILE_NAME)
-    commit('SET_CURRENT_PROFILE', getters.currentProfile)
-  },
+  ...commonActions,
   setCurrentProfileName ({ commit, getters }, profile) {
     commit('SET_CURRENT_PROFILE_NAME', profile)
     commit('SET_CURRENT_PROFILE', getters.currentProfile)

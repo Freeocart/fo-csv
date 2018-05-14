@@ -1,9 +1,8 @@
 import Vue from 'vue'
+import commonMutations from '@/store/common/mutations'
 
 export default {
-  SET_INITIAL_DATA (state, initial) {
-    Vue.set(state, 'data', initial)
-  },
+  ...commonMutations,
   SET_STOCK_STATUS_REWRITE_RULE (state, { value, id }) {
     if (!state.profile.stockStatusRewrites) {
       Vue.set(state.profile, 'stockStatusRewrites', {})
@@ -16,18 +15,9 @@ export default {
     }
     Vue.set(state.profile.statusRewrites, id, value)
   },
-  SET_CURRENT_PROFILE_NAME (state, profileName) {
-    state.currentProfile = profileName
-  },
-  SET_CURRENT_PROFILE (state, profile) {
-    state.profile = profile
-  },
   ADD_PROFILE (state, { name, profile }) {
     Vue.set(state.data.profiles, name, profile)
   },
-  // SET_PROCESS_AT_STEP_NUM (state, num) {
-  //   Vue.set(state.profile, 'processAtStepNum', num)
-  // },
   SAVE_NEW_PROFILE (state, name) {
     let profileSettings = Object.assign({}, state.profile)
     Vue.set(state.data.profiles, name, profileSettings)
@@ -39,7 +29,7 @@ export default {
     state.profile.categoryDelimiter = delimiter
   },
   BIND_DB_TO_CSV_FIELD (state, [ dbField, csvField ]) {
-    Vue.set(state.profile.bindings, csvField, dbField)
+    Vue.set(state.profile.bindings, dbField, csvField)
   },
   SET_CSV_FILE_REF (state, ref) {
     Vue.set(state.data, 'csvFileRef', ref)

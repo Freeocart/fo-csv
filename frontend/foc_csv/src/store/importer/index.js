@@ -39,7 +39,6 @@ let importProgress = genStoreFields([
   'importJobCurrent',
   'importJobWorking'
 ], 'importJob')
-console.log(importProgress)
 
 export default {
   namespaced: true,
