@@ -139,11 +139,12 @@ export default {
     }, 'importer')
   },
   methods: {
-    async submitImportPart ({ importUrl, key, position }) {
+    async submitImportPart ({ importUrl, key, lines, position }) {
       try {
         let data = {
           key,
           position,
+          lines,
           profile: this.profile
         }
         let response = await this.$http.post(decodeURIComponent(importUrl), data)
