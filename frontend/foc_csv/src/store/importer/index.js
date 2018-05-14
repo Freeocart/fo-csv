@@ -11,7 +11,7 @@ import { genStoreFields } from '@/helpers'
 let fields = genStoreFields([
   'keyField',
   'fillParentCategories',
-  'skipFirstLine',
+  'skipLines',
   'store',
   'language',
   'importMode',

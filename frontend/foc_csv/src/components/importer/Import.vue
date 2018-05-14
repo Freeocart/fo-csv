@@ -38,14 +38,19 @@
               <csv-file-upload></csv-file-upload>
             </div>
 
-            <div class="form-group">
-              <label for="" class="label label-default">{{ $t('Process lines per query') }}</label>
-              <input type="text" v-model="processAtStepNum" class="form-control">
-            </div>
-
-            <div class="form-group">
-              <label for="" class="label label-default">{{ $t('Skip first line') }}</label>
-              <input type="checkbox" v-model="skipFirstLine">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="" class="label label-default">{{ $t('Process lines per query') }}</label>
+                  <input type="text" v-model="processAtStepNum" class="form-control">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="" class="label label-default">{{ $t('Skip lines') }}</label>
+                  <input type="text" class="form-control" v-model="skipLines">
+                </div>
+              </div>
             </div>
 
             <div class="form-group">
@@ -129,7 +134,7 @@ export default {
     ]),
     ...mapVuexModels([
       'processAtStepNum',
-      'skipFirstLine',
+      'skipLines',
       'keyField'
     ], 'importer'),
     ...mapVuexModels({
@@ -150,10 +155,12 @@ export default {
         let response = await this.$http.post(decodeURIComponent(importUrl), data)
 
         position = response.data.message.position
+        lines = response.data.message.lines
+
         this.current = position
 
         if (position < this.total) {
-          this.submitImportPart({ importUrl, key, position })
+          this.submitImportPart({ importUrl, key, lines, position })
         }
         else {
           this.working = false
@@ -176,6 +183,7 @@ export default {
           if (response.data.status === 'ok') {
             this.total = response.data.message.csvTotal
             this.working = true
+            console.log(response.data.message)
             this.submitImportPart(response.data.message)
           }
         }

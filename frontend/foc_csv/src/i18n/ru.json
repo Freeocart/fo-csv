@@ -28,7 +28,7 @@
   "Fields settings": "Управление полями",
   "CSV file": "CSV файл",
   "Process lines per query": "Сколько обновлять записей за раз",
-  "Skip first line": "Пропустить первую строку",
+  "Skip lines": "Пропустить строки",
   "Key field": "Ключевое поле (по нему идет сличение)",
   "Fields matching": "Сопоставление полей",
   "CSV field": "CSV поле",
