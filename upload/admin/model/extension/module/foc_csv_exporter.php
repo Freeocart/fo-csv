@@ -65,6 +65,52 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     Make csv lines by profile config and return
   */
   public function export ($profile, $offset = 0, $limit = 10) {
+
+    $productIds = array_column($this->getProducts($offset, $limit), 'product_id');
+    $preparedItems = array();
+    $csvLines = array();
+
+    foreach ($productIds as $id) {
+      $preparedItems[] = $this->prepareData($id, $profile);
+    }
+
+    foreach ($preparedItems as $dataItem) {
+      $csvLine = array();
+      foreach ($profile['bindings'] as $idx => $binding) {
+        list ($table, $field) = explode(':', $binding['dbField']);
+        $separator = '';
+
+        // categories separator
+        if ($table === 'category_description' || $table === 'category') {
+          $separator = $profile['categoriesDelimiter'];
+        }
+        // images separator
+        if ($table === 'product_image') {
+          $separator = $profile['galleryImagesDelimiter'];
+        }
+
+        if (isset($dataItem[$table][$field])) {
+          $csvLine[$idx] = stripcslashes($dataItem[$table][$field]);
+        }
+        // multiple values line
+        else if (isset($dataItem[$table]) && is_array($dataItem[$table])) {
+          $csvLine[$idx] = '';
+          foreach ($dataItem[$table] as $item) {
+            if (isset($item[$field])) {
+              $csvLine[$idx] .= $item[$field] . $separator;
+            }
+          }
+          $csvLine[$idx] = stripcslashes(rtrim($csvLine[$idx], $separator));
+        }
+        else {
+          $csvLine[$idx] = '';
+        }
+      }
+
+      $csvLines[] = $csvLine;
+    }
+
+    return $csvLines;
   }
 
   /*
