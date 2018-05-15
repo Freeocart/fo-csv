@@ -99,8 +99,7 @@
 <script>
 
 import { createNamespacedHelpers } from 'vuex'
-import { submitData, validateProfile, mapVuexModels } from '@/helpers'
-import { IMPORT_URL } from '@/config'
+import { validateProfile, mapVuexModels } from '@/helpers'
 
 import DbFieldsSelect from './DbFieldsSelect'
 import ImportProgress from './ImportProgress'
@@ -188,7 +187,7 @@ export default {
 
       if (validateProfile(data.profile)) {
         try {
-          let response = await submitData(this.$store.actionUrl(IMPORT_URL), data)
+          let response = await this.$api.importer.submitData(data)
 
           if (response.data.status === 'ok') {
             this.total = response.data.message.csvTotal

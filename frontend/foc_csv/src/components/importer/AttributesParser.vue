@@ -46,7 +46,7 @@
 import { mapVuexModels } from '@/helpers'
 import { createNamespacedHelpers } from 'vuex'
 import Autocomplete from 'autocomplete-vue'
-import { ATTRIBUTES_GROUP_AUTOCOMPLETE_URL } from '@/config'
+import { ATTRIBUTES_GROUP_AUTOCOMPLETE_URL } from '@/api/routes'
 
 import AttributeParserSettingsWidgets from './attributeParserSettingsWidgets'
 
@@ -71,7 +71,7 @@ export default {
       'attributeParserOptions'
     ]),
     attributesGroupUrl () {
-      return this.$store.actionUrl(ATTRIBUTES_GROUP_AUTOCOMPLETE_URL)
+      return this.$api.mkUrl(ATTRIBUTES_GROUP_AUTOCOMPLETE_URL)
     },
     currentAttributeParserName: {
       get () {
