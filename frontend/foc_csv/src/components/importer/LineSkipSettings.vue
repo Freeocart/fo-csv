@@ -27,10 +27,10 @@
 export default {
   props: {
     csvFields: {
-      default: []
+      default: () => []
     },
     value: {
-      default: []
+      default: () => []
     }
   },
   computed: {

@@ -11,10 +11,12 @@
 export default {
   props: {
     data: {
-      defaults: {}
+      default: () => {
+        return {}
+      }
     },
     selected: {
-      defaults: ''
+      default: ''
     }
   },
   computed: {

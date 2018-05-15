@@ -9,9 +9,11 @@
 export default {
   props: {
     progress: {
-      default: {
-        current: 0,
-        total: 0
+      default: () => {
+        return {
+          current: 0,
+          total: 0
+        }
       }
     }
   },
