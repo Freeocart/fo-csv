@@ -42,8 +42,43 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     );
   }
 
-  public function export () {
-    die('test');
+  /*
+    convert table:field to table => [field, field]
+  */
+  public function exportSchema ($bindings) {
+    $result = array();
+    foreach ($bindings as $binding) {
+      list ($table, $field) = explode(':', $binding['dbField']);
+      if (!isset($result[$table])) {
+        $result[$table] = array();
+      }
+
+      $result[$table][] = $field;
+    }
+
+    return $result;
+  }
+
+  /*
+    Make csv lines by profile config and return
+  */
+  public function export ($profile, $offset = 0, $limit = 10) {
+  }
+
+  /*
+    Select and return product ids by offset and limit
+  */
+  public function getProducts ($offset, $limit) {
+    $sql = 'SELECT product_id FROM ' . DB_PREFIX . 'product LIMIT ' . (int)$limit . ' OFFSET ' . (int)$offset;
+    return $this->db->query($sql)->rows;
+  }
+
+  /*
+    return total products count
+  */
+  public function getProductTotal () {
+    $this->load->model('catalog/product');
+    return $this->model_catalog_product->getTotalProducts();
   }
 
 }
