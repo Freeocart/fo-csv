@@ -7,14 +7,12 @@ import router from './router'
 import i18n from './i18n'
 
 import store from './store'
-import UrlStore from './url-store'
-
+import ApiProvider from './api'
 import { validateAppConfig } from './helpers'
 
 Vue.use(resource)
 Vue.config.productionTip = true
 
-// let AppConfig = require('./test.json')
 let AppConfig = {}
 
 if (window.FOC_CSV_PARAMS) {
@@ -22,8 +20,9 @@ if (window.FOC_CSV_PARAMS) {
 }
 
 if (validateAppConfig(AppConfig.requestConfig)) {
-  let urlManager = new UrlStore(AppConfig.requestConfig)
-  store.actionUrl = (action) => urlManager.actionUrl(action)
+  // configure api provider
+  let api = ApiProvider.prepare(AppConfig.requestConfig)
+  Vue.use(api)
 
   store.dispatch('importer/setInitialData', Object.assign({}, AppConfig.initial.importer, AppConfig.initial.common))
   store.dispatch('exporter/setInitialData', Object.assign({}, AppConfig.initial.exporter, AppConfig.initial.common))

@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import { SAVE_PROFILE_URL, SAVE_ALL_PROFILES_URL } from '@/config'
 import commonActions from '@/store/common/actions'
 
 export default {
@@ -22,7 +21,7 @@ export default {
   },
   async saveNewProfile ({ commit, state }, name) {
     try {
-      await Vue.http.post(this.actionUrl(SAVE_PROFILE_URL), {
+      await Vue.$api.importer.saveProfile({
         name,
         profile: state.profile
       })
@@ -31,6 +30,7 @@ export default {
       commit('SET_CURRENT_PROFILE_NAME', name)
     }
     catch (e) {
+      console.log(e)
       alert('error on profile saving!')
     }
   },
@@ -51,9 +51,8 @@ export default {
     commit('SET_ATTRIBUTE_PARSER_DATA', data)
   },
   async saveAllProfiles ({ commit }, profiles) {
-    await Vue.http.post(this.actionUrl(SAVE_ALL_PROFILES_URL), {
-      profiles
-    })
+    await Vue.$api.importer.saveProfiles(profiles)
+
     commit('CLEAR_ALL_PROFILES')
     commit('SET_PROFILES', profiles)
   },
