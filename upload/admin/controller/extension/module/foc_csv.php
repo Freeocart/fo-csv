@@ -162,8 +162,16 @@ class ControllerExtensionModuleFocCsv extends Controller {
     Load profile settings from DB
   */
   public function loadProfile () {
+    $type = null;
+
+    if (isset($this->request->get['type'])) {
+      $type = $this->request->get['type'];
+    }
+    else {
+      $this->sendFail('Profile type not specified!');
+    }
+
     $this->load->model('extension/module/foc_csv_common');
-    $this->load->model('extension/module/foc_csv');
 
     $name = 'default';
 
@@ -171,7 +179,20 @@ class ControllerExtensionModuleFocCsv extends Controller {
       $name = $this->request->get['profile'];
     }
 
-    $profile = $this->extension_module_foc_csv->loadProfile($name);
+    $profile = null;
+
+    if ($type === 'importer') {
+      $this->load->model('extension/module/foc_csv');
+      $profile = $this->extension_module_foc_csv->loadProfile($name);
+    }
+    else {
+      $this->load->model('extension/module/foc_csv_exporter');
+      $profile = $this->extension_module_foc_csv_exporter->loadProfile($name);
+    }
+
+    if (is_null($profile)) {
+      $this->sendFail('Profile [' . $name . '] not found!');
+    }
 
     echo json_encode($profile);
     die;
@@ -181,34 +202,70 @@ class ControllerExtensionModuleFocCsv extends Controller {
     Save profile to DB
   */
   public function saveProfile () {
+    $type = null;
+    if (isset($this->request->get['type'])) {
+      $type = $this->request->get['type'];
+    }
+    else {
+      $this->sendFail('Profile type not specified!');
+    }
+
     if ($this->request->server['REQUEST_METHOD'] == 'POST') {
       $json = json_decode(file_get_contents('php://input'), true);
 
       if (isset($json['name']) && isset($json['profile'])) {
         $this->load->model('extension/module/foc_csv_common');
-        $this->load->model('extension/module/foc_csv');
+
         $name = $json['name'];
         $profile = $json['profile'];
 
-        $this->model_extension_module_foc_csv->setProfile($name, $profile);
+        if ($type == 'importer') {
+          $this->load->model('extension/module/foc_csv');
+          $this->model_extension_module_foc_csv->setProfile($name, $profile);
+        }
+        else {
+          $this->load->model('extension/module/foc_csv_exporter');
+          $this->model_extension_module_foc_csv_exporter->setProfile($name, $profile);
+        }
+
         $this->sendOk();
       }
 
-      $this->sendFail();
+      $this->sendFail('No required data present!');
     }
   }
 
   public function saveProfiles () {
+    $type = null;
+    if (isset($this->request->get['type'])) {
+      $type = $this->request->get['type'];
+    }
+    else {
+      $this->sendFail('Profile type not specified!');
+    }
+
     if ($this->request->server['REQUEST_METHOD'] == 'POST') {
       $json = json_decode(file_get_contents('php://input'), true);
 
       if (isset($json['profiles'])) {
         $this->load->model('extension/module/foc_csv_common');
-        $this->load->model('extension/module/foc_csv');
-        $this->model_extension_module_foc_csv->saveProfiles($json['profiles']);
+      }
+      else {
+        $this->sendFail('Profiles to save is not presented!');
       }
 
-      $profiles = $this->model_extension_module_foc_csv->loadProfiles();
+      $profiles = array();
+
+      if ($type == 'importer') {
+        $this->load->model('extension/module/foc_csv');
+        $this->model_extension_module_foc_csv->saveProfiles($json['profiles']);
+        $profiles = $this->model_extension_module_foc_csv->loadProfiles();
+      }
+      else {
+        $this->load->model('extension/module/foc_csv_exporter');
+        $this->model_extension_module_foc_csv_exporter->saveProfiles($json['profiles']);
+        $profiles = $this->model_extension_module_foc_csv_exporter->loadProfiles();
+      }
 
       $this->sendOk(json_encode($profiles));
     }
