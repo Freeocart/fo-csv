@@ -38,7 +38,7 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
       'galleryImagesDelimiter' => ',',
       'store' => $this->config->get('config_store_id'),
       'language' => $this->config->get('config_language_id'),
-      'bindings' => new stdclass
+      'bindings' => array()
     );
   }
 
