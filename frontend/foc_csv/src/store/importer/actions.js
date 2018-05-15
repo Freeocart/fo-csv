@@ -6,8 +6,8 @@ export default {
   setCsvFieldNames ({ commit }, fieldNames) {
     commit('SET_CSV_FIELD_NAMES', fieldNames)
   },
-  bindDBToCsvField ({ commit }, fields) {
-    commit('BIND_DB_TO_CSV_FIELD', fields)
+  setBindings ({ commit }, bindings) {
+    commit('SET_DB_TO_CSV_BINDINGS', bindings)
   },
   setCsvFileRef ({ commit }, ref) {
     commit('SET_CSV_FILE_REF', ref)

@@ -24,8 +24,8 @@ export default {
   SET_CATEGORY_DELIMITER (state, delimiter) {
     state.profile.categoryDelimiter = delimiter
   },
-  BIND_DB_TO_CSV_FIELD (state, [ dbField, csvField ]) {
-    Vue.set(state.profile.bindings, dbField, csvField)
+  SET_DB_TO_CSV_BINDINGS (state, bindings) {
+    state.profile.bindings = bindings
   },
   SET_CSV_FILE_REF (state, ref) {
     Vue.set(state.data, 'csvFileRef', ref)
