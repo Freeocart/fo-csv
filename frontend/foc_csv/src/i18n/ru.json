@@ -92,5 +92,9 @@
   "Dump parent categories": "Выгружать родительские категории",
   "Export images mode": "Режим экспорта изображений",
   "Create images ZIP": "Создать ZIP архив с изображениями",
-  "Render CSV header": "Добавить CSV заголовки"
+  "Render CSV header": "Добавить CSV заголовки",
+  "CSV header": "CSV заголовок",
+  "Control": "Управление",
+  "Add new db field binding": "Добавить новую привязку к полю БД",
+  "There is no created bindings": "Нет добавленных привязок"
 }
