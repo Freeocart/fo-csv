@@ -73,6 +73,10 @@ class ModelExtensionModuleFocCsvCommon extends Model {
     return $result;
   }
 
+  public function fillProfileEmptyValues ($profile) {
+    return array_replace_recursive($this->getDefaultProfile(), $profile);
+  }
+
   public function getDefaultProfile () {
     return array();
   }

@@ -156,10 +156,6 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     ), $data);
   }
 
-  public function fillProfileEmptyValues ($profile) {
-    return array_replace_recursive($this->getDefaultProfile(), $profile);
-  }
-
   /* FILE MANIPULATION METHODS */
 
   /*
