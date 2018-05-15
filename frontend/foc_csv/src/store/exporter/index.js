@@ -18,7 +18,8 @@ let fields = genStoreFields([
   'store',
   'language',
   'csvFieldDelimiter',
-  'csvHeader'
+  'csvHeader',
+  'bindings'
 ], 'profile')
 
 export default {
