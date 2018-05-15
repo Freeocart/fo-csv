@@ -62,9 +62,6 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   }
 
   public function install () {
-    // $this->load->model('setting/setting');
-    // $this->model_setting_setting->editSetting($this->profiles_code, array($this->profiles_key => array()));
-    // $this->saveProfiles($this->getDefaultProfiles());
     parent::install();
   }
 
@@ -111,6 +108,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       'description' => '',
       'meta_title' => '',
       'tag' => '',
+      'name' => '',
       'meta_description' => '',
       'meta_keyword' => '',
       'language_id' => $this->language_id,
@@ -329,6 +327,11 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
     $productData = $this->productTemplate($tablesData['product']);
     $productData['manufacturer_id'] = $manufacturer_id;
+
+    if (!isset($tablesData['product_description'])) {
+      $tablesData['product_description'] = $this->productDescriptionTemplate();
+    }
+
     $productData['product_description'] = $this->productDescriptionTemplate($tablesData['product_description']);
 
     // set attributes to product bindings
