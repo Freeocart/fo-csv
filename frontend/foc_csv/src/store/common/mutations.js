@@ -9,5 +9,9 @@ export default {
   },
   SET_CURRENT_PROFILE (state, profile) {
     state.profile = profile
+  },
+  SAVE_NEW_PROFILE (state, name) {
+    let profileSettings = Object.assign({}, state.profile)
+    Vue.set(state.data.profiles, name, profileSettings)
   }
 }

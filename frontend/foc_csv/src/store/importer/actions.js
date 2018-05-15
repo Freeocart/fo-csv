@@ -3,10 +3,6 @@ import commonActions from '@/store/common/actions'
 
 export default {
   ...commonActions,
-  setCurrentProfileName ({ commit, getters }, profile) {
-    commit('SET_CURRENT_PROFILE_NAME', profile)
-    commit('SET_CURRENT_PROFILE', getters.currentProfile)
-  },
   setCsvFieldNames ({ commit }, fieldNames) {
     commit('SET_CSV_FIELD_NAMES', fieldNames)
   },

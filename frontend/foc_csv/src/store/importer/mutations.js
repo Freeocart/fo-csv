@@ -18,10 +18,6 @@ export default {
   ADD_PROFILE (state, { name, profile }) {
     Vue.set(state.data.profiles, name, profile)
   },
-  SAVE_NEW_PROFILE (state, name) {
-    let profileSettings = Object.assign({}, state.profile)
-    Vue.set(state.data.profiles, name, profileSettings)
-  },
   SET_CSV_FIELD_NAMES (state, fields) {
     state.data.csvFields = fields
   },
