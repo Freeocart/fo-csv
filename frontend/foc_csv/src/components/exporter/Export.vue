@@ -23,7 +23,7 @@
             <h1>{{ $t('Export submodule') }}</h1>
           </div>
           <div class="col-md-4 text-right">
-            <button :disabled="true" @click.prevent="submitExportData" class="btn btn-warning btn-lg"><i class="fa fa-rocket"></i> {{ $t('Start export!') }}</button>
+            <button @click.prevent="submitExportData" class="btn btn-warning btn-lg"><i class="fa fa-rocket"></i> {{ $t('Start export!') }}</button>
           </div>
         </div>
         <hr>
@@ -67,11 +67,13 @@
 </template>
 
 <script>
+import { createNamespacedHelpers } from 'vuex'
 import { mapVuexModels } from '@/helpers'
 import LeftSidebar from './LeftSidebar'
 import RightSidebar from './RightSidebar'
 import ExportFields from './ExportFields'
 import ProgressBar from '@/components/common/ProgressBar'
+const { mapGetters } = createNamespacedHelpers('exporter')
 
 export default {
   components: {
@@ -90,17 +92,62 @@ export default {
     ...mapVuexModels([
       'entriesPerQuery',
       'csvHeader',
-      'bindings'
+      'bindings',
+      'profile'
     ], 'exporter'),
     ...mapVuexModels({
       total: 'exportJobTotal',
       current: 'exportJobCurrent',
       working: 'exportJobWorking'
-    }, 'exporter')
+    }, 'exporter'),
+    ...mapGetters([
+      'submittableData'
+    ])
   },
   methods: {
-    submitExportData () {
+    async submitExportPart (exportUrl, obj) {
+      try {
+        obj.profile = this.profile
+        let response = await this.$http.post(decodeURIComponent(exportUrl), obj)
+        let position = response.data.message.position
 
+        this.current = position
+
+        if (this.current < this.total) {
+          this.submitExportPart(exportUrl, response.data.message)
+        }
+        else {
+          this.working = false
+          this.current = 0
+          this.errors = response.data.message.errors
+        }
+      }
+      catch (e) {
+        console.error(e)
+        this.current = 0
+        this.working = false
+        this.errors = this.errors || 1
+      }
+    },
+    async submitExportData () {
+      let data = this.submittableData
+      this.errors = 0
+
+      try {
+        let response = await this.$api.exporter.submitData(data.profile)
+
+        if (response.data.status === 'ok') {
+          this.total = response.data.message.total
+          this.working = true
+          this.submitExportPart(response.data.message.exportUrl, response.data.message)
+        }
+      }
+      catch (e) {
+        this.working = false
+        this.current = 0
+        alert(this.$t('Error during sending!'))
+        console.error(e)
+      }
     }
   }
 }
