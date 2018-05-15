@@ -29,9 +29,9 @@
         </template>
         <tr v-else>
           <td colspan=3>
-            <p>
+            <span>
               {{ $t('There is no created bindings') }}
-            </p>
+            </span>
           </td>
         </tr>
       </tbody>
