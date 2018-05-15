@@ -11,27 +11,21 @@
 export default {
   props: {
     data: {
-      default: () => {
-        return {}
-      }
+      type: Object,
+      default: () => ({})
     },
-    selected: {
+    value: {
       default: ''
     }
   },
   computed: {
     __selected: {
       get () {
-        return this.selected
+        return this.value
       },
       set (value) {
-        this.$emit('changed', value)
+        this.$emit('input', value)
       }
-    }
-  },
-  methods: {
-    change (value) {
-      this.$emit('changed', value)
     }
   }
 }

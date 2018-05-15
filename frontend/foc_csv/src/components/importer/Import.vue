@@ -66,25 +66,7 @@
               </select>
             </div>
 
-            <label for="" class="label label-default">{{ $t('Fields matching') }}</label>
-            <table class="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th>{{ $t('CSV field') }}</th>
-                  <th>{{ $t('DB field') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(field, idx) in csvFields" :key="idx">
-                  <td>
-                    <span>{{ field }}</span>
-                  </td>
-                  <td>
-                    <db-fields-select :selected="currentProfile.bindings[idx]" :data="dbFields" @changed="bindDBToCsvField([ $event, idx ])"></db-fields-select>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <csv-to-db-matcher v-model="csvFieldsMatcher"></csv-to-db-matcher>
           </div>
         </div>
       </div>
@@ -106,6 +88,7 @@ import ProgressBar from '@/components/common/ProgressBar'
 import CsvFileUpload from './CsvFileUpload'
 import RightSidebar from './RightSidebar'
 import LeftSidebar from './LeftSidebar'
+import CsvToDbMatcher from './CsvToDbMatcher'
 
 const { mapGetters, mapActions } = createNamespacedHelpers('importer')
 
@@ -115,7 +98,8 @@ export default {
     CsvFileUpload,
     ProgressBar,
     RightSidebar,
-    LeftSidebar
+    LeftSidebar,
+    CsvToDbMatcher
   },
   data () {
     return {
@@ -131,13 +115,11 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'dbFields',
-      'csvFields',
       'profile',
       'keyFields',
-      'currentProfile',
       'submittableData',
-      'importMode'
+      'importMode',
+      'currentProfile'
     ]),
     ...mapVuexModels([
       'processAtStepNum',
@@ -148,7 +130,15 @@ export default {
       total: 'importJobTotal',
       current: 'importJobCurrent',
       working: 'importJobWorking'
-    }, 'importer')
+    }, 'importer'),
+    csvFieldsMatcher: {
+      get () {
+        return this.currentProfile.bindings
+      },
+      set (value) {
+        this.setBindings(value)
+      }
+    }
   },
   methods: {
     async submitImportPart (importUrl, obj) {
@@ -214,7 +204,7 @@ export default {
       return true
     },
     ...mapActions([
-      'bindDBToCsvField'
+      'setBindings'
     ])
   },
   created () {

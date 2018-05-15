@@ -98,7 +98,6 @@ const parseCsvHeaders = (raw, delimiter = ';') => {
 
 const validateProfile = (profile) => {
   // validate key field
-  // findIndex(val => val === profile.keyField) !== -1
   return profile.keyField && profile.bindings[profile.keyField]
 }
 
