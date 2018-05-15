@@ -8,8 +8,8 @@ class ModelExtensionModuleFocCsvCommon extends Model {
     parent::__construct($registry);
     $this->log = new Log('foc_csv_' . $type . '.txt');
     $this->type = $type;
+    $this->profiles_code = 'foc_csv_' . $type;
     $this->profiles_key = 'foc_csv_' . $type . '_profiles';
-    $this->profiles_code = 'foc_csv';
   }
 
   public function install () {
