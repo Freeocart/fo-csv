@@ -38,6 +38,9 @@
 
 <script>
 import { mapVuexModels } from '@/helpers'
+import { createNamespacedHelpers } from 'vuex'
+
+const { mapGetters } = createNamespacedHelpers('exporter')
 
 export default {
   computed: {
@@ -47,7 +50,10 @@ export default {
       'categoriesDelimiter',
       'csvFieldDelimiter',
       'encoding'
-    ], 'exporter')
+    ], 'exporter'),
+    ...mapGetters([
+      'encodings'
+    ])
   }
 }
 </script>

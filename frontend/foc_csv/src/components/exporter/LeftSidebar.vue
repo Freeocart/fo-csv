@@ -55,6 +55,11 @@ export default {
   components: {
     ImagesExportSettings
   },
+  data () {
+    return {
+      savingProfile: false
+    }
+  },
   computed: {
     ...mapVuexModels([
       'profile',

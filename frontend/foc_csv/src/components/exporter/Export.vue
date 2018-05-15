@@ -52,12 +52,9 @@
 
 <script>
 import { mapVuexModels } from '@/helpers'
-import { createNamespacedHelpers } from 'vuex'
 import LeftSidebar from './LeftSidebar'
 import RightSidebar from './RightSidebar'
 import ExportFields from './ExportFields'
-
-const { mapGetters } = createNamespacedHelpers('exporter')
 
 export default {
   components: {
@@ -75,10 +72,7 @@ export default {
       'entriesPerQuery',
       'csvHeader',
       'bindings'
-    ], 'exporter'),
-    ...mapGetters([
-      'encodings'
-    ])
+    ], 'exporter')
   },
   methods: {
     submitExportData () {
