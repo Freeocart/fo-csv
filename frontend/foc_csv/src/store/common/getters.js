@@ -45,5 +45,11 @@ export default {
   },
   stockStatusRewrites (state) {
     return state.profile.stockStatusRewrites || {}
+  },
+  submittableData (state) {
+    return {
+      profile: state.profile,
+      data: state.data
+    }
   }
 }

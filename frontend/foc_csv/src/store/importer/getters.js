@@ -33,11 +33,5 @@ export default {
   },
   categoryDelimiter (state) {
     return state.profile.categoryDelimiter
-  },
-  submittableData (state) {
-    return {
-      profile: state.profile,
-      data: state.data
-    }
   }
 }
