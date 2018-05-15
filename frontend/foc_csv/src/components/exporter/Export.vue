@@ -1,5 +1,21 @@
 <template>
   <div class="foc-csv-export">
+    <template v-if="working">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          {{ $t('Import in progress') }}
+        </div>
+        <div class="panel-body">
+          <progress-bar :progress="{ current, total }"></progress-bar>
+        </div>
+      </div>
+    </template>
+    <div v-if="errors > 0">
+      <div class="alert alert-danger" role="alert">
+        <p>{{ $t('During import we had errors, please check foc logs!') }}</p>
+        <p>{{ $t('Errors count') }} - <strong>{{ errors }}</strong></p>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-12">
         <div class="row">
@@ -55,16 +71,19 @@ import { mapVuexModels } from '@/helpers'
 import LeftSidebar from './LeftSidebar'
 import RightSidebar from './RightSidebar'
 import ExportFields from './ExportFields'
+import ProgressBar from '@/components/common/ProgressBar'
 
 export default {
   components: {
     LeftSidebar,
     RightSidebar,
-    ExportFields
+    ExportFields,
+    ProgressBar
   },
   data () {
     return {
-      msg: 'Export'
+      msg: 'Export',
+      errors: 0
     }
   },
   computed: {
@@ -72,7 +91,12 @@ export default {
       'entriesPerQuery',
       'csvHeader',
       'bindings'
-    ], 'exporter')
+    ], 'exporter'),
+    ...mapVuexModels({
+      total: 'exportJobTotal',
+      current: 'exportJobCurrent',
+      working: 'exportJobWorking'
+    }, 'exporter')
   },
   methods: {
     submitExportData () {

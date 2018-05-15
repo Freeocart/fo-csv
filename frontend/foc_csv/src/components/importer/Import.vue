@@ -6,7 +6,7 @@
           {{ $t('Import in progress') }}
         </div>
         <div class="panel-body">
-          <import-progress :progress="{ current, total }"></import-progress>
+          <progress-bar :progress="{ current, total }"></progress-bar>
         </div>
       </div>
     </template>
@@ -102,7 +102,7 @@ import { createNamespacedHelpers } from 'vuex'
 import { validateProfile, mapVuexModels } from '@/helpers'
 
 import DbFieldsSelect from './DbFieldsSelect'
-import ImportProgress from './ImportProgress'
+import ProgressBar from '@/components/common/ProgressBar'
 import CsvFileUpload from './CsvFileUpload'
 import RightSidebar from './RightSidebar'
 import LeftSidebar from './LeftSidebar'
@@ -113,7 +113,7 @@ export default {
   components: {
     DbFieldsSelect,
     CsvFileUpload,
-    ImportProgress,
+    ProgressBar,
     RightSidebar,
     LeftSidebar
   },
