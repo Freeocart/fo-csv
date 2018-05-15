@@ -51,7 +51,7 @@ const { mapGetters } = createNamespacedHelpers('exporter')
 export default {
   props: {
     value: {
-      default: []
+      default: () => []
     }
   },
   data () {
