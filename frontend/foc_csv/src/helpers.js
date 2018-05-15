@@ -96,23 +96,6 @@ const parseCsvHeaders = (raw, delimiter = ';') => {
   return clean.split(delimiter)
 }
 
-const submitData = async function (url, { data, profile }) {
-  let request = new FormData()
-  request.append('csv-file', data.csvFileRef.files[0])
-
-  if (data.imagesZipFileRef && data.imagesZipFileRef.files.length > 0) {
-    request.append('images-zip', data.imagesZipFileRef.files[0])
-  }
-
-  request.append('profile-json', JSON.stringify(profile))
-
-  return Vue.http.post(url, request, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  })
-}
-
 const validateProfile = (profile) => {
   // validate key field
   // findIndex(val => val === profile.keyField) !== -1
@@ -200,7 +183,6 @@ export {
   validateAppConfig,
   FirstLineReader,
   parseCsvHeaders,
-  submitData,
   validateProfile,
   genStoreFields
 }
