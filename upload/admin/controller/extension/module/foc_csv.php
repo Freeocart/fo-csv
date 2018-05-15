@@ -278,9 +278,70 @@ class ControllerExtensionModuleFocCsv extends Controller {
       $this->load->model('extension/module/foc_csv_common');
       $this->load->model('extension/module/foc_csv_exporter');
 
-      $key = $this->model_extension_module_foc_csv_exporter->prepareUploadPath();
+      $profile = $this->model_extension_module_foc_csv_exporter->fillProfileEmptyValues(json_decode($_POST['profile-json'], true));
 
-      var_dump($key);
+      $key = $this->model_extension_module_foc_csv_exporter->prepareUploadPath();
+      $exportFile = $this->model_extension_module_foc_csv_exporter->getExportCsvFilePath($key);
+
+      // put csv headers if need
+      if ($profile['csvHeader']) {
+        $csv_fid = fopen($exportFile, 'w');
+        $headers = array();
+        foreach ($profile['bindings'] as $binding) {
+          $headers[] = $binding['header'];
+        }
+
+        fputcsv($csv_fid, $headers, $profile['csvFieldDelimiter']);
+        fclose($csv_fid);
+      }
+
+      $total = $this->model_extension_module_foc_csv_exporter->getProductTotal();
+
+      $export_url = $this->createUrl('extension/module/foc_csv/exportPart');
+
+      // возвращаем данные на клиент и ожидаем запросы
+      $this->sendOk(array(
+        'total' => $total,
+        'key' => $key,
+        'exportUrl' => html_entity_decode($export_url),
+        'position' => 0 // позиция на которой было закончено чтение в прошлой сессии (0 поскольку чтение еще не начато)
+      ));
+    }
+  }
+
+  public function exportPart () {
+    if ($this->request->server['REQUEST_METHOD'] == 'POST') {
+      $json = json_decode(file_get_contents('php://input'), true);
+
+      $this->load->model('extension/module/foc_csv_common');
+      $this->load->model('extension/module/foc_csv_exporter');
+
+      if (isset($json['position']) && isset($json['key']) && isset($json['profile'])) {
+        $offset = $json['position'];
+        $profile = $json['profile'];
+        $key = $json['key'];
+        $errors = isset($json['errors']) ? intval($json['errors']) : 0;
+        $limit = $profile['entriesPerQuery'];
+
+        $exportFile = $this->model_extension_module_foc_csv_exporter->getExportCsvFilePath($key);
+
+        $exportable = $this->model_extension_module_foc_csv_exporter->export($profile, $offset, $limit);
+
+        $csv_fid = fopen($exportFile, 'a');
+        foreach ($exportable as $csvLine) {
+          fputcsv($csv_fid, $csvLine, $profile['csvFieldDelimiter']);
+        }
+        fclose($csv_fid);
+
+        $position = $offset + $limit;
+
+        $this->sendOk(array(
+          'key' => $key,
+          'position' => $position,
+          'errors' => $errors,
+          // 'lines' => $i + $lines
+        ));
+      }
     }
   }
 
