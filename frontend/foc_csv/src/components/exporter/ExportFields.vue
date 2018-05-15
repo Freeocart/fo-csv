@@ -44,24 +44,20 @@
 
 <script>
 import { createNamespacedHelpers } from 'vuex'
-// import { mapVuexModels } from '@/helpers'
 
 const { mapGetters } = createNamespacedHelpers('exporter')
 
 export default {
   props: {
     value: {
+      type: Array,
       default: () => []
     }
   },
-  data () {
-    let bindings = this.value || []
-
-    return {
-      bindings
-    }
-  },
   computed: {
+    bindings () {
+      return this.value || []
+    },
     ...mapGetters([
       'dbFields'
     ])
