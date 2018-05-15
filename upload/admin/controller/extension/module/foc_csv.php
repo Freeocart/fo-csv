@@ -5,11 +5,15 @@ class ControllerExtensionModuleFocCsv extends Controller {
   const CONFIG_PROFILES = 'fo_csv_profiles';
 
   public function install () {
+    $this->load->model('extension/module/foc_csv_common');
+    $this->load->model('extension/module/foc_csv');
+    $this->load->model('extension/module/foc_csv_exporter');
+
     // Remove unnecessary template version
     $templatePath = DIR_APPLICATION . 'view/template/extension/module/';
     $viewFile = 'foc_csv.twig';
 
-    if ($this->isOpencart3()) {
+    if ($this->model_extension_module_foc_csv_common->isOpencart3()) {
       $viewFile = 'foc_csv.php';
     }
 
@@ -17,9 +21,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
       unlink($templatePath . $viewFile);
     }
 
-    $this->load->model('extension/module/foc_csv_common');
-    $this->load->model('extension/module/foc_csv');
     $this->model_extension_module_foc_csv->install();
+    $this->model_extension_module_foc_csv_exporter->install();
   }
 
   private function sendOk ($message = '') {
