@@ -27,7 +27,7 @@ export default function (module) {
             this.setCurrentProfileName('default')
           }
 
-          this.deleteProfile(name)
+          this.storeDeleteProfile(name)
           this.saveAllProfiles(this.profiles)
         }
       },
@@ -37,12 +37,14 @@ export default function (module) {
         }
       },
       ...mapActions([
-        'deleteProfile',
         'saveAllProfiles',
         'setCurrentProfileName',
         'applyProfile',
         'saveNewProfile'
-      ])
+      ]),
+      ...mapActions({
+        storeDeleteProfile: 'deleteProfile'
+      })
     }
   }
 }
