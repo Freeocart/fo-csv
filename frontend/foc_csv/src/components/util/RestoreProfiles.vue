@@ -6,12 +6,18 @@
 
   <textarea ref="restore_profiles_data" class="form-control"></textarea>
 
-  <button class="btn btn-danger" @click.prevent="restoreProfiles"><i class="fa fa-floppy-o"></i> {{ $t('Restore') }}</button>
+  <button class="btn btn-danger" @click.prevent="restore"><i class="fa fa-floppy-o"></i> {{ $t('Restore') }}</button>
 </div>
 </template>
 
 <script>
 export default {
+  props: {
+    profiles: {
+      type: Object,
+      required: true
+    }
+  },
   methods: {
     restore () {
       try {
@@ -19,7 +25,7 @@ export default {
 
         // keep default profile if user removed it
         if (!profiles['default']) {
-          profiles['default'] = this.data.profiles.default
+          profiles['default'] = this.profiles.default
         }
 
         this.$emit('restore', profiles)

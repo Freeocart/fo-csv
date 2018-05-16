@@ -32,7 +32,7 @@
           {{ $t('Restore state to profile') }}
         </restore-profile>
 
-        <restore-profiles @restore="restoreProfiles($event)">
+        <restore-profiles :profiles="profiles" @restore="restoreProfiles($event)">
           {{ $t('Restore profiles') }}
         </restore-profiles>
       </div>
@@ -56,10 +56,7 @@ import ProfilesControlList from './ProfilesControlList'
 import SerializedDataToggler from './SerializedDataToggler'
 import RestoreProfile from './RestoreProfile'
 import RestoreProfiles from './RestoreProfiles'
-
-import { createNamespacedHelpers } from 'vuex'
-
-const { mapGetters, mapActions, mapState } = createNamespacedHelpers('exporter')
+import utilMixin from '@/mixins/util'
 
 export default {
   components: {
@@ -68,43 +65,8 @@ export default {
     RestoreProfile,
     RestoreProfiles
   },
-  computed: {
-    ...mapState([
-      'data'
-    ]),
-    ...mapGetters([
-      'profile',
-      'profiles',
-      'data'
-    ])
-  },
-  methods: {
-    restoreToProfile ({ name, profile }) {
-      this.applyProfile({ name, profile })
-      this.saveNewProfile(name)
-    },
-    deleteProfile (name) {
-      if (confirm(this.$t('Are you sure you want remove this item?'))) {
-        if (this.currentProfileName === name) {
-          this.setCurrentProfileName('default')
-        }
-
-        this.deleteProfile(name)
-        this.saveAllProfiles(this.profiles)
-      }
-    },
-    restoreProfiles (profiles) {
-      if (confirm(this.$t('Are you sure? This will remove all profiles before trying to add new ones!'))) {
-        this.saveAllProfiles(profiles)
-      }
-    },
-    ...mapActions([
-      'deleteProfile',
-      'saveAllProfiles',
-      'setCurrentProfileName',
-      'applyProfile',
-      'saveNewProfile'
-    ])
-  }
+  mixins: [
+    utilMixin('exporter')
+  ]
 }
 </script>
