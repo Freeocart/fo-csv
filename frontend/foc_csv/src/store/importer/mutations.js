@@ -1,3 +1,7 @@
+/*
+  Mutations for exporter module
+*/
+
 import Vue from 'vue'
 import commonMutations from '@/store/common/mutations'
 

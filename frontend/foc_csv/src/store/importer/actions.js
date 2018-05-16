@@ -1,3 +1,7 @@
+/*
+  Actions for importer module
+*/
+
 import Vue from 'vue'
 import commonActions from '@/store/common/actions'
 

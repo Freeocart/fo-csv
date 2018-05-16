@@ -1,3 +1,6 @@
+/*
+  Application config
+*/
 const DEFAULT_PROFILE_NAME = 'default'
 
 export {

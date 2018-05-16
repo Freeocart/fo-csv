@@ -1,5 +1,6 @@
 /*
   Util import/export mixin
+  used in util components both by export and import tools
 */
 import { createNamespacedHelpers } from 'vuex'
 

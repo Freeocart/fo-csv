@@ -1,3 +1,7 @@
+/*
+  Actions for exporter module
+*/
+
 import Vue from 'vue'
 import commonActions from '@/store/common/actions'
 

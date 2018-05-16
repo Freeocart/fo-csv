@@ -24,6 +24,7 @@ if (validateAppConfig(AppConfig.requestConfig)) {
   let api = ApiProvider.prepare(AppConfig.requestConfig)
   Vue.use(api)
 
+  // set initial data in vuex modules
   store.dispatch('importer/setInitialData', Object.assign({}, AppConfig.initial.importer, AppConfig.initial.common))
   store.dispatch('exporter/setInitialData', Object.assign({}, AppConfig.initial.exporter, AppConfig.initial.common))
 

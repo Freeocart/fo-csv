@@ -1,3 +1,6 @@
+/*
+  Actions for both importer and exporter
+*/
 import { DEFAULT_PROFILE_NAME } from '@/config'
 
 export default {

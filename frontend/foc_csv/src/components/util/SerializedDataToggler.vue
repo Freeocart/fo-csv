@@ -1,7 +1,7 @@
 <template>
 <div class="form-group">
   <button class="btn btn-default" @click.prevent="showState = !showState">
-    <slot>Show/hide</slot>
+    <slot>{{ $t('Show/hide') }}</slot>
   </button>
   <textarea :value="JSON.stringify(value)" class="form-control" v-if="showState"></textarea>
 </div>

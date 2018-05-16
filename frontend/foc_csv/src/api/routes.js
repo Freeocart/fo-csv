@@ -1,3 +1,8 @@
+/*
+  Backend routes
+  please keep in mind, that baseUrl provided by Application config (main.js, requestConfig)
+*/
+
 const SAVE_PROFILE_URL = 'saveProfile'
 const SAVE_ALL_PROFILES_URL = 'saveProfiles'
 const IMPORT_URL = 'import'

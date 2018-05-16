@@ -1,3 +1,7 @@
+/*
+  Getters for exporter module
+*/
+
 import commonGetters from '@/store/common/getters'
 
 export default {

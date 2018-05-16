@@ -1,7 +1,7 @@
 import Vue from 'vue'
 
 /*
-  Валидация обязательных полей
+  Validate required fields in app config
 */
 const validateAppConfig = (config) => {
   const requiredFields = ['token', 'baseRoute', 'baseUrl']
@@ -17,7 +17,10 @@ const validateAppConfig = (config) => {
   return false
 }
 
-// читает первую строку из blob
+/*
+  Read first string from blob
+  TODO: add support for user defined skip lines parameter
+*/
 class FirstLineReader {
   constructor () {
     this.events = {}
@@ -55,7 +58,6 @@ class FirstLineReader {
     if (/\n/.test(this.chunk)) {
       let lines = this.chunk.split('\n')
       let line = this._fixString(lines[0])
-      console.log(line)
       this._emit('line', [line])
     }
     else {
@@ -90,17 +92,27 @@ class FirstLineReader {
   }
 }
 
+/*
+  Parse csv headers - stupid split function:)
+*/
 const parseCsvHeaders = (raw, delimiter = ';') => {
   let clean = raw.replace(/(\r\n|\n)/gm, '')
   clean = clean.split('"').join('')
   return clean.split(delimiter)
 }
 
+/*
+  Validate profile
+  for now - just check keyField exists
+*/
 const validateProfile = (profile) => {
   // validate key field
   return profile.keyField && profile.bindings[profile.keyField]
 }
 
+/*
+  Vuex models
+*/
 const capitalizeFirstLetter = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
@@ -122,6 +134,9 @@ const normalizeMap = (map) => {
     : Object.keys(map).map(function (key) { return ({ key: key, val: map[key] }) })
 }
 
+/*
+  Create { actions, getters, mutations } object to be injected in components
+*/
 const mapVuexModels = (models, namespace = '') => {
   namespace = normalizeNamespace(namespace)
   models = normalizeMap(models)
@@ -153,6 +168,10 @@ const toMutationName = (name) => {
   return parts.join('_').toUpperCase()
 }
 
+/*
+  Generate getter/action/mutation's for vuex store
+  storeAttr - is required state attribute name - this holds values
+*/
 const genStoreFields = (fields, storeAttr) => {
   let result = {
     getters: {},

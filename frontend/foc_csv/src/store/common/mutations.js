@@ -18,7 +18,6 @@ export default {
     Vue.set(state.data.profiles, name, profile)
   },
   DELETE_PROFILE (state, name) {
-    // console.log(name, state.data.profiles[name])
     if (state.data.profiles[name]) {
       Vue.delete(state.data.profiles, name)
     }

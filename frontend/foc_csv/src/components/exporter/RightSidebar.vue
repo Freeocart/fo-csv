@@ -7,7 +7,7 @@
       <div class="panel-body">
         <div class="form-group">
           <label for="" class="label label-default">{{ $t('Field delimiter') }}</label>
-          <input type="text" placeholder="Разделитель полей" v-model="csvFieldDelimiter" class="form-control">
+          <input type="text" :placeholder="$t('Field delimiter')" v-model="csvFieldDelimiter" class="form-control">
         </div>
 
         <div class="form-group">

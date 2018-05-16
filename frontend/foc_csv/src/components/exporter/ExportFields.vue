@@ -82,10 +82,5 @@ export default {
       }
     }
   }
-  // watch: {
-  //   bindings (value) {
-  //     this.$emit('input', value)
-  //   }
-  // }
 }
 </script>

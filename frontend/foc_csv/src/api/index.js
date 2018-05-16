@@ -1,5 +1,18 @@
 import modules from './modules'
+/*
+  ApiProvider
+  vue plugin to simplify api calling
 
+  it creates routes like this:
+    Vue.$api.exporter.loadProfile(<user_argument>)
+  in the handler you have additional argument - mkUrl - module specific version of mkUrl:
+    // exporter module:
+    async saveProfile (mkUrl, options) {
+      mkUrl('test') // --> 'test?__DEFAULT_PARAMS__&type=exporter
+    }
+
+  You can use default version of mkUrl by Vue.$api.mkUrl || this.$api.mkUrl (in components code)
+*/
 class ApiProvider {
   constructor (modules) {
     this.modules = modules
