@@ -13,5 +13,8 @@ export default {
   applyProfile ({ commit }, { name, profile }) {
     commit('ADD_PROFILE', { name, profile })
     commit('SET_CURRENT_PROFILE_NAME', name)
+  },
+  deleteProfile ({ commit }, name) {
+    commit('DELETE_PROFILE', name)
   }
 }

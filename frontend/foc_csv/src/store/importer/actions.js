@@ -47,8 +47,5 @@ export default {
 
     commit('CLEAR_ALL_PROFILES')
     commit('SET_PROFILES', profiles)
-  },
-  deleteProfile ({ commit }, name) {
-    commit('DELETE_PROFILE', name)
   }
 }

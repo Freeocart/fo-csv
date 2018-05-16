@@ -17,5 +17,11 @@ export default {
       console.log(e)
       alert('error on profile saving!')
     }
+  },
+  async saveAllProfiles ({ commit }, profiles) {
+    await Vue.$api.exporter.saveProfiles(profiles)
+
+    commit('CLEAR_ALL_PROFILES')
+    commit('SET_PROFILES', profiles)
   }
 }

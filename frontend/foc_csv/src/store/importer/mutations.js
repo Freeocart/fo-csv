@@ -15,9 +15,6 @@ export default {
     }
     Vue.set(state.profile.statusRewrites, id, value)
   },
-  ADD_PROFILE (state, { name, profile }) {
-    Vue.set(state.data.profiles, name, profile)
-  },
   SET_CSV_FIELD_NAMES (state, fields) {
     state.data.csvFields = fields
   },
@@ -59,17 +56,5 @@ export default {
   SET_ATTRIBUTE_PARSER_DATA (state, [ key, value ]) {
     let parser = state.profile.attributeParser
     Vue.set(state.profile.attributeParserData[parser], key, value)
-  },
-  DELETE_PROFILE (state, name) {
-    // console.log(name, state.data.profiles[name])
-    if (state.data.profiles[name]) {
-      Vue.delete(state.data.profiles, name)
-    }
-  },
-  SET_PROFILES (state, profiles) {
-    Vue.set(state.data, 'profiles', profiles)
-  },
-  CLEAR_ALL_PROFILES (state) {
-    Vue.set(state.data, 'profiles', {})
   }
 }
