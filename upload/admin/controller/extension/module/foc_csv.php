@@ -64,11 +64,13 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $this->document->setTitle($this->language->get('heading_title'));
     $data['heading_title'] = $this->language->get('heading_title');
 
+    $data['foc_app_preload_title'] = $this->language->get('foc_app_preload_title');
+    $data['foc_app_preload_description'] = $this->language->get('foc_app_preload_description');
+
     $data['tokenName'] = $this->getTokenName();
     $data['token'] = $this->getToken();
     $data['baseRoute'] = 'extension/module/foc_csv';
     $data['baseUrl'] = $this->url->link('');
-    $data['language'] = $this->language->get('code');
 
     $this->load->model('extension/module/foc_csv_common');
     $this->load->model('extension/module/foc_csv');
@@ -76,6 +78,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $this->load->model('setting/store');
     $this->load->model('localisation/language');
     $this->load->model('localisation/stock_status');
+
+    $data['language'] = $this->model_extension_module_foc_csv_common->getLanguageCode();
 
     $data['breadcrumbs'] = $this->breadcrumbs();
 

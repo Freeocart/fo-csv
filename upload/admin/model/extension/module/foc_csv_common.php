@@ -238,6 +238,11 @@ class ModelExtensionModuleFocCsvCommon extends Model {
     return $this->db->query('SELECT @@character_set_database AS `charset`')->row['charset'];
   }
 
+  public function getLanguageCode () {
+    $lang = $this->language->get('code');
+    return strtolower(substr($lang, 0, 2));
+  }
+
   /*
     Just OC version checker used to provide forward/backward compatibility
   */
