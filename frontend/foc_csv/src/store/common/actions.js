@@ -9,5 +9,9 @@ export default {
   setCurrentProfileName ({ commit, getters }, profile) {
     commit('SET_CURRENT_PROFILE_NAME', profile)
     commit('SET_CURRENT_PROFILE', getters.currentProfile)
+  },
+  applyProfile ({ commit }, { name, profile }) {
+    commit('ADD_PROFILE', { name, profile })
+    commit('SET_CURRENT_PROFILE_NAME', name)
   }
 }
