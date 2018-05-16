@@ -564,7 +564,12 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   private function downloadImage ($url) {
     if ($this->isUrl($url)) {
       $file_name = md5($url);
-      $save_path = DIR_IMAGE . $this->imageSavePath . '/' . $this->importKey . $file_name;
+      $save_dir = DIR_IMAGE . $this->imageSavePath . '/' . $this->uploadKey;
+      $save_path = $save_dir . $file_name;
+
+      if (!is_dir($save_dir)) {
+        mkdir($save_dir, 0755, true);
+      }
 
       file_put_contents($save_path, file_get_contents($url));
 
@@ -572,18 +577,24 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
       if (!empty($image->getMime())) {
         $image->save($save_path . '.png');
-        return $this->imageSavePath . '/' . $this->importKey . $file_name . '.png';
+        return $this->imageSavePath . '/' . $this->uploadKey . $file_name . '.png';
       }
 
       unlink($save_path);
       return null;
     }
-    else if (is_file($this->getImportImagesPath($this->importKey) . '/' . $url)) {
-      rename($this->getImportImagesPath($this->importKey) . '/' . $url, DIR_IMAGE . $this->imageSavePath . '/' . $this->importKey . $url);
-      return $this->imageSavePath . '/' . $this->importKey . $url;
+    // already unpacked/uploaded image
+    else if (is_file(DIR_IMAGE . $url)) {
+      return $url;
     }
-    else if (is_file(DIR_IMAGE . $this->imageSavePath . '/' . $this->importKey . $url)) {
-      return $this->imageSavePath . '/' . $this->importKey . $url;
+    // previosly imported
+    else if (is_file(DIR_IMAGE . $this->imageSavePath . '/' . $this->uploadKey . $url)) {
+      return $this->imageSavePath . '/' . $this->uploadKey . $url;
+    }
+    else if (is_file($this->getImportImagesPath($this->uploadKey) . '/' . $url)) {
+      $save_dir = dirname(DIR_IMAGE . $this->imageSavePath . '/' . $this->uploadKey . $url);
+      rename($this->getImportImagesPath($this->uploadKey) . '/' . $url, $save_dir . $url);
+      return $this->imageSavePath . '/' . $this->uploadKey . $url;
     }
   }
 
