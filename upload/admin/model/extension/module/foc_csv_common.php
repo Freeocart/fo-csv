@@ -179,9 +179,19 @@ class ModelExtensionModuleFocCsvCommon extends Model {
     $this->uploadKey = $key;
   }
 
-
-
   /* UTILS */
+
+  /*
+    Convert FS path to URL
+  */
+  public function pathToUrl ($path) {
+    return str_replace(DIR_CACHE, HTTPS_CATALOG . 'system/storage/cache/', $path);
+  }
+
+  public function basename ($path) {
+    $parts = explode(DIRECTORY_SEPARATOR, $path);
+    return end($parts);
+  }
 
   /*
     Check if url is url:)
