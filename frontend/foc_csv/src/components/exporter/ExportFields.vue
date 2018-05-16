@@ -55,8 +55,13 @@ export default {
     }
   },
   computed: {
-    bindings () {
-      return this.value || []
+    bindings: {
+      get () {
+        return this.value || []
+      },
+      set (val) {
+        this.$emit('input', val)
+      }
     },
     ...mapGetters([
       'dbFields'
@@ -74,11 +79,11 @@ export default {
         binding.header = value
       }
     }
-  },
-  watch: {
-    bindings (value) {
-      this.$emit('input', value)
-    }
   }
+  // watch: {
+  //   bindings (value) {
+  //     this.$emit('input', value)
+  //   }
+  // }
 }
 </script>
