@@ -675,8 +675,15 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_layout");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_store");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_recurring");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "review");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "url_alias");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "review");
+
+    if ($this->isOpencart3()) {
+      $this->db->query("DELETE FROM " . DB_PREFIX . "seo_url");
+    }
+    else {
+      $this->db->query("DELETE FROM " . DB_PREFIX . "url_alias");
+    }
+
 		$this->db->query("DELETE FROM " . DB_PREFIX . "coupon_product");
   }
 
