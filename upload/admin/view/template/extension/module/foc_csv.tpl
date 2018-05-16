@@ -18,7 +18,16 @@
   </div>
 
   <div class="container-fluid">
-    <div id="foc_csv">FOC_CSV IMPORT/EXPORT</div>
+    <div id="foc_csv">
+      <div class="container">
+        <div class="panel panel-default">
+          <div class="panel-content">
+            <h3><?php echo $foc_app_preload_title; ?></h3>
+            <p><?php echo $foc_app_preload_description; ?></p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
