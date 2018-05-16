@@ -6,9 +6,11 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
 
   protected $exportPath = '';
   protected $csvExportFileName = 'export.csv';
-  protected $imagesZipImportFileName = 'images.zip';
+  protected $imagesZipExportFileName = 'images.zip';
 
   protected $ocDefaultNestingDelimiter = '>';
+
+  private static $foundImages = array();
 
   public function __construct ($registry) {
     parent::__construct($registry, 'exporter');
@@ -24,6 +26,11 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
   public function getExportCsvFilePath ($key) {
     $path = $this->getUploadPath($key);
     return $path . $this->csvExportFileName;
+  }
+
+  public function getExportImagesZipFilePath ($key) {
+    $path = $this->getUploadPath($key);
+    return $path . $this->imagesZipExportFileName;
   }
 
   public function getDefaultProfile () {
@@ -50,6 +57,10 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
   public function exportSchema ($bindings) {
     $result = array();
     foreach ($bindings as $binding) {
+      if (is_null($binding['dbField'])) {
+        continue;
+      }
+
       list ($table, $field) = explode(':', $binding['dbField']);
       if (!isset($result[$table])) {
         $result[$table] = array();
@@ -77,6 +88,9 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     foreach ($preparedItems as $dataItem) {
       $csvLine = array();
       foreach ($profile['bindings'] as $idx => $binding) {
+        if (is_null($binding['dbField'])) {
+          continue;
+        }
         list ($table, $field) = explode(':', $binding['dbField']);
         $separator = '';
 
@@ -135,6 +149,11 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     // product data
     if (isset($schema['product']) && !empty($schema['product'])) {
       $result['product'] = array_intersect_key($product, array_flip($schema['product']));
+
+      if (in_array('image', $schema['product']) && !is_null($result['product']['image']) && trim($result['product']['image']) != '') {
+        $this->addCollectedImage($result['product']['image']);
+      }
+
       unset($schema['product']);
     }
 
@@ -200,15 +219,36 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
         // export image items
         if ($table === 'product_image') {
           $images = $this->model_catalog_product->getProductImages($primary);
+          $result[$table] = array();
           foreach ($images as $image) {
             $result[$table][] = array_intersect_key($image, array_flip($fields));
+
+            if (in_array('image', $fields) && !empty($image['image'])) {
+              $this->addCollectedImage($image['image']);
+            }
           }
+
           continue;
         }
       }
     }
 
     return $result;
+  }
+
+  public function addCollectedImage ($path) {
+    self::$foundImages[] = $path;
+  }
+
+  public function hasCollectedImages () {
+    return count(self::$foundImages) > 0;
+  }
+
+  public function getCollectedImages () {
+    if ($this->hasCollectedImages()) {
+      return self::$foundImages;
+    }
+    return array();
   }
 
   /*
