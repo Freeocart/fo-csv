@@ -3,7 +3,7 @@ import Vue from 'vue'
 import {
   IMPORT_URL,
   SAVE_PROFILE_URL,
-  SAVE_ALL_IMPORT_PROFILES_URL
+  SAVE_ALL_PROFILES_URL
 } from '@/api/routes'
 
 export default {
@@ -13,7 +13,7 @@ export default {
   },
 
   async saveProfiles (mkUrl, profiles) {
-    return Vue.http.post(mkUrl(SAVE_ALL_IMPORT_PROFILES_URL), {
+    return Vue.http.post(mkUrl(SAVE_ALL_PROFILES_URL), {
       profiles
     })
   },
