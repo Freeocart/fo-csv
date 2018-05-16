@@ -236,6 +236,10 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     return $result;
   }
 
+  /*
+    Images collector
+    this stuff accumulates images that will be packed after csv lines processed and putted
+  */
   public function addCollectedImage ($path) {
     self::$foundImages[] = $path;
   }

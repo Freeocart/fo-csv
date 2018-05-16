@@ -351,7 +351,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
           foreach($this->model_extension_module_foc_csv_exporter->getCollectedImages() as $image) {
             $path = DIR_IMAGE . $image;
-            $zip->addFile($path, $image);//$this->model_extension_module_foc_csv_exporter->basename($image));
+            $zip->addFile($path, $image);
           }
 
           $zip->close();
@@ -362,8 +362,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
         $this->sendOk(array(
           'key' => $key,
           'position' => $position,
-          'errors' => $errors,
-          // 'lines' => $i + $lines
+          'errors' => $errors
         ));
       }
     }
@@ -377,14 +376,14 @@ class ControllerExtensionModuleFocCsv extends Controller {
       $this->load->model('extension/module/foc_csv_common');
       $this->load->model('extension/module/foc_csv');
 
-      // первый вызов и заливка файлов - генерим ключ
+      // first call - generate upload key
       $key = $this->model_extension_module_foc_csv->prepareUploadPath();
       $importFile = $this->model_extension_module_foc_csv->getImportCsvFilePath($key);
       $imagesFile = $this->model_extension_module_foc_csv->getImportImagesZipPath($key);
 
       $profile = json_decode($_POST['profile-json'], true);
 
-      // цсвэшник - просто перемещаем
+      // csv file operations
       if (isset($_FILES['csv-file'])) {
 
         $this->model_extension_module_foc_csv->writeLog('CSV file uploaded');
@@ -417,16 +416,15 @@ class ControllerExtensionModuleFocCsv extends Controller {
           move_uploaded_file($_FILES['csv-file']['tmp_name'], $importFile);
         }
       }
-      // архив картинок - перемещаем и распаковываем
+      // images zip - save and unpack
       if (isset($_FILES['images-zip'])) {
         $this->model_extension_module_foc_csv->writeLog('Images ZIP file uploaded');
 
         move_uploaded_file($_FILES['images-zip']['tmp_name'], $imagesFile);
 
-        // unzip...unset
-        // todo: add zip check content before unzipping!
         $zip = new ZipArchive();
         $can_open = $zip->open($imagesFile);
+
         if ($can_open === true) {
           $zip->extractTo($this->model_extension_module_foc_csv->getImportImagesPath($key));
           $this->model_extension_module_foc_csv->moveUploadedImages($key);
@@ -434,16 +432,12 @@ class ControllerExtensionModuleFocCsv extends Controller {
         }
       }
 
-      // читаем количество строк в csv
-      // тут нужно будет что-то поумнее фигануть))
-      // $csv_total = count(file($importFile,FILE_SKIP_EMPTY_LINES));
+      // read csv bytes count
       $csv_file = new SplFileObject($importFile, 'r');
-      // $csv_file->setFlags();
       $csv_file->seek(PHP_INT_MAX);
       $csv_total = $csv_file->ftell();
 
       $import_url = $this->createUrl('extension/module/foc_csv/importPart');
-      //$this->url->link('extension/module/foc_csv/importPart', 'token=' . $this->session->data['token'], 'ssl');
 
       // remove manufacturers if necessary
       if (isset($profile['removeManufacturersBeforeImport']) && $profile['removeManufacturersBeforeImport']) {
@@ -458,13 +452,12 @@ class ControllerExtensionModuleFocCsv extends Controller {
         $this->model_extension_module_foc_csv->clearProducts();
       }
 
-      // urlencode()
-      // возвращаем данные на клиент и ожидаем запросы
       $this->sendOk(array(
         'csvTotal' => $csv_total,
         'key' => $key,
         'importUrl' => html_entity_decode($import_url),
-        'position' => 0 // позиция на которой было закончено чтение в прошлой сессии (0 поскольку чтение еще не начато)
+        // position - last ftell file position
+        'position' => 0
       ));
     }
   }
@@ -573,17 +566,17 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
     $breadcrumbs[] = array(
 			'text'      => $this->language->get('text_home'),
-			'href'      => $this->createUrl('common/home'),//url->link('common/home', 'token=' . $this->session->data['token'], 'SSL'),
+			'href'      => $this->createUrl('common/home'),
 			'separator' => false
     );
     $breadcrumbs[] = array(
       'text'      => $this->language->get('text_extension'),
-      'href'      => $this->createUrl('extension/extension'),//url->link('extension/extension', 'token=' . $this->session->data['token'], 'SSL'),
+      'href'      => $this->createUrl('extension/extension'),
       'separator' => ' :: '
     );
 		$breadcrumbs[] = array(
 			'text'      => $this->language->get('heading_title'),
-			'href'      => $this->createUrl('extension/module/foc_csv'), //url->link('extension/module/foc_csv', 'token=' . $this->session->data['token'], 'SSL'),
+			'href'      => $this->createUrl('extension/module/foc_csv'),
 			'separator' => ' :: '
     );
 
