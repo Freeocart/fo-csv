@@ -2,7 +2,6 @@
 <div>
   <label for="" class="label label-default">{{ $t('Fields matching') }}</label>
 
-  <button @click.prevent="setBindings([])" class="btn btn-danger">{{ $t('Reset') }}</button>
   <table class="table table-bordered table-striped">
     <thead>
       <tr>
@@ -21,6 +20,8 @@
       </tr>
     </tbody>
   </table>
+
+  <button @click.prevent="setBindings([])" class="btn btn-danger"><i class="fa fa-trash"></i> {{ $t('Reset db field bindings') }}</button>
 </div>
 </template>
 

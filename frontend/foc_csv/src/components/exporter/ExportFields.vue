@@ -37,8 +37,10 @@
       </tbody>
     </table>
 
-    <button class="btn btn-primary" @click.prevent="addBinding()"><i class="fa fa-plus"></i> {{ $t('Add new db field binding') }}</button>
-
+    <div class="form-group">
+      <button class="btn btn-primary" @click.prevent="addBinding()"><i class="fa fa-plus"></i> {{ $t('Add new db field binding') }}</button>
+      <button @click.prevent="bindings = []" class="btn btn-danger"><i class="fa fa-trash"></i> {{ $t('Reset db field bindings') }}</button>
+    </div>
   </div>
 </template>
 
