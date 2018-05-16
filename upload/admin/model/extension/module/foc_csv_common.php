@@ -4,6 +4,25 @@
 */
 class ModelExtensionModuleFocCsvCommon extends Model {
 
+  protected $unwantedTableFields = array(
+    'common' => array(
+      'sort_order',
+      'language_id',
+      'date_added',
+      'date_modified'
+    ),
+    'product_description' => array(
+      'product_id'
+    ),
+    'product_image' => array(
+      'product_id',
+      'product_image_id'
+    ),
+    'category_description' => array(
+      'category_id'
+    )
+  );
+
   public function __construct ($registry, $type = 'importer') {
     parent::__construct($registry);
     $this->log = new Log('foc_csv_' . $type . '.txt');
@@ -51,6 +70,17 @@ class ModelExtensionModuleFocCsvCommon extends Model {
   }
 
   /*
+    Remove unwanted fields from select
+  */
+  public function filterTableFields ($table, array $fields) {
+    if (isset($this->unwantedTableFields[$table])) {
+      $fields = array_diff($fields, $this->unwantedTableFields[$table]);
+    }
+
+    return array_diff($fields, $this->unwantedTableFields['common']);
+  }
+
+  /*
     Generate DB fields list
   */
   public function getDbFields () {
@@ -68,6 +98,7 @@ class ModelExtensionModuleFocCsvCommon extends Model {
     foreach ($tables as $table) {
       $data = $this->db->query('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = "' . DB_DATABASE . '" AND TABLE_NAME = "' . DB_PREFIX . $table . '"');
       $result[$table] = array_column($data->rows, 'COLUMN_NAME');
+      $result[$table] = $this->filterTableFields($table, $result[$table]);
     }
 
     return $result;
