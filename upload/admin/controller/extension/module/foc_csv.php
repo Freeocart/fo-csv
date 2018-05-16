@@ -351,7 +351,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
           foreach($this->model_extension_module_foc_csv_exporter->getCollectedImages() as $image) {
             $path = DIR_IMAGE . $image;
-            $zip->addFile($path, $this->model_extension_module_foc_csv_exporter->basename($image));
+            $zip->addFile($path, $image);//$this->model_extension_module_foc_csv_exporter->basename($image));
           }
 
           $zip->close();
@@ -427,9 +427,9 @@ class ControllerExtensionModuleFocCsv extends Controller {
         // todo: add zip check content before unzipping!
         $zip = new ZipArchive();
         $can_open = $zip->open($imagesFile);
-
-        if ($can_open) {
+        if ($can_open === true) {
           $zip->extractTo($this->model_extension_module_foc_csv->getImportImagesPath($key));
+          $this->model_extension_module_foc_csv->moveUploadedImages($key);
           $zip->close();
         }
       }
