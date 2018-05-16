@@ -173,6 +173,31 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   }
 
   /*
+    Move uploaded images to site IMAGES dir
+  */
+  public function moveUploadedImages ($key) {
+    $path = $this->getImportImagesPath($key);
+
+    $dirIterator = new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS);
+    $iterator = new RecursiveIteratorIterator($dirIterator);
+
+    foreach ($iterator as $filename) {
+      if ($filename->isDir()) {
+        continue;
+      }
+
+      $moveTo = DIR_IMAGE . ltrim(str_replace($path, '', $filename->getPathname()), '/');
+      $moveToDir = DIR_IMAGE . ltrim(str_replace($path, '', $filename->getPath()));
+
+      if (!is_dir($moveToDir)) {
+        mkdir($moveToDir, 0755, true);
+      }
+
+      rename($filename->getPathname(), $moveTo);
+    }
+  }
+
+  /*
     Returns images extract path
   */
   public function getImportImagesPath ($key) {
