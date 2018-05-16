@@ -29,21 +29,13 @@
       </div>
 
       <div class="panel-body">
-        <div class="form-group">
-          <label class="label label-default">{{ $t('Restore state to profile') }}</label>
-          <input ref="restore_profile_name" :placeholder="$t('Profile name')" type="text" class="form-control">
-          <textarea ref="restore_profile_data" class="form-control"></textarea>
+        <restore-profile @restore="restoreToProfile($event)">
+          {{ $t('Restore state to profile') }}
+        </restore-profile>
 
-          <button class="btn btn-primary" @click.prevent="restoreToProfile"><i class="fa fa-floppy-o"></i> {{ $t('Restore') }}</button>
-        </div>
-
-        <div class="form-group">
-          <label class="label label-default">{{ $t('Restore profiles') }}</label>
-
-          <textarea ref="restore_profiles_data" class="form-control"></textarea>
-
-          <button class="btn btn-danger" @click.prevent="restoreProfiles"><i class="fa fa-floppy-o"></i> {{ $t('Restore') }}</button>
-        </div>
+        <restore-profiles @restore="restoreProfiles">
+          {{ $t('Restore profiles') }}
+        </restore-profiles>
       </div>
     </div>
   </div>
@@ -56,7 +48,7 @@
 
       <div class="panel-body">
         <div class="form-group">
-          <profiles-control-list></profiles-control-list>
+          <profiles-control-list :profiles="profiles" @deleteProfile="deleteProfile($event)"></profiles-control-list>
         </div>
       </div>
     </div>
@@ -67,15 +59,19 @@
 <script>
 import ProfilesControlList from './ProfilesControlList'
 import SerializedDataToggler from './SerializedDataToggler'
+import RestoreProfile from './RestoreProfile'
+import RestoreProfiles from './RestoreProfiles'
 
 import { createNamespacedHelpers } from 'vuex'
 
-const { mapActions, mapState } = createNamespacedHelpers('importer')
+const { mapActions, mapState, mapGetters } = createNamespacedHelpers('importer')
 
 export default {
   components: {
     ProfilesControlList,
-    SerializedDataToggler
+    SerializedDataToggler,
+    RestoreProfile,
+    RestoreProfiles
   },
   data () {
     return {
@@ -86,38 +82,39 @@ export default {
   },
   computed: {
     ...mapState([
-      'profile',
       'data'
+    ]),
+    ...mapGetters([
+      'profile',
+      'profiles'
     ])
   },
   methods: {
-    restoreToProfile () {
-      let name = this.$refs.restore_profile_name.value
-      let profile = JSON.parse(this.$refs.restore_profile_data.value)
+    deleteProfile (name) {
+      if (confirm(this.$t('Are you sure you want remove this item?'))) {
+        if (this.currentProfileName === name) {
+          this.setCurrentProfileName('default')
+        }
 
+        this.deleteProfile(name)
+        this.saveAllProfiles(this.profiles)
+      }
+    },
+    restoreToProfile ({ name, profile }) {
       this.applyProfile({ name, profile })
       this.saveNewProfile(name)
     },
-    restoreProfiles () {
+    restoreProfiles (profiles) {
       if (confirm(this.$t('Are you sure? This will remove all profiles before trying to add new ones!'))) {
-        try {
-          let profiles = JSON.parse(this.$refs.restore_profiles_data.value)
-
-          // keep default profile if user removed it
-          if (!profiles['default']) {
-            profiles['default'] = this.data.profiles.default
-          }
-          this.saveAllProfiles(profiles)
-        }
-        catch (e) {
-          console.error(e)
-        }
+        this.saveAllProfiles(profiles)
       }
     },
     ...mapActions([
       'applyProfile',
       'saveNewProfile',
-      'saveAllProfiles'
+      'deleteProfile',
+      'saveAllProfiles',
+      'setCurrentProfileName'
     ])
   }
 }
