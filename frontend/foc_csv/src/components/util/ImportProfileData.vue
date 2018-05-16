@@ -7,23 +7,17 @@
       </div>
 
       <div class="panel-body">
-        <div class="form-group">
-          <button class="btn btn-default" @click.prevent="showProfileState = !showProfileState">{{ $t('Show current profile data') }}</button>
+        <serialized-data-toggler :value="profile">
+          {{ $t('Show current profile data') }}
+        </serialized-data-toggler>
 
-          <textarea :value="JSON.stringify(profile)" class="form-control" v-if="showProfileState"></textarea>
-        </div>
+        <serialized-data-toggler :value="data.profiles">
+          {{ $t('Show profiles data') }}
+        </serialized-data-toggler>
 
-        <div class="form-group">
-          <button class="btn btn-default" @click.prevent="showProfilesState = !showProfilesState">{{ $t('Show profiles data') }}</button>
-
-          <textarea :value="JSON.stringify(data.profiles)" class="form-control" v-if="showProfilesState"></textarea>
-        </div>
-
-        <div class="form-group">
-          <button class="btn btn-default" @click.prevent="showAllDataState = !showAllDataState">{{ $t('Show all data state') }}</button>
-
-          <textarea :value="JSON.stringify(data)" class="form-control" v-if="showAllDataState"></textarea>
-        </div>
+        <serialized-data-toggler :value="data">
+          {{ $t('Show all data state') }}
+        </serialized-data-toggler>
       </div>
     </div>
   </div>
@@ -72,6 +66,7 @@
 
 <script>
 import ProfilesControlList from './ProfilesControlList'
+import SerializedDataToggler from './SerializedDataToggler'
 
 import { createNamespacedHelpers } from 'vuex'
 
@@ -79,7 +74,8 @@ const { mapActions, mapState } = createNamespacedHelpers('importer')
 
 export default {
   components: {
-    ProfilesControlList
+    ProfilesControlList,
+    SerializedDataToggler
   },
   data () {
     return {
