@@ -98,5 +98,6 @@
   "CSV header": "CSV заголовок",
   "Control": "Управление",
   "Add new db field binding": "Добавить новую привязку к полю БД",
-  "There is no created bindings": "Нет добавленных привязок"
+  "There is no created bindings": "Нет добавленных привязок",
+  "Reset db field bindings": "Сбросить привязки к полям"
 }
