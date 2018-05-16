@@ -187,7 +187,6 @@ class ModelExtensionModuleFocCsvCommon extends Model {
     return DIR_CACHE . $this->profiles_code . '/' . $key . '/' . $this->type . '/';
   }
 
-
   /*
     Prepare import storage
     Returns storage key
@@ -227,7 +226,7 @@ class ModelExtensionModuleFocCsvCommon extends Model {
   /*
     Check if url is url:)
   */
-  private function isUrl ($url) {
+  public function isUrl ($url) {
     return preg_match('/^https?\:\/\//', $url);
   }
 
