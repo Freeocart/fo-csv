@@ -282,6 +282,11 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
       $key = $this->model_extension_module_foc_csv_exporter->prepareUploadPath();
       $exportFile = $this->model_extension_module_foc_csv_exporter->getExportCsvFilePath($key);
+      $exportImagesFile = '';
+
+      if ($profile['createImagesZIP']) {
+        $exportImagesFile = $this->model_extension_module_foc_csv_exporter->getExportImagesZipFilePath($key);
+      }
 
       // put csv headers if need
       if ($profile['csvHeader']) {
@@ -304,6 +309,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
         'total' => $total,
         'key' => $key,
         'exportUrl' => html_entity_decode($export_url),
+        'csvFileUrl' => $this->model_extension_module_foc_csv_exporter->pathToUrl($exportFile),
+        'imagesZipUrl' => $this->model_extension_module_foc_csv_exporter->pathToUrl($exportImagesFile),
         'position' => 0 // позиция на которой было закончено чтение в прошлой сессии (0 поскольку чтение еще не начато)
       ));
     }
@@ -332,6 +339,19 @@ class ControllerExtensionModuleFocCsv extends Controller {
           fputcsv($csv_fid, $csvLine, $profile['csvFieldDelimiter']);
         }
         fclose($csv_fid);
+
+        if ($profile['createImagesZIP'] && $this->model_extension_module_foc_csv_exporter->hasCollectedImages()) {
+          $exportImagesFile = $this->model_extension_module_foc_csv_exporter->getExportImagesZipFilePath($key);
+          $zip = new ZipArchive();
+          $zip->open($exportImagesFile, ZipArchive::CREATE);
+
+          foreach($this->model_extension_module_foc_csv_exporter->getCollectedImages() as $image) {
+            $path = DIR_IMAGE . $image;
+            $zip->addFile($path, $this->model_extension_module_foc_csv_exporter->basename($image));
+          }
+
+          $zip->close();
+        }
 
         $position = $offset + $limit;
 
