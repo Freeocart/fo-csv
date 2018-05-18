@@ -15,12 +15,23 @@ export default {
   computed: {
     ...mapGetters([
       'encoding',
-      'csvFieldDelimiter'
+      'csvFieldDelimiter',
+      'skipLines',
+      'csvWithoutHeaders',
+      'csvHeadersLineNumber'
     ])
   },
   methods: {
     readBlob (event) {
       let file = null
+      let skipToHeaders = 0
+
+      if (!this.csvWithoutHeaders) {
+        skipToHeaders = parseInt(this.csvHeadersLineNumber)
+      }
+      else {
+        skipToHeaders = parseInt(this.skipLines) + 1
+      }
 
       if (event.srcElement.files.length > 0) {
         file = event.srcElement.files[0]
@@ -34,7 +45,7 @@ export default {
           this.setCsvFileRef(this.$refs.fileRef)
         })
 
-        reader.read(file, this.encoding)
+        reader.read(file, this.encoding, skipToHeaders)
       }
     },
     ...mapActions([

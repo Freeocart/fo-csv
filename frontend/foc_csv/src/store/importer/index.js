@@ -12,6 +12,8 @@ let fields = genStoreFields([
   'keyField',
   'fillParentCategories',
   'skipLines',
+  'csvWithoutHeaders',
+  'csvHeadersLineNumber',
   'store',
   'language',
   'importMode',

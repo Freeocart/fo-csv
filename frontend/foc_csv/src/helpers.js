@@ -30,6 +30,7 @@ class FirstLineReader {
     this.lines = []
     this.chunk = ''
     this.file = null
+    this.readedLines = 0
 
     this.reader.onload = () => {
       this.chunk += this.reader.result
@@ -57,8 +58,16 @@ class FirstLineReader {
   process () {
     if (/\n/.test(this.chunk)) {
       let lines = this.chunk.split('\n')
-      let line = this._fixString(lines[0])
-      this._emit('line', [line])
+      let line = this._fixString(lines.shift())
+      this.readedLines++
+
+      if (this.readedLines === this.skipLines) {
+        this._emit('line', [line])
+      }
+      else {
+        this.chunk = lines.join('\n')
+        this.step()
+      }
     }
     else {
       if (this.readPos < this.file.size) {
@@ -70,12 +79,13 @@ class FirstLineReader {
     }
   }
 
-  read (file, encoding) {
+  read (file, encoding, skipLines = 0) {
     this.file = file
     this.lines = []
     this.chunk = ''
     this.readPos = 0
     this.encoding = encoding || 'UTF8'
+    this.skipLines = parseInt(skipLines)
 
     this.step()
   }

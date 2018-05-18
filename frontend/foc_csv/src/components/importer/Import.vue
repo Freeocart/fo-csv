@@ -49,11 +49,23 @@
                   <label for="" class="label label-default">{{ $t('Process lines per query') }}</label>
                   <input type="text" v-model="processAtStepNum" class="form-control">
                 </div>
-              </div>
-              <div class="col-md-6">
                 <div class="form-group">
                   <label for="" class="label label-default">{{ $t('Skip lines') }}</label>
                   <input type="text" class="form-control" v-model="skipLines">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="label label-default">{{ $t('CSV headers control') }}</label>
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" v-model="csvWithoutHeaders"> {{ $t('CSV without headers') }}
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="" class="label label-default">{{ $t('CSV headers line number') }}</label>
+                  <input :disabled="csvWithoutHeaders" type="text" class="form-control" v-model="csvHeadersLineNumber">
                 </div>
               </div>
             </div>
@@ -125,6 +137,8 @@ export default {
     ...mapVuexModels([
       'processAtStepNum',
       'skipLines',
+      'csvWithoutHeaders',
+      'csvHeadersLineNumber',
       'keyField'
     ], 'importer'),
     ...mapVuexModels({

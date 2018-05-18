@@ -487,6 +487,11 @@ class ControllerExtensionModuleFocCsv extends Controller {
           $this->model_extension_module_foc_csv->setUploadKey($import_key);
 
           $skipLines = $profile['skipLines'];
+
+          if (!$profile['csvWithoutHeaders'] && $profile['csvHeadersLineNumber'] > $skipLines) {
+            $skipLines = $profile['csvHeadersLineNumber'];
+          }
+
           $delimiter = empty($profile['csvFieldDelimiter']) ? ';' : $profile['csvFieldDelimiter'];
           $importAtOnce = empty($profile['processAtStepNum']) ? 10 : $profile['processAtStepNum'];
 
