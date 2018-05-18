@@ -16,6 +16,17 @@
         <p>{{ $t('Errors count') }} - <strong>{{ errors }}</strong></p>
       </div>
     </div>
+    <div class="panel panel-success" v-if="showDownloadLinks">
+      <div class="panel-heading">
+        {{ $t('Export complete, here is your download links:') }}
+      </div>
+      <div class="panel-body">
+        <div class="btn-group">
+          <a :href="csvFileUrl" target="_blank" class="btn btn-primary">{{ $t('CSV file') }}</a>
+          <a v-if="imagesZipUrl" target="_blank" :href="imagesZipUrl" class="btn btn-default">{{ $t('Images ZIP file') }}</a>
+        </div>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-12">
         <div class="row">
@@ -85,7 +96,9 @@ export default {
   data () {
     return {
       msg: 'Export',
-      errors: 0
+      errors: 0,
+      imagesZipUrl: null,
+      csvFileUrl: null
     }
   },
   computed: {
@@ -102,7 +115,11 @@ export default {
     }, 'exporter'),
     ...mapGetters([
       'submittableData'
-    ])
+    ]),
+    showDownloadLinks () {
+      console.log(this.working, this.csvFileUrl)
+      return this.working === false && this.csvFileUrl !== null
+    }
   },
   methods: {
     async submitExportPart (exportUrl, obj) {
@@ -132,6 +149,8 @@ export default {
     async submitExportData () {
       let data = this.submittableData
       this.errors = 0
+      this.csvFileUrl = null
+      this.imagesZipUrl = null
 
       try {
         let response = await this.$api.exporter.submitData(data.profile)
@@ -139,6 +158,8 @@ export default {
         if (response.data.status === 'ok') {
           this.total = response.data.message.total
           this.working = true
+          this.csvFileUrl = response.data.message.csvFileUrl
+          this.imagesZipUrl = response.data.message.imagesZipUrl
           this.submitExportPart(response.data.message.exportUrl, response.data.message)
         }
       }
