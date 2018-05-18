@@ -11,8 +11,8 @@
 export default {
   props: {
     errors: {
-      type: Array,
-      default: () => ([])
+      type: Number,
+      default: 0
     }
   }
 }
