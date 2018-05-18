@@ -20,7 +20,7 @@ export default {
     Vue.set(state.profile.statusRewrites, id, value)
   },
   SET_CSV_FIELD_NAMES (state, fields) {
-    state.data.csvFields = fields
+    Vue.set(state.data, 'csvFields', fields)
   },
   SET_CATEGORY_DELIMITER (state, delimiter) {
     state.profile.categoryDelimiter = delimiter
