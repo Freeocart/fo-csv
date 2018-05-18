@@ -80,7 +80,8 @@
   "Default status": "Статус по умолчанию",
   "Default stock status": "Складской статус",
 
-  "During import we had errors, please check foc logs!": "Во время импорта произошли ошибки, пожалуйста, проверьте логи foc!",
+  "During import we catched some errors, please check foc logs!": "Во время импорта произошли ошибки, пожалуйста, проверьте логи foc!",
+  "During export we catched some errors, please check foc logs!": "Во время экспорта произошли ошибки, пожалуйста, проверьте логи foc!",
   "Errors count": "Количество ошибок",
 
   "Error during sending!": "Ошибка во время отправки данных!",

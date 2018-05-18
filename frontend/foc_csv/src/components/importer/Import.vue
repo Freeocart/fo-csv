@@ -10,12 +10,11 @@
         </div>
       </div>
     </template>
-    <div v-if="errors > 0">
-      <div class="alert alert-danger" role="alert">
-        <p>{{ $t('During import we had errors, please check foc logs!') }}</p>
-        <p>{{ $t('Errors count') }} - <strong>{{ errors }}</strong></p>
-      </div>
-    </div>
+
+    <error-message :errors="errors">
+      <p>{{ $t('During import we catched some errors, please check foc logs!') }}</p>
+    </error-message>
+
     <div class="row">
       <div class="col-md-12">
         <div class="row">
@@ -88,6 +87,7 @@ import ProgressBar from '@/components/common/ProgressBar'
 import CsvFileUpload from './CsvFileUpload'
 import RightSidebar from './RightSidebar'
 import LeftSidebar from './LeftSidebar'
+import ErrorMessage from '@/components/common/ErrorMessage'
 import CsvToDbMatcher from './CsvToDbMatcher'
 
 const { mapGetters, mapActions } = createNamespacedHelpers('importer')
@@ -99,7 +99,8 @@ export default {
     ProgressBar,
     RightSidebar,
     LeftSidebar,
-    CsvToDbMatcher
+    CsvToDbMatcher,
+    ErrorMessage
   },
   data () {
     return {

@@ -10,12 +10,11 @@
         </div>
       </div>
     </template>
-    <div v-if="errors > 0">
-      <div class="alert alert-danger" role="alert">
-        <p>{{ $t('During import we had errors, please check foc logs!') }}</p>
-        <p>{{ $t('Errors count') }} - <strong>{{ errors }}</strong></p>
-      </div>
-    </div>
+
+    <error-message :errors="errors">
+      <p>{{ $t('During export we catched some errors, please check foc logs!') }}</p>
+    </error-message>
+
     <div class="panel panel-success" v-if="showDownloadLinks">
       <div class="panel-heading">
         {{ $t('Export complete, here is your download links:') }}
@@ -84,6 +83,7 @@ import LeftSidebar from './LeftSidebar'
 import RightSidebar from './RightSidebar'
 import ExportFields from './ExportFields'
 import ProgressBar from '@/components/common/ProgressBar'
+import ErrorMessage from '@/components/common/ErrorMessage'
 const { mapGetters } = createNamespacedHelpers('exporter')
 
 export default {
@@ -91,7 +91,8 @@ export default {
     LeftSidebar,
     RightSidebar,
     ExportFields,
-    ProgressBar
+    ProgressBar,
+    ErrorMessage
   },
   data () {
     return {
@@ -117,7 +118,6 @@ export default {
       'submittableData'
     ]),
     showDownloadLinks () {
-      console.log(this.working, this.csvFileUrl)
       return this.working === false && this.csvFileUrl !== null
     }
   },
