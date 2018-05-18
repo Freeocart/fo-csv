@@ -18,8 +18,11 @@
         </div>
 
         <div class="form-group">
-          <label class="label label-default">{{ $t('Dump parent categories') }}</label>
-          <input type="checkbox" class="form-control" v-model="dumpParentCategories">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" v-model="dumpParentCategories"> {{ $t('Dump parent categories') }}
+            </label>
+          </div>
         </div>
 
         <div class="form-group">

@@ -13,25 +13,21 @@
   </div>
 
   <div class="form-group">
-    <label for="" class="label label-default">
-      {{ $t('If no preview - set it from gallery') }}
-    </label>
-    <input type="checkbox" v-model="previewFromGallery" class="form-control">
-  </div>
-
-  <div class="form-group">
-    <label for="" class="label label-default">
-      {{ $t('Clear gallery before import') }}
-    </label>
-    <input type="checkbox" v-model="clearGalleryBeforeImport" class="form-control">
-  </div>
-
-  <div class="form-group">
-    <label for="" class="label label-default">
-      {{ $t('Download images with URL') }}
-    </label>
-
-    <input type="checkbox" v-model="downloadImages" class="form-control">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" v-model="previewFromGallery"> {{ $t('If no preview - set it from gallery') }}
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" v-model="clearGalleryBeforeImport"> {{ $t('Clear gallery before import') }}
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" v-model="downloadImages"> {{ $t('Download images with URL') }}
+      </label>
+    </div>
   </div>
 
   <div class="form-group">

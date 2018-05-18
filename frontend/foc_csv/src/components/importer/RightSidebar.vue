@@ -18,8 +18,11 @@
     </div>
 
     <div class="form-group">
-      <label for="" class="label label-default">{{ $t('Clear manufacturers before import') }}</label>
-      <input type="checkbox" class="form-control" v-model="removeManufacturersBeforeImport">
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" v-model="removeManufacturersBeforeImport"> {{ $t('Clear manufacturers before import') }}
+        </label>
+      </div>
     </div>
 
     <div class="form-group">
@@ -53,8 +56,11 @@
       <input type="text" v-model="categoryDelimiter" class="form-control">
     </div>
     <div class="form-group">
-      <label for="" class="label label-default">{{ $t('Fill parent categories') }}</label>
-      <input type="checkbox" v-model="fillParentCategories" class="form-control">
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" v-model="fillParentCategories"> {{ $t('Fill parent categories') }}
+        </label>
+      </div>
     </div>
     <div class="form-group">
       <label for="" class="label label-default">{{ $t('Remove chars from category fields') }}</label>

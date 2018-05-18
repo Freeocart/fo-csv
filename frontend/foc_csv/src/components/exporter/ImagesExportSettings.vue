@@ -14,8 +14,11 @@
       </div>
 
       <div class="form-group">
-        <label class="label label-default">{{ $t('Create images ZIP') }}</label>
-        <input type="checkbox" class="form-control" v-model="createImagesZIP">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" v-model="createImagesZIP"> {{ $t('Create images ZIP') }}
+          </label>
+        </div>
       </div>
 
       <div class="form-group">

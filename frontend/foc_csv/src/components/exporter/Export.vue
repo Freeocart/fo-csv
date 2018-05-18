@@ -58,8 +58,11 @@
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label class="label label-default">{{ $t('Render CSV header') }}</label>
-                  <input type="checkbox" class="form-control" v-model="csvHeader">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" v-model="csvHeader"> {{ $t('Render CSV header') }}
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
