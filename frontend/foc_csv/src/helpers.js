@@ -117,7 +117,7 @@ const parseCsvHeaders = (raw, delimiter = ';') => {
 */
 const validateProfile = (profile) => {
   // validate key field
-  return profile.keyField && profile.bindings[profile.keyField]
+  return profile.keyField && profile.bindings[profile.keyField] != null
 }
 
 /*
