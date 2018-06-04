@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+  <name>fo_csv_menu_link</name>
+  <code>default</code>
+  <version>2.1.0.0</version>
+  <author>ikenfin</author>
+  <link>https://ikfi.ru/</link>
+  <file path="admin/controller/common/column_left.php">
+    <operation>
+      <search><![CDATA[if ($this->user->hasPermission('access', 'tool/backup')) {]]></search>
+      <add position="before"><![CDATA[
+        if ($this->user->hasPermission('access', 'extension/module/foc_csv')) {
+          $item = array(
+            'name'	   => $this->language->get('text_foc_csv'),
+            'children' => array()
+          );
+
+          // oc 2
+          if (isset($tool) && is_array($tool)) {
+            $item['href'] = $this->url->link('extension/module/foc_csv', 'token=' . $this->session->data['token'], true);
+            $tool[] = $item;
+          }
+          // oc 3
+          elseif (isset($maintenance) && is_array($maintenance)) {
+            $item['href'] = $this->url->link('extension/module/foc_csv', 'user_token=' . $this->session->data['user_token'], true);
+            $maintenance[] = $item;
+          }
+        }
+      ]]></add>
+    </operation>
+  </file>
+
+  <file path="admin/language/ru-ru/common/column_left.php">
+    <operation>
+      <search><![CDATA[<?php]]></search>
+      <add position="after"><![CDATA[
+        $_['text_foc_csv'] = 'Импорт/экспорт FO CSV';
+      ]]></add>
+    </operation>
+  </file>
+
+  <file path="admin/language/en-gb/common/column_left.php">
+    <operation>
+      <search><![CDATA[<?php]]></search>
+      <add position="after"><![CDATA[
+        $_['text_foc_csv'] = 'Import/export FO CSV';
+      ]]></add>
+    </operation>
+  </file>
+</modification>
