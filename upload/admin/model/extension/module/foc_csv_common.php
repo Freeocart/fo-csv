@@ -246,8 +246,10 @@ class ModelExtensionModuleFocCsvCommon extends Model {
     Just OC version checker used to provide forward/backward compatibility
   */
   public function isOpencart3 () {
-    $version = (int)preg_replace('/\./', '', VERSION);
-    return $version > 2999;
+    $digits = explode('.', VERSION);
+    // check only first digit - ocStore uses 5 digits versioning system
+    $major_version = (int)array_shift($digits);
+    return $major_version > 2;
   }
 
 }
