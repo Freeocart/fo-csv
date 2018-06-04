@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modification>
   <name>fo_csv_menu_link</name>
-  <code>default</code>
+  <code>fo_csv_menu_link_id</code>
   <version>2.1.0.0</version>
   <author>ikenfin</author>
-  <link>https://ikfi.ru/</link>
+  <link>http://freeocart.ru</link>
   <file path="admin/controller/common/column_left.php">
     <operation>
       <search><![CDATA[if ($this->user->hasPermission('access', 'tool/backup')) {]]></search>
