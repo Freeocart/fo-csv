@@ -96,7 +96,8 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       'store' => $this->config->get('config_store_id'),
       'language' => $this->config->get('config_language_id'),
       'attributeParserData' => array(),
-      'skipLineOnEmptyFields' => array()
+      'skipLineOnEmptyFields' => array(),
+      'multicolumnFields' => array()
     );
   }
 
