@@ -1,6 +1,11 @@
 <template>
-  <div>
-    <multicolumn-extractor></multicolumn-extractor>
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      {{ $t('Additional processing settings') }}
+    </div>
+    <div class="panel-body">
+      <multicolumn-extractor></multicolumn-extractor>
+    </div>
   </div>
 </template>
 

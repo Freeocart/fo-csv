@@ -1,5 +1,7 @@
 <template>
-  <table class="table">
+<div>
+  <label class="label label-default">{{ $t('Multicolumn fields settings') }}</label>
+  <table class="table table-bordered table-striped">
     <thead>
       <tr>
         <th>{{ $t('CSV column') }}</th>
@@ -8,13 +10,13 @@
         <th>{{ $t('Control') }}</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody v-if="csvFields && csvFields.length > 0">
       <tr v-for="(field, idx) in multicolumnFields" :key="idx">
         <td>
           <multi-csv-fields-selector :options="csvFields" v-model="field.csvFields"></multi-csv-fields-selector>
         </td>
         <td>
-          <textarea :value="undefined" v-model="field.valueTemplate"></textarea>
+          <textarea :value="undefined" v-model="field.valueTemplate" class="form-control"></textarea>
         </td>
         <td>
           <db-fields-select :data="dbFields" v-model="field.dbField"></db-fields-select>
@@ -34,7 +36,16 @@
         </td>
       </tr>
     </tbody>
+    <tbody v-else>
+      <tr>
+        <td colspan="4">
+          {{ $t('Csv not selected!') }}
+        </td>
+      </tr>
+    </tbody>
   </table>
+  ...
+</div>
 </template>
 
 <script>
@@ -62,11 +73,9 @@ export default {
   },
   methods: {
     deleteMulticolumnField (idx) {
-      console.log(this.multicolumnFields)
       this.multicolumnFields = this.multicolumnFields.filter((val, index) => index !== idx)
     },
     insertNewMulticolumnField () {
-      console.log(this.multicolumnFields)
       this.multicolumnFields.push({})
     },
     ...mapActions([
