@@ -7,6 +7,8 @@
   "Util": "Утилиты",
   "Import utils": "Утилиты импортера",
   "Export utils": "Утилиты экспортера",
+  "Delete": "Удалить",
+  "Unavailable": "Недоступно",
   "soon": "скоро",
   "Show/hide": "Показать/скрыть",
   "Import in progress": "Импорт данных в процессе",
@@ -106,5 +108,9 @@
   "There is no created bindings": "Нет добавленных привязок",
   "Reset db field bindings": "Сбросить привязки к полям",
 
-  "Export complete, here is your download links:": "Экспорт завершён, ссылки для скачивания файлов:"
+  "Export complete, here is your download links:": "Экспорт завершён, ссылки для скачивания файлов:",
+  "Additional processing settings": "Настройки дополнительной обработки",
+  "Multicolumn fields settings": "Несколько колонок в одно поле",
+  "Field value template": "Шаблон значения поля",
+  "CSV file not selected": "Файл CSV не выбран"
 }

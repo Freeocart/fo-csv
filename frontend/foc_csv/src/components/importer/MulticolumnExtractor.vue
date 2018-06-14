@@ -4,7 +4,7 @@
   <table class="table table-bordered table-striped">
     <thead>
       <tr>
-        <th>{{ $t('CSV column') }}</th>
+        <th>{{ $t('CSV field') }}</th>
         <th>{{ $t('Value template') }}</th>
         <th>{{ $t('DB field') }}</th>
         <th>{{ $t('Control') }}</th>
@@ -16,7 +16,7 @@
           <multi-csv-fields-selector :options="csvFields" v-model="field.csvFields"></multi-csv-fields-selector>
         </td>
         <td>
-          <textarea :value="undefined" v-model="field.valueTemplate" class="form-control"></textarea>
+          <textarea :value="undefined" v-model="field.valueTemplate" class="form-control" :placeholder="$t('Field value template')"></textarea>
         </td>
         <td>
           <db-fields-select :data="dbFields" v-model="field.dbField"></db-fields-select>
@@ -39,12 +39,12 @@
     <tbody v-else>
       <tr>
         <td colspan="4">
-          {{ $t('Csv not selected!') }}
+          <p>{{ $t('Unavailable') }}</p>
+          <p>{{ $t('CSV file not selected') }}</p>
         </td>
       </tr>
     </tbody>
   </table>
-  ...
 </div>
 </template>
 
