@@ -38,7 +38,6 @@ export default {
       bindings = JSON.parse(this.value)
     }
     catch (e) {
-      console.error(e)
       bindings = []
     }
 

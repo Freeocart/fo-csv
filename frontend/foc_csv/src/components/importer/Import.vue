@@ -80,6 +80,8 @@
             <csv-to-db-matcher v-model="csvFieldsMatcher"></csv-to-db-matcher>
           </div>
         </div>
+
+        <additional-processing-settings></additional-processing-settings>
       </div>
 
       <div class="col-md-3">
@@ -101,6 +103,7 @@ import RightSidebar from './RightSidebar'
 import LeftSidebar from './LeftSidebar'
 import ErrorMessage from '@/components/common/ErrorMessage'
 import CsvToDbMatcher from './CsvToDbMatcher'
+import AdditionalProcessingSettings from './AdditionalProcessingSettings'
 
 const { mapGetters, mapActions } = createNamespacedHelpers('importer')
 
@@ -112,7 +115,8 @@ export default {
     RightSidebar,
     LeftSidebar,
     CsvToDbMatcher,
-    ErrorMessage
+    ErrorMessage,
+    AdditionalProcessingSettings
   },
   data () {
     return {

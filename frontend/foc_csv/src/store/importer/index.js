@@ -33,7 +33,8 @@ let fields = genStoreFields([
   'removeManufacturersBeforeImport',
   'defaultAttributesGroup',
   'attributesCSVField',
-  'skipLineOnEmptyFields'
+  'skipLineOnEmptyFields',
+  'multicolumnFields'
 ], 'profile')
 
 let importProgress = genStoreFields([
