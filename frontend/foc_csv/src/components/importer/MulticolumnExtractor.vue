@@ -5,7 +5,7 @@
     <thead>
       <tr>
         <th>{{ $t('CSV field') }}</th>
-        <th>{{ $t('Value template') }}</th>
+        <th>{{ $t('Preprocess value template') }}</th>
         <th>{{ $t('DB field') }}</th>
         <th>{{ $t('Control') }}</th>
       </tr>
@@ -16,7 +16,7 @@
           <multi-csv-fields-selector :options="csvFields" v-model="field.csvFields"></multi-csv-fields-selector>
         </td>
         <td>
-          <textarea :value="undefined" v-model="field.valueTemplate" class="form-control" :placeholder="$t('Field value template')"></textarea>
+          <textarea :value="undefined" v-model="field.valueTemplate" class="form-control" :placeholder="$t('Preprocess value template')"></textarea>
         </td>
         <td>
           <db-fields-select :data="dbFields" v-model="field.dbField"></db-fields-select>
