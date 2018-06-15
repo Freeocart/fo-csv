@@ -1,7 +1,7 @@
 <template>
 <div>
   <ul class="list-group">
-    <li v-for="(binding, idx) in bindings" :key="idx" class="list-group-item">
+    <li v-for="(binding, idx) in _value" :key="idx" class="list-group-item">
       <span class="input-group">
         <select v-model="binding.field" @change="setDefaultBindingName(binding, items[$event.target.value])" class="form-control" :placeholder="$t('Attribute value')">
           <option :value="undefined">{{ $t('Not selected') }}</option>
@@ -21,47 +21,40 @@
 </template>
 
 <script>
+import Vue from 'vue'
 
 export default {
   props: {
     value: {
-      default: ''
+      type: Array,
+      default: () => ([])
     },
     items: {
       type: Array,
       default: () => ([])
     }
   },
-  data () {
-    let bindings = []
-
-    try {
-      bindings = JSON.parse(this.value)
-    }
-    catch (e) {
-      bindings = []
-    }
-
-    return {
-      bindings
+  computed: {
+    _value: {
+      get () {
+        return this.value
+      },
+      set (val) {
+        this.$emit('input', val)
+      }
     }
   },
   methods: {
     addBinding () {
-      this.bindings.push({})
+      this._value.push({})
     },
     removeBinding (binding) {
-      this.bindings = this.bindings.filter(item => item !== binding)
+      this._value = this._value.filter(item => item !== binding)
     },
     setDefaultBindingName (binding, value) {
       if (!binding.name) {
-        binding.name = value
+        Vue.set(binding, 'name', value)
       }
-    }
-  },
-  watch: {
-    bindings (newV) {
-      this.$emit('input', JSON.stringify(newV))
     }
   }
 }
