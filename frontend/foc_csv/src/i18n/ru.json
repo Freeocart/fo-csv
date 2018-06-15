@@ -7,6 +7,7 @@
   "Util": "Утилиты",
   "Import utils": "Утилиты импортера",
   "Export utils": "Утилиты экспортера",
+  "Add": "Добавить",
   "Delete": "Удалить",
   "Unavailable": "Недоступно",
   "soon": "скоро",
@@ -112,5 +113,9 @@
   "Additional processing settings": "Настройки дополнительной обработки",
   "Multicolumn fields settings": "Несколько колонок в одно поле",
   "Preprocess value template": "Шаблон преобразования значения",
-  "CSV file not selected": "Файл CSV не выбран"
+  "CSV file not selected": "Файл CSV не выбран",
+  "Template variables": "Переменные шаблона",
+  "Template variable name": "Имя переменной в шаблоне",
+  "Add new template variable": "Добавить новую переменную шаблона",
+  "Remove template variable": "Удалить переменную шаблона"
 }
