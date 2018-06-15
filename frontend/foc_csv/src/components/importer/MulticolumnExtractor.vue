@@ -7,6 +7,7 @@
         <th>{{ $t('Template variables') }}</th>
         <th>{{ $t('Preprocess value template') }}</th>
         <th>{{ $t('DB field') }}</th>
+        <th>{{ $t('Mode') }}</th>
         <th>{{ $t('Control') }}</th>
       </tr>
     </thead>
@@ -30,11 +31,18 @@
           </button>
         </td>
         <td>
-          <textarea v-model="field.valueTemplate" class="form-control" :placeholder="$t('Preprocess value template')">
+          <textarea v-model="field.valueTemplate" class="form-control b-form-control-fill-height" :placeholder="$t('Preprocess value template')">
           </textarea>
         </td>
         <td>
           <db-fields-select :data="dbFields" v-model="field.dbField"></db-fields-select>
+        </td>
+        <td>
+          <select v-model="field.mode" class="form-control">
+            <option value="replace">{{ $t('Replace CSV field data') }}</option>
+            <option value="after">{{ $t('Add after CSV field data') }}</option>
+            <option value="before">{{ $t('Add before CSV field data') }}</option>
+          </select>
         </td>
         <td>
           <button class="btn btn-danger" @click.prevent="deleteMulticolumnField(idx)">
@@ -43,7 +51,7 @@
         </td>
       </tr>
       <tr>
-        <td colspan="3">&nbsp; {{ multicolumnFields }}</td>
+        <td colspan="4">&nbsp;</td>
         <td>
           <button class="btn btn-primary" @click.prevent="insertNewMulticolumnField()">
             <i class="fa fa-plus"></i> {{ $t('Add') }}
@@ -53,7 +61,7 @@
     </tbody>
     <tbody v-else>
       <tr>
-        <td colspan="4">
+        <td colspan="5">
           <p>{{ $t('Unavailable') }}</p>
           <p>{{ $t('CSV file not selected') }}</p>
         </td>
@@ -92,7 +100,8 @@ export default {
     },
     insertNewMulticolumnField () {
       this.multicolumnFields.push({
-        csvFields: []
+        csvFields: [],
+        mode: 'replace'
       })
     },
     deleteMulticolumnFieldGroup (idx, groupIdx) {
@@ -117,5 +126,9 @@ export default {
   padding: .5em;
   border: 1px solid #ddd;
   margin: .25em 0;
+}
+.b-form-control-fill-height {
+  resize: vertical;
+  min-width: 300px;
 }
 </style>
