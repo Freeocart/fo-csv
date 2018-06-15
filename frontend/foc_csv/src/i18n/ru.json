@@ -5,6 +5,7 @@
   "Import": "Импорт",
   "Export": "Экспорт",
   "Util": "Утилиты",
+  "Mode": "Режим",
   "Import utils": "Утилиты импортера",
   "Export utils": "Утилиты экспортера",
   "Add": "Добавить",
@@ -117,5 +118,9 @@
   "Template variables": "Переменные шаблона",
   "Template variable name": "Имя переменной в шаблоне",
   "Add new template variable": "Добавить новую переменную шаблона",
-  "Remove template variable": "Удалить переменную шаблона"
+  "Remove template variable": "Удалить переменную шаблона",
+
+  "Replace CSV field data": "Заменить значение из CSV поля",
+  "Add after CSV field data": "Добавить после значения CSV поля",
+  "Add before CSV field data": "Добавить до значения CSV поля"
 }
