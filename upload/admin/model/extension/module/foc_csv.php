@@ -107,18 +107,26 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   */
   private function productDescriptionTemplate ($data = array()) {
     $tableData = array();
-    $tableData[$this->language_id] = array_replace(array(
+    $default = array(
       'description' => '',
       'meta_title' => '',
-      // ocstore compat
-      'meta_h1' => '',
       'tag' => '',
       'name' => '',
+      'meta_title' => '',
       'meta_description' => '',
-      'meta_keyword' => '',
-      'language_id' => $this->language_id,
-      'product_id' => $this->product_id
-    ), $data);
+      'meta_keyword' => ''//,
+      // 'language_id' => $this->language_id,
+      // 'product_id' => $this->product_id
+    );
+
+    if ($this->isOcstore()) {
+      $default['meta_h1'] = '';
+    }
+    else {
+      $default['meta_title'] = '';
+    }
+
+    $tableData[$this->language_id] = array_replace($default, $data);
 
     return $tableData;
   }
@@ -684,7 +692,12 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       $this->db->query("DELETE FROM " . DB_PREFIX . "product_description WHERE product_id = '" . (int)$product_id . "'");
 
       foreach ($data['product_description'] as $language_id => $value) {
-        $this->db->query("INSERT INTO " . DB_PREFIX . "product_description SET product_id = '" . (int)$product_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "', description = '" . $this->db->escape($value['description']) . "', tag = '" . $this->db->escape($value['tag']) . "', meta_title = '" . $this->db->escape($value['meta_title']) . "', meta_h1 = '" . $this->db->escape($value['meta_h1']) . "', meta_description = '" . $this->db->escape($value['meta_description']) . "', meta_keyword = '" . $this->db->escape($value['meta_keyword']) . "'");
+        $insert_string = "product_id = '" . (int)$product_id . "', language_id = '" . (int)$language_id . "',";
+        foreach ($value as $name => $value) {
+          $insert_string .= $name . " = '" . $this->db->escape($value) . "',";
+        }
+
+        $this->db->query("INSERT INTO " . DB_PREFIX . "product_description SET " . rtrim($insert_string, ','));
       }
     }
 
@@ -808,7 +821,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     $id = 0;
 
     if (isset($fields['name']) && !empty($fields['name'])) {
-      $id = $this->db->query('SELECT IFNULL((SELECT manufacturer_id FROM '. DB_PREFIX .'manufacturer WHERE name LIKE "' . $fields['name'] . '" LIMIT 1), 0) AS `id`')->row['id'];
+      $id = $this->db->query('SELECT IFNULL((SELECT manufacturer_id FROM '. DB_PREFIX .'manufacturer WHERE name LIKE "' . $this->db->escape($fields['name']) . '" LIMIT 1), 0) AS `id`')->row['id'];
     }
     else {
       $this->writeLog('Manufacturer [' . $fields['name'] . '] has wrong name on [' . $this->csv_row_num . '], so skipping...', 'warn');
