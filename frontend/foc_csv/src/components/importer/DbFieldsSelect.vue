@@ -15,7 +15,7 @@ export default {
       default: () => ({})
     },
     value: {
-      default: ''
+      default: null
     }
   },
   computed: {
