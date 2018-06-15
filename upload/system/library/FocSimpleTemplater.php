@@ -99,6 +99,9 @@ class FocSimpleTemplater {
           $result .= trim(self::render_loop($loop_cond, $loop_body, $vars));
         }
       }
+      else {
+        $result .= trim(self::render_vars($loop, $vars));
+      }
     }
     return $result;
   }
