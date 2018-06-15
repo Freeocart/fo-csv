@@ -82,11 +82,12 @@ class FocSimpleTemplater {
 
   // render template
   public static function render ($template, $vars = array()) {
-    $loops = array_filter(explode('[@endeach]', self::normalize($template)));
+    $normalized_template = self::normalize($template);
+    $loops = array_filter(explode('[@endeach]', $normalized_template));
     $result = '';
 
-    if (count($loops) < 1) {
-      return trim(self::render_vars($loops[0], $vars));
+    if (count($loops) === 0) {
+      return trim(self::render_vars($normalized_template, $vars));
     }
 
     foreach ($loops as $loop) {
