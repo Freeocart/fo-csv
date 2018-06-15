@@ -252,4 +252,11 @@ class ModelExtensionModuleFocCsvCommon extends Model {
     return $major_version > 2;
   }
 
+  /*
+    Check is this a ocStore
+  */
+  public function isOcstore () {
+    return count(explode('.', VERSION)) > 4;
+  }
+
 }
