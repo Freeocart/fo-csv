@@ -1,20 +1,15 @@
 <template>
   <div>
-    <multiselect
-      :options="preparedOptions"
-      v-model="value"
-      :multiple="true"
-      :custom-label="csvFieldLabel"
-    ></multiselect>
+    <csv-column-name-binder v-model="value" :items="options"></csv-column-name-binder>
   </div>
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect'
+import CsvColumnNameBinder from './CsvColumnNameBinder'
 
 export default {
   components: {
-    Multiselect
+    CsvColumnNameBinder
   },
   props: {
     options: {
@@ -43,7 +38,3 @@ export default {
   }
 }
 </script>
-
-<style type="text/scss">
-@import 'vue-multiselect/dist/vue-multiselect.min.css';
-</style>
