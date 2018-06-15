@@ -302,11 +302,38 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     $this->importMode = $mode;
   }
 
+  public function processMulticolumnField ($config, $bindings, $csv_row) {
+    $variables = array(
+      'multicolumn' => array()
+    );
+    foreach ($config['csvFields'] as $group) {
+      $fields = $group['fields'];//json_decode($group['fields'], true);
+
+      foreach ($fields as $field) {
+        $variable = array();
+
+        if (is_array($field)) {
+          foreach ($field as $field_key => $field_value) {
+            if ($field_key == 'field') {
+              $variable[$field_key] = $csv_row[$field_value];
+            }
+            else {
+              $variable[$field_key] = $field_value;
+            }
+          }
+          $variables[$group['variable']][] = $variable;
+        }
+
+      }
+    }
+
+    return FocSimpleTemplater::render($config['valueTemplate'], $variables);
+  }
+
   /*
     Import entry point
   */
   public function import ($profile, $csv_row, $csv_row_num = 0) {
-
     $this->csv_row_num = $csv_row_num;
 
     $skipOnEmpty = isset($profile['skipLineOnEmptyFields']) ? $profile['skipLineOnEmptyFields'] : array();
@@ -324,6 +351,33 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
     $tablesData = $this->getCsvToDBFields($bindings, $csv_row);
 
+    foreach ($profile['multicolumnFields'] as $mc_field) {
+      $mc_db_field_raw = $mc_field['dbField'];
+      $mc_mode = $mc_field['mode'];
+      list($mc_table, $mc_table_field) = explode(':', $mc_db_field_raw);
+
+      if (!isset($tablesData[$mc_table])) {
+        $tablesData[$mc_table] = array();
+      }
+      if (!isset($tablesData[$mc_table][$mc_table_field])) {
+        $tablesData[$mc_table][$mc_table_field] = '';
+      }
+
+      $processed = $this->processMulticolumnField($mc_field, $bindings, $csv_row);
+
+      switch ($mc_mode) {
+        case 'before':
+          $tablesData[$mc_table][$mc_table_field] = $processed . $tablesData[$mc_table][$mc_table_field];
+          break;
+        case 'after':
+          $tablesData[$mc_table][$mc_table_field] .= $processed;
+          break;
+        default:
+          $tablesData[$mc_table][$mc_table_field] = $processed;
+          break;
+      }
+    }
+
     $this->language_id = (int) $this->config->get('config_language_id');
     if (isset($profile['languageId'])) {
       $this->language_id = (int) $profile['languageId'];
@@ -335,9 +389,9 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     }
 
     $manufacturer_id = 0;
+
     if (isset($tablesData['manufacturer'])) {
       $manufacturer_id = $this->importManufacturer($tablesData['manufacturer']);
-
       // set manufacturer id to product fields
       $tablesData['product']['manufacturer_id'] = $manufacturer_id;
     }
@@ -678,7 +732,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
     // we do not want to lose product data before import, so use old data as basement
     $product_data = $this->model_catalog_product->getProduct($product_id);
-    $data = array_merge($data, $product_data);
+    $data = array_merge($product_data, $data);
 
     // update product table
     $this->db->query("UPDATE " . DB_PREFIX . "product SET model = '" . $this->db->escape($data['model']) . "', sku = '" . $this->db->escape($data['sku']) . "', upc = '" . $this->db->escape($data['upc']) . "', ean = '" . $this->db->escape($data['ean']) . "', jan = '" . $this->db->escape($data['jan']) . "', isbn = '" . $this->db->escape($data['isbn']) . "', mpn = '" . $this->db->escape($data['mpn']) . "', location = '" . $this->db->escape($data['location']) . "', quantity = '" . (int)$data['quantity'] . "', minimum = '" . (int)$data['minimum'] . "', subtract = '" . (int)$data['subtract'] . "', stock_status_id = '" . (int)$data['stock_status_id'] . "', date_available = '" . $this->db->escape($data['date_available']) . "', manufacturer_id = '" . (int)$data['manufacturer_id'] . "', shipping = '" . (int)$data['shipping'] . "', price = '" . (float)$data['price'] . "', points = '" . (int)$data['points'] . "', weight = '" . (float)$data['weight'] . "', weight_class_id = '" . (int)$data['weight_class_id'] . "', length = '" . (float)$data['length'] . "', width = '" . (float)$data['width'] . "', height = '" . (float)$data['height'] . "', length_class_id = '" . (int)$data['length_class_id'] . "', status = '" . (int)$data['status'] . "', tax_class_id = '" . (int)$data['tax_class_id'] . "', sort_order = '" . (int)$data['sort_order'] . "', date_modified = NOW() WHERE product_id = '" . (int)$product_id . "'");
