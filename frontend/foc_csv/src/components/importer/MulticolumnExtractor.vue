@@ -4,7 +4,7 @@
   <table class="table table-bordered table-striped">
     <thead>
       <tr>
-        <th>{{ $t('CSV field') }}</th>
+        <th>{{ $t('Template variables') }}</th>
         <th>{{ $t('Preprocess value template') }}</th>
         <th>{{ $t('DB field') }}</th>
         <th>{{ $t('Control') }}</th>
@@ -13,19 +13,25 @@
     <tbody v-if="csvFields && csvFields.length > 0">
       <tr v-for="(field, idx) in multicolumnFields" :key="idx">
         <td>
-          <div v-for="(group, groupIdx) in field.csvFields" :key="groupIdx">
-            <input type="text" v-model="group.variable" class="form-control">
+          <div class="b-variable-group-definition" v-for="(group, groupIdx) in field.csvFields" :key="groupIdx">
+            <label class="label label-default">
+              {{ $t('Template variable name') }}
+            </label>
+            <input class="form-control" type="text" v-model="group.variable">
+
             <multi-csv-fields-selector :options="csvFields" v-model="group.fields"></multi-csv-fields-selector>
-            <button @click.prevent="deleteMulticolumnFieldGroup(idx, groupIdx)" class="btn btn-danger">
-              <i class="fa fa-times"></i>
+
+            <button @click.prevent="deleteMulticolumnFieldGroup(idx, groupIdx)" class="btn btn-danger btn-block">
+              <i class="fa fa-times"></i> {{ $t('Remove template variable') }}
             </button>
           </div>
           <button @click.prevent="insertNewMulticolumnFieldGroup(idx)" class="btn btn-primary">
-            <i class="fa fa-plus"></i>
+            <i class="fa fa-plus"></i> {{ $t('Add new template variable') }}
           </button>
         </td>
         <td>
-          <textarea :value="undefined" v-model="field.valueTemplate" class="form-control" :placeholder="$t('Preprocess value template')"></textarea>
+          <textarea v-model="field.valueTemplate" class="form-control" :placeholder="$t('Preprocess value template')">
+          </textarea>
         </td>
         <td>
           <db-fields-select :data="dbFields" v-model="field.dbField"></db-fields-select>
@@ -105,3 +111,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.b-variable-group-definition {
+  padding: .5em;
+  border: 1px solid #ddd;
+  margin: .25em 0;
+}
+</style>
