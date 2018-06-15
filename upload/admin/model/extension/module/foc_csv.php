@@ -42,7 +42,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       'options' => array(
         'columns' => array(
           'title' => $this->language->get('parser_column_column'),
-          'default' => '',
+          'default' => array(),
           'type' => 'column'
         )
       )
@@ -1020,7 +1020,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     $result = array();
 
     try {
-      $options = json_decode($parser['options']['columns'], true);
+      $options = $parser['options']['columns'];
       $group_id = $this->createOrUpdateAttributeGroup($parser['defaultGroup']);
 
       foreach ($options as $option) {
