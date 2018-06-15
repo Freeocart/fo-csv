@@ -1,6 +1,6 @@
 <template>
 <div>
-  <csv-column-name-binder v-model="value" :items="csvFields"></csv-column-name-binder>
+  <csv-column-name-binder v-model="_value" :items="csvFields"></csv-column-name-binder>
 </div>
 </template>
 
@@ -22,11 +22,14 @@ export default {
   computed: {
     ...mapGetters([
       'csvFields'
-    ])
-  },
-  watch: {
-    value (newV) {
-      this.$emit('change', newV)
+    ]),
+    _value: {
+      get () {
+        return this.value
+      },
+      set (val) {
+        this.$emit('change', val)
+      }
     }
   }
 }
