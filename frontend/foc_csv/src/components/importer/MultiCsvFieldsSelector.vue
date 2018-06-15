@@ -1,6 +1,6 @@
 <template>
   <div>
-    <csv-column-name-binder v-model="value" :items="options"></csv-column-name-binder>
+    <csv-column-name-binder v-model="_value" :items="options"></csv-column-name-binder>
   </div>
 </template>
 
@@ -29,11 +29,15 @@ export default {
   computed: {
     preparedOptions () {
       return Object.keys(this.options)
-    }
-  },
-  watch: {
-    value (newV) {
-      this.$emit('input', newV)
+    },
+    _value: {
+      get () {
+        return this.value
+      },
+      set (val) {
+        console.log(val)
+        this.$emit('input', val)
+      }
     }
   }
 }
