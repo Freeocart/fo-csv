@@ -80,12 +80,14 @@
             <csv-to-db-matcher v-model="csvFieldsMatcher"></csv-to-db-matcher>
           </div>
         </div>
-
-        <additional-processing-settings></additional-processing-settings>
       </div>
 
       <div class="col-md-3">
         <right-sidebar></right-sidebar>
+      </div>
+
+      <div class="col-md-12">
+        <additional-processing-settings></additional-processing-settings>
       </div>
     </div>
   </div>

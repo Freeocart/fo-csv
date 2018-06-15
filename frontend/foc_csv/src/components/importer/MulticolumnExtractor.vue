@@ -13,7 +13,16 @@
     <tbody v-if="csvFields && csvFields.length > 0">
       <tr v-for="(field, idx) in multicolumnFields" :key="idx">
         <td>
-          <multi-csv-fields-selector :options="csvFields" v-model="field.csvFields"></multi-csv-fields-selector>
+          <div v-for="(group, groupIdx) in field.csvFields" :key="groupIdx">
+            <input type="text" v-model="group.variable" class="form-control">
+            <multi-csv-fields-selector :options="csvFields" v-model="group.fields"></multi-csv-fields-selector>
+            <button @click.prevent="deleteMulticolumnFieldGroup(idx, groupIdx)" class="btn btn-danger">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+          <button @click.prevent="insertNewMulticolumnFieldGroup(idx)" class="btn btn-primary">
+            <i class="fa fa-plus"></i>
+          </button>
         </td>
         <td>
           <textarea :value="undefined" v-model="field.valueTemplate" class="form-control" :placeholder="$t('Preprocess value template')"></textarea>
@@ -76,7 +85,19 @@ export default {
       this.multicolumnFields = this.multicolumnFields.filter((val, index) => index !== idx)
     },
     insertNewMulticolumnField () {
-      this.multicolumnFields.push({})
+      this.multicolumnFields.push({
+        csvFields: []
+      })
+    },
+    deleteMulticolumnFieldGroup (idx, groupIdx) {
+      this.multicolumnFields[idx].csvFields = this.multicolumnFields[idx].csvFields.filter((val, index) => index !== idx)
+    },
+    insertNewMulticolumnFieldGroup (idx) {
+      let group = {
+        variable: `source_${this.multicolumnFields[idx].csvFields.length}`,
+        fields: []
+      }
+      this.multicolumnFields[idx].csvFields.push(group)
     },
     ...mapActions([
       'store'
