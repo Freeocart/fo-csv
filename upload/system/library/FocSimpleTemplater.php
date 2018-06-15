@@ -19,7 +19,7 @@
 class FocSimpleTemplater {
   // multiline to single line
   protected static function normalize ($template) {
-    return preg_replace("/\n/", "", preg_replace("/\s+/", " ", $template));
+    return trim(preg_replace("/\r?\n/", "", preg_replace("/[^\S\t]+/", " ", $template)));
   }
 
   // replace variables with values
@@ -43,7 +43,6 @@ class FocSimpleTemplater {
     $result = '';
     list($condition, $source_name) = explode('<=', $loop_cond);
     $loop_vars = explode(',', str_replace(array('(', ')', ' '), '', $condition));
-
     if (count($loop_vars) > 1) {
       list($l_value, $l_key) = $loop_vars;
     }
@@ -53,6 +52,7 @@ class FocSimpleTemplater {
     }
 
     $source_name = trim($source_name);
+
     if (!isset($data[$source_name]) || empty($data[$source_name])) {
       return $result;
     }
@@ -82,19 +82,22 @@ class FocSimpleTemplater {
 
   // render template
   public static function render ($template, $vars = array()) {
-    $loops = explode('[@endeach]', self::normalize($template));
+    $loops = array_filter(explode('[@endeach]', self::normalize($template)));
     $result = '';
-    if (count($loops) == 1) {
-      return self::render_vars($loops[0], $vars);
+
+    if (count($loops) < 1) {
+      return trim(self::render_vars($loops[0], $vars));
     }
+
     foreach ($loops as $loop) {
-      preg_match("/((?!\[\@each).*)\[\@each ([^\]]+)\](.*)/iu", $loop, $matches);
-      if (count($matches) == 4) {
-        $pre = $matches[1];
-        $loop_cond = $matches[2];
-        $loop_body = $matches[3];
-        $result .= self::render_vars($pre, $vars);
-        $result .= self::render_loop($loop_cond, $loop_body, $vars);
+      if (preg_match("/((?!\[\@each).*)?\[\@each ([^\]]+)\]\s*(.*)/iu", $loop, $matches)) {
+        if (count($matches) == 4) {
+          $pre = $matches[1];
+          $loop_cond = $matches[2];
+          $loop_body = $matches[3];
+          $result .= trim(self::render_vars($pre, $vars));
+          $result .= trim(self::render_loop($loop_cond, $loop_body, $vars));
+        }
       }
     }
     return $result;
