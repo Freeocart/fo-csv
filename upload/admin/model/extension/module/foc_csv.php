@@ -11,7 +11,12 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   private $imageSavePath = 'catalog/import';
   private $importMode = 'updateCreate';
 
+  private $multicolumnData = array();
   private $attributeParsers = array();
+
+  const MULTILANGUAGE_TABLES = array(
+    'product_description'
+  );
 
   public function __construct ($registry) {
     parent::__construct($registry, 'importer');
@@ -331,6 +336,60 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   }
 
   /*
+    Check if table expect multilanguage data structure
+  */
+  function isMultilangTable ($table) {
+    return in_array($table, self::MULTILANGUAGE_TABLES);
+  }
+
+  function processMulticolumnFields ($fields) {
+    foreach ($this->multicolumnData as $table => $field) {
+      foreach ($field as $fieldName => $data) {
+        $srcTable_link = null;
+        $fieldValue = '';
+
+        if (!isset($fields[$table])) {
+          $fields[$table] = array();
+        }
+
+        if ($this->isMultilangTable($table) && !isset($fields[$table][$this->language_id])) {
+          $fields[$table][$this->language_id] = array();
+          $fields[$table][$this->language_id][$fieldName] = '';
+        }
+
+        if (!$this->isMultilangTable($table)) {
+          if (!isset($fields[$table][$fieldName])) {
+            $fields[$table][$fieldName] = '';
+          }
+          $srcTable_link =& $fields[$table];
+        }
+        else {
+          $srcTable_link =& $fields[$table][$this->language_id];
+        }
+
+        if (is_null($srcTable_link)) {
+          $this->writeLog('Cannot link to multicolumn field:(');
+          continue;
+        }
+
+        switch ($data['mode']) {
+          case 'after':
+            $fieldValue = $srcTable_link[$fieldName] . $data['value'];
+            break;
+          case 'before':
+            $fieldValue = $data['value'] . $srcTable_link[$fieldName];
+            break;
+          default:
+            $fieldValue = $data['value'];
+            break;
+        }
+        $srcTable_link[$fieldName] = $fieldValue;
+      }
+    }
+
+    return $fields;
+  }
+  /*
     Import entry point
   */
   public function import ($profile, $csv_row, $csv_row_num = 0) {
@@ -352,32 +411,25 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
     $tablesData = $this->getCsvToDBFields($bindings, $csv_row);
 
+    $this->multicolumnData = array();
     // multicolumn fields processing
     foreach ($profile['multicolumnFields'] as $mc_field) {
       $mc_db_field_raw = $mc_field['dbField'];
       $mc_mode = $mc_field['mode'];
       list($mc_table, $mc_table_field) = explode(':', $mc_db_field_raw);
 
-      if (!isset($tablesData[$mc_table])) {
-        $tablesData[$mc_table] = array();
+      if (!isset($this->multicolumnData[$mc_table])) {
+        $this->multicolumnData[$mc_table] = array();
       }
-      if (!isset($tablesData[$mc_table][$mc_table_field])) {
-        $tablesData[$mc_table][$mc_table_field] = '';
+      if (!isset($this->multicolumnData[$mc_table][$mc_table_field])) {
+        $this->multicolumnData[$mc_table][$mc_table_field] = '';
       }
 
       $processed = $this->processMulticolumnField($mc_field, $bindings, $csv_row);
-
-      switch ($mc_mode) {
-        case 'before':
-          $tablesData[$mc_table][$mc_table_field] = $processed . $tablesData[$mc_table][$mc_table_field];
-          break;
-        case 'after':
-          $tablesData[$mc_table][$mc_table_field] .= $processed;
-          break;
-        default:
-          $tablesData[$mc_table][$mc_table_field] = $processed;
-          break;
-      }
+      $this->multicolumnData[$mc_table][$mc_table_field] = array(
+        'value' => $processed,
+        'mode' => $mc_mode
+      );
     }
 
     $this->language_id = (int) $this->config->get('config_language_id');
@@ -738,6 +790,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     $data = $this->productTemplate($data);
     $data['product_description'] = $this->productDescriptionTemplate($data['product_description']);
 
+    $data = $this->processMulticolumnFields($data);
     return $this->model_catalog_product->addProduct($data);
   }
 
@@ -748,7 +801,6 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     Only FO CSV supported fields being updated!
   */
   public function safeEditProduct ($product_id, $data) {
-
     // we do not want to lose product data before import, so use old data as basement
     // $product_data = $this->model_catalog_product->getProduct($product_id);
     $query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "product p WHERE p.product_id = '" . (int)$product_id . "'");
@@ -757,6 +809,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       $product_data = $query->row;
       $product_data['product_description'] = $this->model_catalog_product->getProductDescriptions($product_id);
       $data = array_replace_recursive($product_data, $data);
+      $data = $this->processMulticolumnFields($data);
     }
     else {
       $this->writeLog('Product [' . $product_id . '] not found!');
