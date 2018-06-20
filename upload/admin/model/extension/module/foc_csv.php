@@ -635,6 +635,9 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
             $prev_id = $id;
           }
 
+          $this->db->query("DELETE FROM " . DB_PREFIX . "category_to_store WHERE category_id = '" . (int)$prev_id . "'");
+          $this->db->query('INSERT INTO ' . DB_PREFIX . 'category_to_store (category_id, store_id) VALUES (' . (int)$prev_id . ', ' . (int) $this->store_id . ')');
+
           $result[$categoryPath][] = $prev_id;
         }
       }
