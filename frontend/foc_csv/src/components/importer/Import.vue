@@ -98,7 +98,6 @@
 import { createNamespacedHelpers } from 'vuex'
 import { validateProfile, mapVuexModels } from '@/helpers'
 
-import DbFieldsSelect from './DbFieldsSelect'
 import ProgressBar from '@/components/common/ProgressBar'
 import CsvFileUpload from './CsvFileUpload'
 import RightSidebar from './RightSidebar'
@@ -111,7 +110,6 @@ const { mapGetters, mapActions } = createNamespacedHelpers('importer')
 
 export default {
   components: {
-    DbFieldsSelect,
     CsvFileUpload,
     ProgressBar,
     RightSidebar,

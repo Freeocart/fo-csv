@@ -16,6 +16,10 @@ export default {
     },
     value: {
       default: null
+    },
+    trackOldValues: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -23,8 +27,13 @@ export default {
       get () {
         return this.value
       },
-      set (value) {
-        this.$emit('input', value)
+      set (newValue) {
+        if (this.trackOldValues) {
+          this.$emit('input', { newValue, oldValue: this.value })
+        }
+        else {
+          this.$emit('input', this.value)
+        }
       }
     }
   }

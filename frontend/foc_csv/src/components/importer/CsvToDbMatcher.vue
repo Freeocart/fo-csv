@@ -15,13 +15,13 @@
           <span>{{ field }}</span>
         </td>
         <td>
-          <db-fields-select :value="findSelected(idx)" :data="dbFields" @input="addBinding($event, idx)"></db-fields-select>
+          <db-fields-select :track-old-values="true" :value="findSelected(idx)" :data="dbFields" @input="addBinding($event, idx)" ></db-fields-select>
         </td>
       </tr>
     </tbody>
   </table>
 
-  <button @click.prevent="setBindings([])" class="btn btn-danger"><i class="fa fa-trash"></i> {{ $t('Reset db field bindings') }}</button>
+  <button @click.prevent="setBindings({})" class="btn btn-danger"><i class="fa fa-trash"></i> {{ $t('Reset db field bindings') }}</button>
 </div>
 </template>
 
@@ -50,8 +50,16 @@ export default {
     ])
   },
   methods: {
-    addBinding (key, value) {
-      this.setBindings({ ...this.value, [key]: value })
+    addBinding ({ newValue, oldValue }, value) {
+      // remove old binding
+      const { [oldValue]: removedValue, ...cleanedValue } = this.value
+
+      if (newValue) {
+        this.setBindings({ ...cleanedValue, [newValue]: value })
+      }
+      else {
+        this.setBindings({ ...cleanedValue })
+      }
     },
     setBindings (bindings) {
       this.$emit('input', bindings)
