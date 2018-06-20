@@ -336,6 +336,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   public function import ($profile, $csv_row, $csv_row_num = 0) {
     $this->csv_row_num = $csv_row_num;
 
+    // skip csv line conditions
     $skipOnEmpty = isset($profile['skipLineOnEmptyFields']) ? $profile['skipLineOnEmptyFields'] : array();
 
     if (!is_null($skipOnEmpty) && count($skipOnEmpty) > 0) {
@@ -351,6 +352,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
     $tablesData = $this->getCsvToDBFields($bindings, $csv_row);
 
+    // multicolumn fields processing
     foreach ($profile['multicolumnFields'] as $mc_field) {
       $mc_db_field_raw = $mc_field['dbField'];
       $mc_mode = $mc_field['mode'];
@@ -388,6 +390,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       $this->store_id = (int) $profile['storeId'];
     }
 
+    // inport manufacturers
     $manufacturer_id = 0;
 
     if (isset($tablesData['manufacturer'])) {
