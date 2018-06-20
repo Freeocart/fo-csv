@@ -721,8 +721,20 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       Insert new product
     */
     if ($this->insertNew) {
-      return $this->model_catalog_product->addProduct($fields);
+      return $this->safeAddProduct($fields);
+      // return $this->model_catalog_product->addProduct($fields);
     }
+  }
+
+  /*
+    Fill data object with default values
+    before add
+  */
+  public function safeAddProduct ($data) {
+    $data = $this->productTemplate($data);
+    $data['product_description'] = $this->productDescriptionTemplate($data['product_description']);
+
+    return $this->model_catalog_product->addProduct($data);
   }
 
   /*
