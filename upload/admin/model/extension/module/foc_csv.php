@@ -420,15 +420,18 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       $tablesData['product']['status'] = $profile['defaultStatus'];
     }
 
-    $productData = $this->productTemplate($tablesData['product']);
+    // fill product data from csv
+    $productData = $tablesData['product']; //$this->productTemplate($tablesData['product']);
     $productData['manufacturer_id'] = $manufacturer_id;
 
-    if (!isset($tablesData['product_description'])) {
-      $tablesData['product_description'] = $this->productDescriptionTemplate();
+    // fill product description from csv
+    $productData['product_description'] = array();
+
+    if (isset($tablesData['product_description'])) {
+      $productData['product_description'][$this->language_id] = $tablesData['product_description'];
     }
 
-    $productData['product_description'] = $this->productDescriptionTemplate($tablesData['product_description']);
-
+    // process attributes
     // set attributes to product bindings
     if ($attributes) {
       $productData['product_attribute'] = array();
@@ -447,15 +450,16 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     }
 
     // status rewrites processing
-    if (isset($profile['statusRewrites']) && in_array($productData['status'], $profile['statusRewrites'])) {
+    if (isset($profile['statusRewrites']) && isset($productData['status']) && in_array($productData['status'], $profile['statusRewrites'])) {
       $productData['status'] = array_search($productData['status'], $profile['statusRewrites']);
     }
 
     if (isset($profile['defaultStockStatus'])) {
       $productData['stock_status_id'] = $profile['defaultStockStatus'];
     }
+
     // stock_status rewrites processing
-    if (isset($profile['stockStatusRewrites']) && in_array($productData['stock_status_id'], $profile['stockStatusRewrites'])) {
+    if (isset($profile['stockStatusRewrites']) && isset($productData['stock_status_id']) && in_array($productData['stock_status_id'], $profile['stockStatusRewrites'])) {
       $productData['stock_status_id'] = array_search($productData['stock_status_id'], $profile['stockStatusRewrites']);
     }
 
@@ -746,8 +750,18 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   public function safeEditProduct ($product_id, $data) {
 
     // we do not want to lose product data before import, so use old data as basement
-    $product_data = $this->model_catalog_product->getProduct($product_id);
-    $data = array_merge($product_data, $data);
+    // $product_data = $this->model_catalog_product->getProduct($product_id);
+    $query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "product p WHERE p.product_id = '" . (int)$product_id . "'");
+
+    if ($query->num_rows) {
+      $product_data = $query->row;
+      $product_data['product_description'] = $this->model_catalog_product->getProductDescriptions($product_id);
+      $data = array_replace_recursive($product_data, $data);
+    }
+    else {
+      $this->writeLog('Product [' . $product_id . '] not found!');
+      return false;
+    }
 
     // update product table
     $this->db->query("UPDATE " . DB_PREFIX . "product SET model = '" . $this->db->escape($data['model']) . "', sku = '" . $this->db->escape($data['sku']) . "', upc = '" . $this->db->escape($data['upc']) . "', ean = '" . $this->db->escape($data['ean']) . "', jan = '" . $this->db->escape($data['jan']) . "', isbn = '" . $this->db->escape($data['isbn']) . "', mpn = '" . $this->db->escape($data['mpn']) . "', location = '" . $this->db->escape($data['location']) . "', quantity = '" . (int)$data['quantity'] . "', minimum = '" . (int)$data['minimum'] . "', subtract = '" . (int)$data['subtract'] . "', stock_status_id = '" . (int)$data['stock_status_id'] . "', date_available = '" . $this->db->escape($data['date_available']) . "', manufacturer_id = '" . (int)$data['manufacturer_id'] . "', shipping = '" . (int)$data['shipping'] . "', price = '" . (float)$data['price'] . "', points = '" . (int)$data['points'] . "', weight = '" . (float)$data['weight'] . "', weight_class_id = '" . (int)$data['weight_class_id'] . "', length = '" . (float)$data['length'] . "', width = '" . (float)$data['width'] . "', height = '" . (float)$data['height'] . "', length_class_id = '" . (int)$data['length_class_id'] . "', status = '" . (int)$data['status'] . "', tax_class_id = '" . (int)$data['tax_class_id'] . "', sort_order = '" . (int)$data['sort_order'] . "', date_modified = NOW() WHERE product_id = '" . (int)$product_id . "'");
@@ -762,6 +776,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
       foreach ($data['product_description'] as $language_id => $value) {
         $insert_string = "product_id = '" . (int)$product_id . "', language_id = '" . (int)$language_id . "',";
+
         foreach ($value as $name => $value) {
           $insert_string .= $name . " = '" . $this->db->escape($value) . "',";
         }
