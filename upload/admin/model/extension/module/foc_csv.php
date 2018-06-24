@@ -131,7 +131,9 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       $default['meta_title'] = '';
     }
 
-    $tableData[$this->language_id] = array_replace($default, $data);
+    foreach ($data as $language_id => $values) {
+      $tableData[$language_id] = array_replace($default, $values);
+    }
 
     return $tableData;
   }
@@ -416,6 +418,9 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     foreach ($profile['multicolumnFields'] as $mc_field) {
       $mc_db_field_raw = $mc_field['dbField'];
       $mc_mode = $mc_field['mode'];
+      if (!$mc_db_field_raw) {
+        continue;
+      }
       list($mc_table, $mc_table_field) = explode(':', $mc_db_field_raw);
 
       if (!isset($this->multicolumnData[$mc_table])) {
@@ -792,8 +797,8 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   public function safeAddProduct ($data) {
     $data = $this->productTemplate($data);
     $data['product_description'] = $this->productDescriptionTemplate($data['product_description']);
-
     $data = $this->processMulticolumnFields($data);
+
     return $this->model_catalog_product->addProduct($data);
   }
 
