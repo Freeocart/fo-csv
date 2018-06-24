@@ -101,7 +101,8 @@ export default {
     insertNewMulticolumnField () {
       this.multicolumnFields.push({
         csvFields: [],
-        mode: 'replace'
+        mode: 'replace',
+        dbField: 'null'
       })
     },
     deleteMulticolumnFieldGroup (idx, groupIdx) {
