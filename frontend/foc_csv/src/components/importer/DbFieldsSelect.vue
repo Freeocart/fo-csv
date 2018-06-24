@@ -32,7 +32,7 @@ export default {
           this.$emit('input', { newValue, oldValue: this.value })
         }
         else {
-          this.$emit('input', this.value)
+          this.$emit('input', newValue)
         }
       }
     }
