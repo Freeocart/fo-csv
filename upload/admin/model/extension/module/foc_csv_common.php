@@ -11,6 +11,17 @@ class ModelExtensionModuleFocCsvCommon extends Model {
       'date_added',
       'date_modified'
     ),
+    'product' => array(
+      'location',
+      'manufacturer_id',
+      'shipping',
+      'points',
+      'tax_class_id',
+      'weight_class_id',
+      'length_class_id',
+      'subtract',
+      'minimum'
+    ),
     'product_description' => array(
       'product_id'
     ),
@@ -20,6 +31,12 @@ class ModelExtensionModuleFocCsvCommon extends Model {
     ),
     'category_description' => array(
       'category_id'
+    ),
+    'category' => array(
+      'category_id',
+      'parent_id',
+      'top',
+      'column'
     )
   );
 
