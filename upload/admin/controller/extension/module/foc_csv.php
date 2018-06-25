@@ -404,7 +404,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
           $out = fopen($importFile, 'w');
 
           while ($line = fgets($src)) {
-            fwrite($out, iconv($encoding, $charset, $line));
+            fwrite($out, iconv($encoding, $charset . '//TRANSLIT//IGNORE', $line));
           }
 
           fclose($src);
