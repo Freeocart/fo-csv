@@ -174,6 +174,36 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     ), $data);
   }
 
+  /*
+    OcStore compatibility
+  */
+  private function manufacturerTemplate ($data = array()) {
+    if (!isset($data['name'])) {
+      return array();
+    }
+
+    $defaultDescription = array();
+    $defaultDescription[$this->language_id] = array();
+    $defaultDescription[$this->language_id] = array_replace(array(
+      'name' => '',
+      'description' => '',
+      'meta_title' => '',
+      'meta_description' => '',
+      'meta_h1' => '',
+      'meta_keyword' => ''
+    ), $data);
+
+    $defaultStoreInfo = array($this->store_id);
+
+    return array_replace_recursive(array(
+      'name' => '',
+      'sort_order' => 0,
+      'image' => '',
+      'manufacturer_description' => $defaultDescription,
+      'manufacturer_to_store' => $defaultStoreInfo
+    ), $data);
+  }
+
   /* FILE MANIPULATION METHODS */
 
   /*
@@ -449,9 +479,9 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
     // inport manufacturers
     $manufacturer_id = 0;
-
     if (isset($tablesData['manufacturer'])) {
-      $manufacturer_id = $this->importManufacturer($tablesData['manufacturer']);
+      $manufacturerData = $this->manufacturerTemplate($tablesData['manufacturer']);
+      $manufacturer_id = $this->importManufacturer($manufacturerData);
       // set manufacturer id to product fields
       $tablesData['product']['manufacturer_id'] = $manufacturer_id;
     }
@@ -959,9 +989,6 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   */
   private function importManufacturer ($fields) {
     $this->load->model('catalog/manufacturer');
-
-    $fields['manufacturer_store'] = array($this->store_id);
-    $fields['sort_order'] = 0;
 
     $id = 0;
 
