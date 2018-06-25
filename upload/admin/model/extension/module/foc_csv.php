@@ -193,14 +193,14 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       'meta_keyword' => ''
     ), $data);
 
-    $defaultStoreInfo = array($this->store_id);
+    $defaultStore = array($this->store_id);
 
     return array_replace_recursive(array(
       'name' => '',
       'sort_order' => 0,
       'image' => '',
       'manufacturer_description' => $defaultDescription,
-      'manufacturer_to_store' => $defaultStoreInfo
+      'manufacturer_store' => $defaultStore
     ), $data);
   }
 
