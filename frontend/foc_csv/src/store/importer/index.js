@@ -3,12 +3,12 @@ import mutations from './mutations'
 import actions from './actions'
 import getters from './getters'
 
-import { genStoreFields } from '@/helpers'
+import { genVuexModels } from 'vuex-models'
 
 /*
   Generate mutation/action/getters for profile fields
 */
-let fields = genStoreFields([
+let fields = genVuexModels([
   'keyField',
   'fillParentCategories',
   'skipLines',
@@ -37,7 +37,7 @@ let fields = genStoreFields([
   'multicolumnFields'
 ], 'profile')
 
-let importProgress = genStoreFields([
+let importProgress = genVuexModels([
   'importJobTotal',
   'importJobCurrent',
   'importJobWorking'

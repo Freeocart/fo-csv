@@ -63,7 +63,7 @@ import AttributesParser from './AttributesParser'
 import ImagesImportSettings from './ImagesImportSettings'
 
 import { createNamespacedHelpers } from 'vuex'
-import { mapVuexModels } from '@/helpers'
+import { mapVuexModels } from 'vuex-models'
 
 const { mapActions, mapGetters } = createNamespacedHelpers('importer')
 

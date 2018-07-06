@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { mapVuexModels } from '@/helpers'
+import { mapVuexModels } from 'vuex-models'
 import { createNamespacedHelpers } from 'vuex'
 import ImagesExportSettings from './ImagesExportSettings'
 

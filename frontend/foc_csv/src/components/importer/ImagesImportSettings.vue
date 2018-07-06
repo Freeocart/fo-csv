@@ -42,7 +42,7 @@
 
 <script>
 import ImagesZipUpload from './ImagesZipUpload'
-import { mapVuexModels } from '@/helpers'
+import { mapVuexModels } from 'vuex-models'
 
 export default {
   components: {

@@ -96,8 +96,8 @@
 <script>
 
 import { createNamespacedHelpers } from 'vuex'
-import { validateProfile, mapVuexModels } from '@/helpers'
-
+import { validateProfile } from '@/helpers'
+import { mapVuexModels } from 'vuex-models'
 import ProgressBar from '@/components/common/ProgressBar'
 import CsvFileUpload from './CsvFileUpload'
 import RightSidebar from './RightSidebar'

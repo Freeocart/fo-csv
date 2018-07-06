@@ -75,7 +75,7 @@
 import MultiCsvFieldsSelector from './MultiCsvFieldsSelector'
 import DbFieldsSelect from './DbFieldsSelect'
 
-import { mapVuexModels } from '@/helpers'
+import { mapVuexModels } from 'vuex-models'
 
 import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapActions } = createNamespacedHelpers('importer')

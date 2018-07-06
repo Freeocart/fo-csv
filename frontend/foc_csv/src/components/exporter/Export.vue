@@ -81,7 +81,7 @@
 
 <script>
 import { createNamespacedHelpers } from 'vuex'
-import { mapVuexModels } from '@/helpers'
+import { mapVuexModels } from 'vuex-models'
 import LeftSidebar from './LeftSidebar'
 import RightSidebar from './RightSidebar'
 import ExportFields from './ExportFields'

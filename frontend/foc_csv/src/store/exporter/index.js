@@ -3,9 +3,9 @@ import mutations from './mutations'
 import actions from './actions'
 import getters from './getters'
 
-import { genStoreFields } from '@/helpers'
+import { genVuexModels } from 'vuex-models'
 
-let fields = genStoreFields([
+let fields = genVuexModels([
   'entriesPerQuery',
   'encoding',
   'dumpParentCategories',
@@ -22,7 +22,7 @@ let fields = genStoreFields([
   'bindings'
 ], 'profile')
 
-let exportProgress = genStoreFields([
+let exportProgress = genVuexModels([
   'exportJobTotal',
   'exportJobCurrent',
   'exportJobWorking'

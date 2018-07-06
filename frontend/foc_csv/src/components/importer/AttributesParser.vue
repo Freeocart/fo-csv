@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { mapVuexModels } from '@/helpers'
+import { mapVuexModels } from 'vuex-models'
 import { createNamespacedHelpers } from 'vuex'
 import Autocomplete from 'autocomplete-vue'
 import { ATTRIBUTES_GROUP_AUTOCOMPLETE_URL } from '@/api/routes'

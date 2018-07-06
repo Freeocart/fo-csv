@@ -112,7 +112,7 @@
 import StatusRewrites from './StatusRewrites'
 import LineSkipSettings from './LineSkipSettings'
 
-import { mapVuexModels } from '@/helpers'
+import { mapVuexModels } from 'vuex-models'
 import { createNamespacedHelpers } from 'vuex'
 
 const { mapGetters, mapActions } = createNamespacedHelpers('importer')

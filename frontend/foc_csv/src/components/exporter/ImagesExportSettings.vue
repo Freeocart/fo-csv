@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { mapVuexModels } from '@/helpers'
+import { mapVuexModels } from 'vuex-models'
 
 export default {
   computed: {

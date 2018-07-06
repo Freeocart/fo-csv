@@ -1,5 +1,3 @@
-import Vue from 'vue'
-
 /*
   Validate required fields in app config
 */
@@ -120,97 +118,9 @@ const validateProfile = (profile) => {
   return profile.keyField && profile.bindings[profile.keyField] != null
 }
 
-/*
-  Vuex models
-*/
-const capitalizeFirstLetter = (str) => {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-const normalizeNamespace = (namespace = '') => {
-  if (namespace.length > 0) {
-    if (namespace.charAt(namespace.length - 1) !== '/') {
-      namespace += '/'
-    }
-  }
-
-  return namespace
-}
-
-// code from Vuex source
-const normalizeMap = (map) => {
-  return Array.isArray(map)
-    ? map.map(function (key) { return ({ key: key, val: key }) })
-    : Object.keys(map).map(function (key) { return ({ key: key, val: map[key] }) })
-}
-
-/*
-  Create { actions, getters, mutations } object to be injected in components
-*/
-const mapVuexModels = (models, namespace = '') => {
-  namespace = normalizeNamespace(namespace)
-  models = normalizeMap(models)
-
-  return models.reduce(function (prev, {key, val}) {
-    prev[key] = {
-      get () {
-        let value = null
-        try {
-          value = this.$store.getters[`${namespace}${val}`]
-        }
-        catch (e) {
-          console.error(e)
-          console.error(`missing getter ${namespace}${val}`)
-        }
-        return value
-      },
-      set (value) {
-        this.$store.dispatch(`${namespace}set${capitalizeFirstLetter(val)}`, value)
-      }
-    }
-
-    return prev
-  }, {})
-}
-
-const toMutationName = (name) => {
-  let parts = name.match(/([A-Z]?[^A-Z]*)/g).slice(0, -1)
-  return parts.join('_').toUpperCase()
-}
-
-/*
-  Generate getter/action/mutation's for vuex store
-  storeAttr - is required state attribute name - this holds values
-*/
-const genStoreFields = (fields, storeAttr) => {
-  let result = {
-    getters: {},
-    actions: {},
-    mutations: {}
-  }
-
-  fields.reduce(function (prev, field) {
-    prev.getters[field] = function (state) {
-      return state[storeAttr][field]
-    }
-    prev.actions[`set${field.charAt(0).toUpperCase() + field.substr(1)}`] = function ({ commit }, data) {
-      commit(toMutationName(field), data)
-    }
-    prev.mutations[toMutationName(field)] = function (state, value) {
-      Vue.set(state[storeAttr], field, value)
-    }
-
-    return prev
-  }, result)
-
-  return result
-}
-
 export {
-  mapVuexModels,
   validateAppConfig,
   FirstLineReader,
   parseCsvHeaders,
-  validateProfile,
-  genStoreFields
+  validateProfile
 }
