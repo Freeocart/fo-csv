@@ -508,7 +508,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     }
 
     // fill product data from csv
-    $productData = $tablesData['product']; //$this->productTemplate($tablesData['product']);
+    $productData = isset($tablesData['product']) ? $tablesData['product'] : array(); //$this->productTemplate($tablesData['product']);
     $productData['manufacturer_id'] = $manufacturer_id;
 
     // fill product description from csv
