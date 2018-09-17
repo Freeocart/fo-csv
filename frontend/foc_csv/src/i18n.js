@@ -7,7 +7,7 @@ export default (locale) => {
   return new VueI18n({
     locale,
     messages: {
-      en: {},
+      en: require('./i18n/en.json'),
       ru: require('./i18n/ru.json')
     }
   })

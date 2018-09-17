@@ -94,7 +94,7 @@
   "Error during sending!": "Ошибка во время отправки данных!",
   "Invalid profile!": "Ошибки в профиле!",
   "Import canceled!": "Импорт отменён!",
-  "Re-read file info": "Перечитать данные из файла",
+  "Re-read CSV": "Перечитать CSV",
 
   "Attention! You chosed a danger import mode!": "Внимание! Вы выбрали опасный режим импорта!",
   "Before import from CSV, we will remove all product related data from your database!": "Перед импортом данных из CSV, будут удалены все данные о продуктах из вашей базы данных!",
@@ -123,5 +123,21 @@
 
   "Replace CSV field data": "Заменить значение из CSV поля",
   "Add after CSV field data": "Добавить после значения CSV поля",
-  "Add before CSV field data": "Добавить до значения CSV поля"
+  "Add before CSV field data": "Добавить до значения CSV поля",
+
+  "Info": "Информация",
+  "Application information": "Информация о ПО",
+  "How to use": "Как пользоваться",
+  "Disclaimer": "Дисклеймер",
+  "Module <strong>{name}</strong> targets to be a maximum flexible for import/export CSV data, without any restrictions in CSV format.": "Модуль <strong>{name}</strong> задумывался как максимально гибкое решение для импорта/экспорта данных. Нет каких-либо ограничений на формат входных CSV файлов.",
+  "However, more flexibility costs more complexity, so if you not sure what you do, please, entrust the work to more qualified employee!": "Однако, такая гибкость сопряжена с довольно высокой сложностью использования, поэтому, если вы не уверены в своей квалификации, лучше доверьте работу с модулем более квалифицированному сотруднику!",
+  "Please, look for instructions below": "Далее прилагается инструкция пользователя, а также небольшой видеоурок.",
+  "Thank you for choosing <strong>{name}</strong> opencart module!": "Спасибо за выбор модуля <strong>{name}</strong>!",
+  "I hope, my work will be useful for you": "Я надеюсь, моя работа была полезна для вас",
+  "If you have any questions, found bugs, or want request a features, you can send me email, or use github issues to inform me.": "Если у вас есть вопросы, вы нашли ошибки, или хотите новые возможности, пожалуйста, пришлите мне email, или отпишитесь в issues на github.",
+  "focsv-support@freeocart.ru": "focsv-support@freeocart.ru",
+  "Use this software at your own risk!": "Используйте данное ПО на свой страх и риск!",
+  "Author or contributors are not responsible at data corruption/remove caused by using this software.": "Ни автор, ни контрибьюторы проекта не отвечают за порчу/удаление данных, возникшие при использовании этого ПО.",
+  "We are strongly recommend you to backup data before using this.": "Мы настоятельно рекомендуем делать бэкап перед использованием модуля.",
+  "Source code distributed 'as is', all parts of the software is free and opensource and respecting GPLv3 license.": "Код распространяется 'как есть', все части ПО являются открытым программным обеспечением, распространяемым согласно лицензии GPLv3."
 }
