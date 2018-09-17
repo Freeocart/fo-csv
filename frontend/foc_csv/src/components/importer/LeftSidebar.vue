@@ -79,12 +79,12 @@ export default {
   },
   computed: {
     ...mapGetters([
+      'currentProfileName',
       'profiles',
       'stores',
       'languages'
     ]),
     ...mapVuexModels([
-      'currentProfileName',
       'store',
       'language'
     ], 'importer')
