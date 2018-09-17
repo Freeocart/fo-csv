@@ -98,6 +98,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $importer = array();
     $exporter = array();
 
+    $data['foc_version'] = $this->model_extension_module_foc_csv->getVersion();
+
     $importer['profiles'] = $this->model_extension_module_foc_csv->loadProfiles();
     $importer['keyFields'] = $this->model_extension_module_foc_csv->getKeyFields();
     $common['encodings'] = array('UTF8', 'cp1251');

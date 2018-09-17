@@ -4,6 +4,12 @@
 */
 class ModelExtensionModuleFocCsvCommon extends Model {
 
+  const VERSION = '0.0.92';
+
+  public function getVersion () {
+    return self::VERSION;
+  }
+
   protected $unwantedTableFields = array(
     'common' => array(
       'sort_order',

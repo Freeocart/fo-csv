@@ -40,6 +40,8 @@ window.FOC_CSV_PARAMS = {
     'baseRoute': '<?php echo $baseRoute; ?>',
     'baseUrl': '<?php echo $baseUrl; ?>',
   },
+  'appName' : '<?php echo $heading_title; ?>',
+  'appVersion' : '<?php echo $foc_version; ?>',
   'language': '<?php echo $language; ?>',
   'initial' : <?php echo $initial; ?>
 };
