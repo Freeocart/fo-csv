@@ -55,7 +55,7 @@ export default {
       'downloadImages',
       'previewFromGallery',
       'clearGalleryBeforeImport'
-    ])
+    ], 'importer')
   }
 }
 </script>
