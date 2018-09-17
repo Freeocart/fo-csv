@@ -12,7 +12,7 @@
     </template>
 
     <error-message :errors="errors">
-      <p>{{ $t('During import we catched some errors, please check foc logs!') }}</p>
+      <p>{{ $t('We catched some errors during import, please check foc logs!') }}</p>
     </error-message>
 
     <div class="row">
