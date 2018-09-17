@@ -1,7 +1,8 @@
 <template>
 <div v-if="errors > 0">
   <div class="alert alert-danger" role="alert">
-    <slot><p>There is errors while doing job!</p></slot>
+    <slot><p>{{ $t('There is errors while doing job!') }}</p></slot>
+    <p>{{ messages }}</p>
     <p>{{ $t('Errors count') }} - <strong>{{ errors }}</strong></p>
   </div>
 </div>
@@ -13,7 +14,8 @@ export default {
     errors: {
       type: Number,
       default: 0
-    }
+    },
+    messages: ''
   }
 }
 </script>

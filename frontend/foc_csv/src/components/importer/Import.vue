@@ -11,9 +11,20 @@
       </div>
     </template>
 
-    <error-message :errors="errors">
-      <p>{{ $t('We catched some errors during import, please check foc logs!') }}</p>
+    <error-message :errors="errors" :messages="errorMessages">
+      <div>
+        <p>{{ $t('We catched some errors during import, please check foc logs!') }}</p>
+      </div>
     </error-message>
+
+    <div class="panel panel-success" v-if="importComplete">
+      <div class="panel-heading">
+        {{ $t('Complete') }}
+      </div>
+      <div class="panel-body">
+        <p>{{ $t('Import task successfully complete!') }}</p>
+      </div>
+    </div>
 
     <div class="row">
       <div class="col-md-12">
@@ -123,7 +134,9 @@ export default {
         current: 0,
         total: 0
       },
-      errors: 0
+      errors: 0,
+      errorMessages: '',
+      importComplete: false
     }
   },
   computed: {
@@ -156,31 +169,49 @@ export default {
     }
   },
   methods: {
-    async submitImportPart (importUrl, obj) {
+    setErrorState () {
+      this.current = 0
+      this.working = false
+      this.errors = this.errors || 1
+    },
+    async submitImportPart (callbackUrl, requestConfig) {
       try {
-        obj.profile = this.profile
-        let response = await this.$http.post(decodeURIComponent(importUrl), obj)
+        let response = await this.$api.importer.submitPart({
+          callbackUrl,
+          options: {
+            ...requestConfig,
+            profile: this.profile
+          }
+        })
+
+        if (response.data.status === 'fail') {
+          this.errorMessages = response.data.message
+          this.errors = 1
+          this.setErrorState()
+          return
+        }
+
         let position = response.data.message.position
 
         this.current = position
 
         if (this.current < this.total) {
-          this.submitImportPart(importUrl, response.data.message)
+          this.submitImportPart(callbackUrl, response.data.message)
         }
         else {
           this.working = false
           this.current = 0
           this.errors = response.data.message.errors
+          this.importComplete = true
         }
       }
       catch (e) {
-        console.error(e)
-        this.current = 0
-        this.working = false
-        this.errors = this.errors || 1
+        this.setErrorState()
       }
     },
     async submitImportData () {
+      this.importComplete = false
+
       let data = this.submittableData
       // reset errors counter
       this.errors = 0

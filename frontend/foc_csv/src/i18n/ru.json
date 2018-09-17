@@ -67,6 +67,8 @@
   "Backup utils": "Утилиты бэкапирования",
   "Restore utils": "Утилиты восстановления",
 
+  "There is errors while doing job!": "Во время выполнения возникли ошибки!",
+
   "Show current profile data": "Показать данные текущего профиля",
   "Show profiles data": "Показать данные всех профилей",
   "Show all data state": "Показать состояние",
@@ -101,6 +103,9 @@
   "Please, make sure you have working backup before you continue!": "Пожалуйста, убедитесь что у вас есть рабочий бэкап перед тем как продолжать!",
   "Are you totally sure you want do this???! With this import method you can lose your data!": "Вы абсолютно уверены, что хотите продолжить???! Этот режим импорта может привести к потере всех ваших данных!",
 
+  "Complete": "Завершено",
+  "Import task successfully complete!": "Импорт данных успешно завершён!",
+
   "Dump parent categories": "Выгружать родительские категории",
   "Export images mode": "Режим экспорта изображений",
   "Create images ZIP": "Создать ZIP архив с изображениями",
@@ -111,7 +116,7 @@
   "There is no created bindings": "Нет добавленных привязок",
   "Reset db field bindings": "Сбросить привязки к полям",
 
-  "Export complete, here is your download links:": "Экспорт завершён, ссылки для скачивания файлов:",
+  "Check your download links:": "Ваши ссылки для скачивания файлов:",
   "Additional processing settings": "Настройки дополнительной обработки",
   "Multicolumn fields settings": "Несколько колонок в одно поле",
   "Preprocess value template": "Шаблон преобразования значения",

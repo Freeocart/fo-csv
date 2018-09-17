@@ -17,9 +17,10 @@
 
     <div class="panel panel-success" v-if="showDownloadLinks">
       <div class="panel-heading">
-        {{ $t('Export complete, here is your download links:') }}
+        {{ $t('Complete') }}
       </div>
       <div class="panel-body">
+        <p>{{ $t('Check your download links:') }}</p>
         <div class="btn-group">
           <a :href="csvFileUrl" target="_blank" class="btn btn-primary">{{ $t('CSV file') }}</a>
           <a v-if="imagesZipUrl" target="_blank" :href="imagesZipUrl" class="btn btn-default">{{ $t('Images ZIP file') }}</a>
@@ -109,8 +110,7 @@ export default {
     ...mapVuexModels([
       'entriesPerQuery',
       'csvHeader',
-      'bindings',
-      'profile'
+      'bindings'
     ], 'exporter'),
     ...mapVuexModels({
       total: 'exportJobTotal',
@@ -118,23 +118,42 @@ export default {
       working: 'exportJobWorking'
     }, 'exporter'),
     ...mapGetters([
-      'submittableData'
+      'submittableData',
+      'profile'
     ]),
     showDownloadLinks () {
       return this.working === false && this.csvFileUrl !== null
     }
   },
   methods: {
-    async submitExportPart (exportUrl, obj) {
+    setErrorState () {
+      this.current = 0
+      this.working = false
+      this.errors = this.errors || 1
+    },
+    async submitExportPart (callbackUrl, requestConfig) {
       try {
-        obj.profile = this.profile
-        let response = await this.$http.post(decodeURIComponent(exportUrl), obj)
+        let response = await this.$api.exporter.submitPart({
+          callbackUrl,
+          options: {
+            ...requestConfig,
+            profile: this.profile
+          }
+        })
+
+        if (response.data.status === 'fail') {
+          this.errorMessages = response.data.message
+          this.errors = 1
+          this.setErrorState()
+          return
+        }
+
         let position = response.data.message.position
 
         this.current = position
 
         if (this.current < this.total) {
-          this.submitExportPart(exportUrl, response.data.message)
+          this.submitExportPart(callbackUrl, response.data.message)
         }
         else {
           this.working = false
@@ -143,10 +162,7 @@ export default {
         }
       }
       catch (e) {
-        console.error(e)
-        this.current = 0
-        this.working = false
-        this.errors = this.errors || 1
+        this.setErrorState()
       }
     },
     async submitExportData () {
