@@ -11,7 +11,7 @@ import ApiProvider from './api'
 import { validateAppConfig } from './helpers'
 
 Vue.use(resource)
-Vue.config.productionTip = true
+Vue.config.productionTip = false
 
 let AppConfig = {}
 
@@ -29,12 +29,13 @@ if (validateAppConfig(AppConfig.requestConfig)) {
   store.dispatch('exporter/setInitialData', Object.assign({}, AppConfig.initial.exporter, AppConfig.initial.common))
 
   const language = AppConfig.language || 'en'
-
   /* eslint-disable no-new */
+  Vue.prototype.$appName = AppConfig.appName
+  Vue.prototype.$appVersion = AppConfig.appVersion
+
   new Vue({
     el: '#foc_csv',
     router,
-    AppConfig,
     store,
     i18n: i18n(language),
     components: { App },
