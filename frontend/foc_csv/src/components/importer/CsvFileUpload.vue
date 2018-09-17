@@ -1,10 +1,15 @@
 <template>
   <div class="row">
-    <div class="col-md-8">
-      <input ref="fileRef" type="file" @change="fileChange($event)" accept=".csv">
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="" class="label label-default">{{ $t('CSV file') }}</label>
+        <input ref="fileRef" type="file" @change="fileChange($event)" accept=".csv">
+      </div>
     </div>
-    <div class="col-md-4">
-      <button class="btn btn-success" :disabled="!csvFileRef" @click.prevent="updateFromFile()"><i class="fa fa-refresh"></i> {{ $t('Re-read file info') }}</button>
+    <div class="col-md-6">
+      <div class="form-group">
+        <button class="btn btn-success" :disabled="!csvFileRef" @click.prevent="updateFromFile()"><i class="fa fa-refresh"></i> {{ $t('Re-read CSV') }}</button>
+      </div>
     </div>
   </div>
 </template>

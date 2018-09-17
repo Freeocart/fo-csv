@@ -37,11 +37,7 @@
             {{ $t('Fields settings') }}
           </div>
           <div class="panel-body">
-
-            <div class="form-group">
-              <label for="" class="label label-default">{{ $t('CSV file') }}</label>
-              <csv-file-upload></csv-file-upload>
-            </div>
+            <csv-file-upload></csv-file-upload>
 
             <div class="row">
               <div class="col-md-6">
