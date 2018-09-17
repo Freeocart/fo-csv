@@ -9,6 +9,9 @@ export default {
   csvFields (state) {
     return state.data.csvFields
   },
+  csvFileRef (state) {
+    return state.data.csvFileRef
+  },
   keyFields (state) {
     return state.data.keyFields
   },
