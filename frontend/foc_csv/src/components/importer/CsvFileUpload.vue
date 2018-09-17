@@ -1,6 +1,11 @@
 <template>
-  <div>
-    <input ref="fileRef" type="file" @change="readBlob($event)" accept=".csv">
+  <div class="row">
+    <div class="col-md-8">
+      <input ref="fileRef" type="file" @change="fileChange($event)" accept=".csv">
+    </div>
+    <div class="col-md-4">
+      <button class="btn btn-success" :disabled="!csvFileRef" @click.prevent="updateFromFile()"><i class="fa fa-refresh"></i> {{ $t('Re-read file info') }}</button>
+    </div>
   </div>
 </template>
 
@@ -8,22 +13,30 @@
 import { FirstLineReader, parseCsvHeaders } from '@/helpers'
 
 import { createNamespacedHelpers } from 'vuex'
+import { mapVuexModels } from 'vuex-models'
 
 const { mapActions, mapGetters } = createNamespacedHelpers('importer')
 
 export default {
+  data () {
+    return {
+      fileSelected: false
+    }
+  },
   computed: {
     ...mapGetters([
-      'encoding',
-      'csvFieldDelimiter',
+      'csvFileRef'
+    ]),
+    ...mapVuexModels([
       'skipLines',
+      'csvFieldDelimiter',
+      'csvHeadersLineNumber',
       'csvWithoutHeaders',
-      'csvHeadersLineNumber'
-    ])
+      'encoding'
+    ], 'importer')
   },
   methods: {
-    readBlob (event) {
-      let file = null
+    readBlob (file) {
       let skipToHeaders = 0
 
       if (!this.csvWithoutHeaders) {
@@ -33,19 +46,28 @@ export default {
         skipToHeaders = parseInt(this.skipLines) + 1
       }
 
-      if (event.srcElement.files.length > 0) {
-        file = event.srcElement.files[0]
-      }
-
       if (file !== null && file.type === 'text/csv') {
         let reader = new FirstLineReader()
         reader.on('line', (line) => {
           let headers = parseCsvHeaders(line, this.csvFieldDelimiter)
           this.setCsvFieldNames(headers)
-          this.setCsvFileRef(this.$refs.fileRef)
         })
 
         reader.read(file, this.encoding, skipToHeaders)
+      }
+      else {
+        console.log(file)
+      }
+    },
+    updateFromFile () {
+      if (this.csvFileRef.files && this.csvFileRef.files.length > 0) {
+        this.readBlob(this.csvFileRef.files[0])
+      }
+    },
+    fileChange (event) {
+      if (event.srcElement.files.length > 0) {
+        this.setCsvFileRef(this.$refs.fileRef)
+        this.readBlob(event.srcElement.files[0])
       }
     },
     ...mapActions([
