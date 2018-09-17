@@ -33,6 +33,10 @@ export default {
         'Content-Type': 'multipart/form-data'
       }
     })
+  },
+
+  async submitPart (_mkUrl, { callbackUrl, options }) {
+    return Vue.http.post(callbackUrl, options)
   }
 
 }
