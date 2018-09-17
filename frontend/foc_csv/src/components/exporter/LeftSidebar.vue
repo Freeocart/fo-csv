@@ -64,10 +64,10 @@ export default {
     ...mapVuexModels([
       'profile',
       'store',
-      'language',
-      'currentProfileName'
+      'language'
     ], 'exporter'),
     ...mapGetters([
+      'currentProfileName',
       'profiles',
       'stores',
       'languages'
