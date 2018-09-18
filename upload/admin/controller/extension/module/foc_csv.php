@@ -341,7 +341,25 @@ class ControllerExtensionModuleFocCsv extends Controller {
         $exportable = $this->model_extension_module_foc_csv_exporter->export($profile, $offset, $limit);
 
         $csv_fid = fopen($exportFile, 'a');
+
+        $charset = strtolower($this->model_extension_module_foc_csv_exporter->getDBCharset());
+        $encoding = strtolower($profile['encoding']);
+
         foreach ($exportable as $csvLine) {
+          // try change file encoding
+          if ($charset !== $encoding) {
+            $this->model_extension_module_foc_csv_exporter->writeLog('Trying to convert character encoding from [' . $encoding . '] to [' . $charset . ']');
+
+            if (!function_exists('iconv')) {
+              $this->model_extension_module_foc_csv_exporter->writeLog('Please install iconv or convert csv file to [' . $charset . ']', 'error');
+              $this->sendFail('Please install iconv or convert csv file to [' . $charset . ']');
+            }
+
+            foreach ($csvLine as $part_idx => $part) {
+              $csvLine[$part_idx] = iconv($charset, $encoding . '//TRANSLIT//IGNORE', $part);
+            }
+          }
+
           fputcsv($csv_fid, $csvLine, $profile['csvFieldDelimiter']);
         }
         fclose($csv_fid);
