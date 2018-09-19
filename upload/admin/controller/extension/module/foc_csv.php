@@ -310,14 +310,13 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
       $export_url = $this->createUrl('extension/module/foc_csv/exportPart');
 
-      // возвращаем данные на клиент и ожидаем запросы
       $this->sendOk(array(
         'total' => $total,
         'key' => $key,
         'exportUrl' => html_entity_decode($export_url),
         'csvFileUrl' => $this->model_extension_module_foc_csv_exporter->pathToUrl($exportFile),
         'imagesZipUrl' => $this->model_extension_module_foc_csv_exporter->pathToUrl($exportImagesFile),
-        'position' => 0 // позиция на которой было закончено чтение в прошлой сессии (0 поскольку чтение еще не начато)
+        'position' => 0
       ));
     }
   }
@@ -590,19 +589,19 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $breadcrumbs = array();
 
     $breadcrumbs[] = array(
-			'text'      => $this->language->get('text_home'),
-			'href'      => $this->createUrl('common/home'),
-			'separator' => false
+      'text'      => $this->language->get('text_home'),
+      'href'      => $this->createUrl('common/home'),
+      'separator' => false
     );
     $breadcrumbs[] = array(
       'text'      => $this->language->get('text_extension'),
       'href'      => $this->createUrl('extension/extension'),
       'separator' => ' :: '
     );
-		$breadcrumbs[] = array(
-			'text'      => $this->language->get('heading_title'),
-			'href'      => $this->createUrl('extension/module/foc_csv'),
-			'separator' => ' :: '
+    $breadcrumbs[] = array(
+      'text'      => $this->language->get('heading_title'),
+      'href'      => $this->createUrl('extension/module/foc_csv'),
+      'separator' => ' :: '
     );
 
     return $breadcrumbs;
