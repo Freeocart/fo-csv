@@ -1,29 +1,32 @@
-# FO_CSV - гибкий импорт/экспорт данных из CSV для Opencart
+# FO_CSV - flexible CSV import/export for Opencart
 
-Модуль для Opencart, призванный упростить процедуру импортирования данных в онлайн магазин на Opencart.
+With this module, you can simplify import/export data from CSV files in your Opencart project.
+Current version developed and tested on Opencart 2.3/3.0.2.0.
 
-Текущая версия модуля разработана и протестирована под версию Opencart 2.3/3.0.2.0.
+### Why do we need another import/export module?
 
-### Зачем ещё один модуль импорта/экспорта
+There is known fact that Opencart licensed under free GPLv3 license, but many extensions uses they own license (proprietary in most cases) - many authors limiting access to source code (especially in Russia).
 
-Как известно, Opencart распространяется под свободной лицензией GPLv3, однако на многие модули и дополнения это не распространяется - многие авторы модулей ограничивают возможность просмотра/модификации исходных кодов своего ПО.
+On the one hand, authors try to protect they code with encrypting software (ionCube, etc) and force users to accept their license (for example, license keys check).
 
-С одной стороны, авторы пытаются защитить свой код использованием разного шифрующего ПО (например, ionCube) и заставить пользователей соблюдать лицензионное соглашение.
+As a user, you cannot modify encrypted source code by yourself. Authors not always can modify their products for your case, so you got in vendor lock.
 
-Однако, такое отношение к распространению сильно ограничивает свободы пользователя - он не сможет доработать код под свою задачу (авторы модулей неохотно/дорого дорабатывают свои модули), пользователь не может знать что происходит внутри зашифрованного участка кода, а потому автор не может гарантировать пользователю безопасность такого ПО, также пользователь не может поспособствовать улучшению качества ПО.
+Also, enctypted software cannot give you any security guarantees, because you dont know what code do in these encrypted sections.
 
-Проект [Freeocart](http://freeocart.ru) нацелен на разработку свободной и открытой экосистемы для Opencart.
+Project [Freeocart](http://freeocart.ru) aims to create opensource ecosystem for Opencart.
 
-### Нестабильная версия
+### UNSTABLE VERSION
 
-На данный момент модуль находится в активной разработке, поэтому некоторые функции ещё не реализованы/могут работать некорректно.
+At the moment extension is under heavy development, some functions may work incorrect.
 
-Приветствуется любая помощь - ISSUES/PR
+I'm open to any help - ISSUES/PR
 
-### Внимание!
+### Attention!
 
-Используйте данное ПО на свой страх и риск!
+Use this software at your own risk!
 
-Ни автор, ни контрибьюторы проекта не отвечают за порчу/удаление данных, возникшие при использовании этого ПО.
+Author or contributors are not responsible at data corruption/remove caused by using this software.
 
-Код распространяется "как есть", все части ПО являются открытым программным обеспечением, распространяемым согласно лицензии GPLv3.
+We are strongly recommend you to backup data before using this.
+
+Source code distributed "as is", all parts of the software is free and opensource and respecting GPLv3 license.
