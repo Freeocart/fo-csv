@@ -46,8 +46,9 @@ window.FOC_CSV_PARAMS = {
   'initial' : <?php echo $initial; ?>
 };
 </script>
-<?php foreach ($scripts as $script) { ?>
+
+<?php foreach ($scripts as $script) : ?>
   <script src="<?php echo $script; ?>" type="text/javascript"></script>
-<?php } ?>
+<?php endforeach; ?>
 
 <?php echo $footer; ?>

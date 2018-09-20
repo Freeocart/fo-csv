@@ -537,7 +537,10 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     }
 
     // status rewrites processing
-    if (isset($profile['statusRewrites']) && isset($productData['status']) && in_array($productData['status'], $profile['statusRewrites'])) {
+    if (isset($profile['statusRewrites'])
+        && isset($productData['status'])
+        && in_array($productData['status'], $profile['statusRewrites'])
+    ) {
       $productData['status'] = array_search($productData['status'], $profile['statusRewrites']);
     }
 
@@ -546,7 +549,10 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     }
 
     // stock_status rewrites processing
-    if (isset($profile['stockStatusRewrites']) && isset($productData['stock_status_id']) && in_array($productData['stock_status_id'], $profile['stockStatusRewrites'])) {
+    if (isset($profile['stockStatusRewrites'])
+        && isset($productData['stock_status_id'])
+        && in_array($productData['stock_status_id'], $profile['stockStatusRewrites'])
+    ) {
       $productData['stock_status_id'] = array_search($productData['stock_status_id'], $profile['stockStatusRewrites']);
     }
 
@@ -566,7 +572,10 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       $setPreviewFromGallery = false;
       $image = $this->db->query('SELECT `image` FROM '.DB_PREFIX.'product WHERE product_id = ' . (int)$product_id)->row['image'];
 
-      if (isset($profile['previewFromGallery']) && $profile['previewFromGallery'] && empty($image)) {
+      if (isset($profile['previewFromGallery'])
+          && $profile['previewFromGallery']
+          && empty($image)
+      ) {
         $setPreviewFromGallery = true;
       }
 
@@ -578,7 +587,9 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       }
 
       if (!$skipImportGallery) {
-        if (isset($profile['clearGalleryBeforeImport']) && $profile['clearGalleryBeforeImport']) {
+        if (isset($profile['clearGalleryBeforeImport'])
+            && $profile['clearGalleryBeforeImport']
+        ) {
           $this->db->query('DELETE FROM ' . DB_PREFIX . 'product_image WHERE product_id=' . (int)$product_id);
         }
 
@@ -591,7 +602,14 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
       $cleanCategoryNames = isset($profile['removeCharsFromCategory']) ? $profile['removeCharsFromCategory'] : '';
 
-      $category_ids = $this->importProductCategories($tablesData['category_description'], $profile['categoryDelimiter'], $profile['categoryLevelDelimiter'], $cleanCategoryNames, $this->language_id, $this->store_id);
+      $category_ids = $this->importProductCategories(
+        $tablesData['category_description'],
+        $profile['categoryDelimiter'],
+        $profile['categoryLevelDelimiter'],
+        $cleanCategoryNames,
+        $this->language_id,
+        $this->store_id
+      );
 
       $fillParentCategories = isset($profile['fillParentCategories']) ? $profile['fillParentCategories'] : false;
       $clearCategoriesBeforeImport = isset($profile['clearCategoriesBeforeImport']) ? $profile['clearCategoriesBeforeImport'] : false;
@@ -614,7 +632,6 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
         }
       }
     }
-
 
     return true;
   }
@@ -816,7 +833,6 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     */
     if ($this->insertNew) {
       return $this->safeAddProduct($fields);
-      // return $this->model_catalog_product->addProduct($fields);
     }
   }
 
@@ -858,11 +874,13 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     $this->db->query("UPDATE " . DB_PREFIX . "product SET model = '" . $this->db->escape($data['model']) . "', sku = '" . $this->db->escape($data['sku']) . "', upc = '" . $this->db->escape($data['upc']) . "', ean = '" . $this->db->escape($data['ean']) . "', jan = '" . $this->db->escape($data['jan']) . "', isbn = '" . $this->db->escape($data['isbn']) . "', mpn = '" . $this->db->escape($data['mpn']) . "', location = '" . $this->db->escape($data['location']) . "', quantity = '" . (int)$data['quantity'] . "', minimum = '" . (int)$data['minimum'] . "', subtract = '" . (int)$data['subtract'] . "', stock_status_id = '" . (int)$data['stock_status_id'] . "', date_available = '" . $this->db->escape($data['date_available']) . "', manufacturer_id = '" . (int)$data['manufacturer_id'] . "', shipping = '" . (int)$data['shipping'] . "', price = '" . (float)$data['price'] . "', points = '" . (int)$data['points'] . "', weight = '" . (float)$data['weight'] . "', weight_class_id = '" . (int)$data['weight_class_id'] . "', length = '" . (float)$data['length'] . "', width = '" . (float)$data['width'] . "', height = '" . (float)$data['height'] . "', length_class_id = '" . (int)$data['length_class_id'] . "', status = '" . (int)$data['status'] . "', tax_class_id = '" . (int)$data['tax_class_id'] . "', sort_order = '" . (int)$data['sort_order'] . "', date_modified = NOW() WHERE product_id = '" . (int)$product_id . "'");
 
     if (isset($data['image'])) {
-			$this->db->query("UPDATE " . DB_PREFIX . "product SET image = '" . $this->db->escape($data['image']) . "' WHERE product_id = '" . (int)$product_id . "'");
+      $this->db->query("UPDATE " . DB_PREFIX . "product SET image = '" . $this->db->escape($data['image']) . "' WHERE product_id = '" . (int)$product_id . "'");
     }
 
     // description
-    if (isset($data['product_description']) && !empty($data['product_description'])) {
+    if (isset($data['product_description'])
+        && !empty($data['product_description'])
+    ) {
       $this->db->query("DELETE FROM " . DB_PREFIX . "product_description WHERE product_id = '" . (int)$product_id . "'");
 
       foreach ($data['product_description'] as $language_id => $value) {
@@ -877,7 +895,9 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     }
 
     // product_store update
-    if (isset($data['product_store']) && !empty($data['product_store'])) {
+    if (isset($data['product_store'])
+        && !empty($data['product_store'])
+    ) {
       $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_store WHERE product_id = '" . (int)$product_id . "'");
 
       if (isset($data['product_store'])) {
@@ -888,7 +908,9 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     }
 
     // attributes
-    if (isset($data['product_attribute']) && !empty($data['product_attribute'])) {
+    if (isset($data['product_attribute'])
+        && !empty($data['product_attribute'])
+    ) {
       $this->db->query("DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id = '" . (int)$product_id . "'");
 
       if (!empty($data['product_attribute'])) {
@@ -906,29 +928,36 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     }
 
     // image
-		if (isset($data['product_image']) && !empty($data['product_image'])) {
+    if (isset($data['product_image'])
+        && !empty($data['product_image'])
+    ) {
       $this->db->query("DELETE FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "'");
 
-			foreach ($data['product_image'] as $product_image) {
-				$this->db->query("INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $this->db->escape($product_image['image']) . "', sort_order = '" . (int)$product_image['sort_order'] . "'");
-			}
-		}
+      foreach ($data['product_image'] as $product_image) {
+        $this->db->query("INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $this->db->escape($product_image['image']) . "', sort_order = '" . (int)$product_image['sort_order'] . "'");
+      }
+    }
 
     // product categories
-		if (isset($data['product_category']) && !empty($data['product_category'])) {
+    if (isset($data['product_category'])
+        && !empty($data['product_category'])
+    ) {
       $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'");
 
-			foreach ($data['product_category'] as $category_id) {
-				$this->db->query("INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int)$product_id . "', category_id = '" . (int)$category_id . "'");
-			}
+      foreach ($data['product_category'] as $category_id) {
+        $this->db->query("INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int)$product_id . "', category_id = '" . (int)$category_id . "'");
+      }
     }
 
     // main category
-    if(isset($data['main_category_id']) && $data['main_category_id'] > 0) {
-			$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "' AND category_id = '" . (int)$data['main_category_id'] . "'");
-			$this->db->query("INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int)$product_id . "', category_id = '" . (int)$data['main_category_id'] . "', main_category = 1");
-		} elseif(isset($data['product_category'][0])) {
-			$this->db->query("UPDATE " . DB_PREFIX . "product_to_category SET main_category = 1 WHERE product_id = '" . (int)$product_id . "' AND category_id = '" . (int)$data['product_category'][0] . "'");
+    if(isset($data['main_category_id'])
+      && $data['main_category_id'] > 0
+    ) {
+      $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "' AND category_id = '" . (int)$data['main_category_id'] . "'");
+      $this->db->query("INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int)$product_id . "', category_id = '" . (int)$data['main_category_id'] . "', main_category = 1");
+    }
+    elseif (isset($data['product_category'][0])) {
+      $this->db->query("UPDATE " . DB_PREFIX . "product_to_category SET main_category = 1 WHERE product_id = '" . (int)$product_id . "' AND category_id = '" . (int)$data['product_category'][0] . "'");
     }
 
     // seo url
@@ -955,21 +984,21 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   */
   public function clearProducts () {
     $this->db->query("DELETE FROM " . DB_PREFIX . "product");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_attribute");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_description");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_discount");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_filter");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_image");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_option");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_option_value");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_related");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_reward");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_special");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_download");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_layout");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_store");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_recurring");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_attribute");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_description");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_discount");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_filter");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_image");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_option");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_option_value");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_related");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_reward");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_special");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_download");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_layout");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_store");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "product_recurring");
     $this->db->query("DELETE FROM " . DB_PREFIX . "review");
 
     if ($this->isOpencart3()) {
@@ -979,7 +1008,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       $this->db->query("DELETE FROM " . DB_PREFIX . "url_alias");
     }
 
-		$this->db->query("DELETE FROM " . DB_PREFIX . "coupon_product");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "coupon_product");
   }
 
   /* MANUFACTURER METHODS */
@@ -1003,7 +1032,9 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     /*
       If need check before insert and checking successfull -> update or delete
     */
-    if (!$this->checkBeforeInsert || $this->checkerValue === ($id > 0)) {
+    if (!$this->checkBeforeInsert
+        || $this->checkerValue === ($id > 0)
+    ) {
       if ($this->updateExisting) {
         // fix for editManufacturer
         if (!isset($fields['keyword'])) {
@@ -1012,6 +1043,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
         $this->model_catalog_manufacturer->editManufacturer($id, $fields);
         return $id;
       }
+
       if ($this->deleteMode) {
         $this->model_catalog_manufacturer->deleteManufacturer($id);
         return $id;
@@ -1039,7 +1071,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     }
 
     $this->db->query("DELETE FROM " . DB_PREFIX . "manufacturer");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "manufacturer_to_store");
+    $this->db->query("DELETE FROM " . DB_PREFIX . "manufacturer_to_store");
     $this->db->query("DELETE FROM " . DB_PREFIX . $seo_url_table . " WHERE query LIKE 'manufacturer_id=%'")
     ;
   }
@@ -1139,9 +1171,13 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       if ($parserMethod) {
         $parserDescription = $this->attributeParsers[$parser['name']];
 
-        if (!empty($parserDescription['options']) && !empty($parser['options'])) {
+        if (!empty($parserDescription['options'])
+            && !empty($parser['options'])
+        ) {
           foreach ($parserDescription['options'] as $name => $option) {
-            if (isset($parser['options'][$name]) && !empty($parser['options'][$name])) {
+            if (isset($parser['options'][$name])
+                && !empty($parser['options'][$name])
+            ) {
               $valid = true;
               continue;
             }

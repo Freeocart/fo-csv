@@ -187,7 +187,11 @@ class ModelExtensionModuleFocCsvCommon extends Model {
       $profiles[$key] = $this->fillProfileEmptyValues($profile);
     }
 
-    $this->model_setting_setting->editSettingValue($this->profiles_code, $this->profiles_key, $profiles);
+    $this->model_setting_setting->editSettingValue(
+      $this->profiles_code,
+      $this->profiles_key,
+      $profiles
+    );
   }
 
   /*
@@ -207,7 +211,7 @@ class ModelExtensionModuleFocCsvCommon extends Model {
     Return path to file by key
   */
   public function getUploadPath ($key) {
-    return DIR_CACHE . $this->profiles_code . '/' . $key . '/' . $this->type . '/';
+    return DIR_CACHE . $this->profiles_code . DIRECTORY_SEPARATOR . $key . DIRECTORY_SEPARATOR . $this->type . DIRECTORY_SEPARATOR;
   }
 
   /*

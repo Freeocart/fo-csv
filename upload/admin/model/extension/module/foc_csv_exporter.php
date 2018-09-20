@@ -62,6 +62,7 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
       }
 
       list ($table, $field) = explode(':', $binding['dbField']);
+
       if (!isset($result[$table])) {
         $result[$table] = array();
       }
@@ -150,7 +151,10 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     if (isset($schema['product']) && !empty($schema['product'])) {
       $result['product'] = array_intersect_key($product, array_flip($schema['product']));
 
-      if (in_array('image', $schema['product']) && !is_null($result['product']['image']) && trim($result['product']['image']) != '') {
+      if (in_array('image', $schema['product'])
+          && !is_null($result['product']['image'])
+          && trim($result['product']['image']) != ''
+      ) {
         $this->addCollectedImage($result['product']['image']);
       }
 
@@ -158,7 +162,9 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     }
 
     // product description data
-    if (isset($schema['product_description']) && !empty($schema['product_description'])) {
+    if (isset($schema['product_description'])
+        && !empty($schema['product_description'])
+    ) {
       $descriptions = $this->model_catalog_product->getProductDescriptions($primary);
       $result['product_description'] = array_intersect_key($product, array_flip($schema['product_description']));
     }
@@ -179,9 +185,11 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
       if (count($fields) > 0) {
         // export categories data
         if ($table === 'category' || $table === 'category_description') {
+
           if ($dumpParentCategories && !in_array('path', $fields)) {
             $fields[] = 'path';
           }
+
           if (!in_array('name', $fields)) {
             $fields[] = 'name';
           }
@@ -220,6 +228,7 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
         if ($table === 'product_image') {
           $images = $this->model_catalog_product->getProductImages($primary);
           $result[$table] = array();
+
           foreach ($images as $image) {
             $result[$table][] = array_intersect_key($image, array_flip($fields));
 
