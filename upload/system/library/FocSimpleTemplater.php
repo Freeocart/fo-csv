@@ -15,11 +15,97 @@
   [@each value <= source]
     {{ value }}
   [@endeach]
+
+  TODO:
+  0: add some useful default variables
+  1: maybe it would be nice to add some useful functions, like date or time with filter
+      ex:
+        [@fn date | 'Y-m-d'] - calls date('Y-m-d')
+        [@fn nl2br | @variable] - calls nl2br($variables['variable'])
 */
 class FocSimpleTemplater {
+
+  // available functions
+  protected static $enabled_functions = array(
+    'nl2br',
+    'date',
+    'htmlspecialchars',
+    'htmlentities',
+    'html_entity_decode',
+    'md5',
+    'lcfirst',
+    'ucfirst',
+    'strtolower',
+    'strtoupper',
+    'ucwords',
+    'trim',
+    'time',
+    'microtime',
+    'money_format',
+    'number_format'
+  );
+
   // multiline to single line
   protected static function normalize ($template) {
     return trim(preg_replace("/\r?\n/", "", preg_replace("/[^\S\t]+/", " ", $template)));
+  }
+
+  // make arguments array from string
+  protected static function process_function_args ($args_raw, $vars = array()) {
+    $args = array_map('trim', preg_split('/,/', $args_raw, -1, PREG_SPLIT_NO_EMPTY));
+    $result = array();
+
+    foreach ($args as $arg) {
+      if (preg_match("/^\@(.*)/", $arg, $matches)) {
+        $result[] = isset($vars[$matches[1]]) ? $vars[$matches[1]] : null;
+      }
+      else {
+        $result[] = trim($arg, "\"\'");
+      }
+    }
+
+    return $result;
+  }
+
+  // parse and execute function code
+  protected static function execute_function_code ($code, $vars = array()) {
+    $result = '';
+
+    $f_name = null;
+    $f_args_raw = '';
+
+    $parts = array_map('trim', explode('|', $code));
+
+    if (count($parts) > 1) {
+      list ($f_name, $f_args_raw) = $parts;
+    }
+    else {
+      $f_name = $parts[0];
+    }
+
+    $f_args = self::process_function_args($f_args_raw, $vars);
+
+    if (in_array($f_name, self::$enabled_functions)) {
+      $result = call_user_func_array($f_name, $f_args);
+    }
+
+    return $result;
+  }
+
+  /*
+    render functions:
+    [@fn <function_name> | <argument>]
+  */
+  public static function render_functions ($template, $vars = array()) {
+    return preg_replace_callback(
+      "/\[\@fn ([^\]]+)\]/ium",
+      function ($matches) use ($vars) {
+        if (count($matches) === 2) {
+          $fn = $matches[1];
+          return self::execute_function_code($fn, $vars);
+        }
+        return '';
+      }, $template);
   }
 
   // replace variables with values
@@ -43,6 +129,7 @@ class FocSimpleTemplater {
     $result = '';
     list($condition, $source_name) = explode('<=', $loop_cond);
     $loop_vars = explode(',', str_replace(array('(', ')', ' '), '', $condition));
+
     if (count($loop_vars) > 1) {
       list($l_value, $l_key) = $loop_vars;
     }
@@ -77,22 +164,36 @@ class FocSimpleTemplater {
       $result .= self::render_vars($loop_body, $local_vars);
     }
 
-    return $result;
+    return self::render_functions($result, $local_vars);
   }
 
   // render template
   public static function render ($template, $vars = array()) {
+    /*
+      <table>
+      [@each (field,iter) <= source]
+      values
+      [@endeach]
+      something other
+
+      becomes single line
+    */
     $normalized_template = self::normalize($template);
     $loops = array_filter(explode('[@endeach]', $normalized_template));
+
     $result = '';
 
-    if (count($loops) === 0) {
-      return trim(self::render_vars($normalized_template, $vars));
-    }
-
+    /*
+      <table>[@each (field,iter) <= source]values
+      processed as:
+      0: whole match
+      1: pre: <table>
+      2: loop_cond: (field,iter) <= source
+      3: loop_body: values
+    */
     foreach ($loops as $loop) {
       if (preg_match("/((?!\[\@each).*)?\[\@each ([^\]]+)\]\s*(.*)/iu", $loop, $matches)) {
-        if (count($matches) == 4) {
+        if (count($matches) === 4) {
           $pre = $matches[1];
           $loop_cond = $matches[2];
           $loop_body = $matches[3];
@@ -101,7 +202,8 @@ class FocSimpleTemplater {
         }
       }
       else {
-        $result .= trim(self::render_vars($loop, $vars));
+        $fns_executed = self::render_functions($loop, $vars);
+        $result .= trim(self::render_vars($fns_executed, $vars));
       }
     }
     return $result;
