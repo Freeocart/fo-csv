@@ -34,7 +34,7 @@
     <operation>
       <search><![CDATA[<?php]]></search>
       <add position="after"><![CDATA[
-        $_['text_foc_csv'] = 'Импорт/экспорт FO CSV';
+        $_['text_foc_csv'] = 'FO: Гибкий импорт/экспорт CSV';
       ]]></add>
     </operation>
   </file>
@@ -43,7 +43,7 @@
     <operation>
       <search><![CDATA[<?php]]></search>
       <add position="after"><![CDATA[
-        $_['text_foc_csv'] = 'Import/export FO CSV';
+        $_['text_foc_csv'] = 'FO: Flexible CSV import/export';
       ]]></add>
     </operation>
   </file>
