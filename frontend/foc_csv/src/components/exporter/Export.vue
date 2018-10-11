@@ -91,6 +91,7 @@ import ErrorMessage from '@/components/common/ErrorMessage'
 const { mapGetters } = createNamespacedHelpers('exporter')
 
 export default {
+  name: 'export',
   components: {
     LeftSidebar,
     RightSidebar,

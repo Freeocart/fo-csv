@@ -116,6 +116,7 @@ import AdditionalProcessingSettings from './AdditionalProcessingSettings'
 const { mapGetters, mapActions } = createNamespacedHelpers('importer')
 
 export default {
+  name: 'import',
   components: {
     CsvFileUpload,
     ProgressBar,

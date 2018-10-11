@@ -1,7 +1,9 @@
 <template>
   <div>
     <navigation></navigation>
-    <router-view/>
+    <keep-alive include="import,export">
+      <router-view/>
+    </keep-alive>
   </div>
 </template>
 
