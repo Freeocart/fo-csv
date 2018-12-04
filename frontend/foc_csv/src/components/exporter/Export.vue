@@ -3,7 +3,7 @@
     <template v-if="working">
       <div class="panel panel-primary">
         <div class="panel-heading">
-          {{ $t('Import in progress') }}
+          {{ $t('Export in progress') }}
         </div>
         <div class="panel-body">
           <progress-bar :progress="{ current, total }"></progress-bar>
