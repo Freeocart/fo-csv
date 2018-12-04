@@ -39,7 +39,6 @@ class ModelExtensionModuleFocCsvCommon extends Model {
       'category_id'
     ),
     'category' => array(
-      'category_id',
       'parent_id',
       'top',
       'column'
