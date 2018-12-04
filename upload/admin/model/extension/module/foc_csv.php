@@ -42,6 +42,28 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       )
     );
 
+    $this->attributeParsers['advantshop_grouped'] = array(
+      'title' => $this->language->get('parser_advantshop_grouped'),
+      'options' => array(
+        'groupattrs_delimiter' => array(
+          'title' => $this->language->get('parser_advantshop_grouped_groupattr_delimiter'),
+          'default' => '=>'
+        ),
+        'groups_delimiter' => array(
+          'title' => $this->language->get('parser_advantshop_grouped_groups_delimiter'),
+          'default' => ','
+        ),
+        'keyvalue_delimiter' => array(
+          'title' => $this->language->get('parser_advantshop_keyvalue_delimiter'),
+          'default' => ':'
+        ),
+        'entries_delimiter' => array(
+          'title' => $this->language->get('parser_advantshop_entries_delimiter'),
+          'default' => ';'
+        )
+      )
+    );
+
     $this->attributeParsers['column'] = array(
       'title' => $this->language->get('parser_column'),
       'options' => array(
@@ -1268,6 +1290,9 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
   /*
     Advantshop attributes format parser
+    Format:
+      attr:val,attr:val
+      delimiters are configurable.
   */
   private function parser_advantshop ($parser, $atts) {
     $result = array();
@@ -1296,6 +1321,48 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
           'value' => $value,
           'group' => $group_id
         );
+      }
+    }
+
+    return $result;
+  }
+
+  /*
+    Advantshop attributes format parser
+    Format:
+      group=>{attr:val},
+      only { and } is required by protocol, you can change delimiters, for example:
+        group^^^{attr###val}|||group...
+
+    Also, for correct work, please wrap structured content in your CSV to quotes
+   */
+  private function parser_advantshop_grouped ($parser, $atts) {
+    $result = array();
+    $attributesIdx = $parser['CSVFieldIdx'];
+
+    if (isset($parser['options'])
+      && !empty($parser['options'])
+      && isset($parser['defaultGroup'])
+      && isset($atts[$attributesIdx])) {
+      $options = $parser['options'];
+
+      $keyValueDelimiter = $options['keyvalue_delimiter'];
+      $entriesDelimiter = $options['entries_delimiter'];
+      $groupAttrsDelimiter = $options['groupattrs_delimiter'];
+      $groupsDelimiter = $options['groups_delimiter'];
+
+      $groups = array_filter(explode('}'.$groupsDelimiter, $atts[$attributesIdx]));
+
+      foreach ($groups as $groupedAttrs) {
+        list($group, $wrappedAttrs) = explode($groupAttrsDelimiter, $groupedAttrs);
+
+        $advantshopMonkeyParser = $parser;
+        $advantshopMonkeyParser['defaultGroup'] = $group;
+
+        $fakeAttrs = array();
+        $fakeAttrs[$attributesIdx] = trim($wrappedAttrs, '{}');
+
+        $result = array_merge($result, $this->parser_advantshop($advantshopMonkeyParser, $fakeAttrs));
       }
     }
 
