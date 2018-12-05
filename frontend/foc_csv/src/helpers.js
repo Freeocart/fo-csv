@@ -22,30 +22,30 @@ class FirstLineReader {
   constructor () {
     this.events = {}
 
-    // i'm using 4kb because i don't hugging know how
-    // to correctly process line_by_line non ascii text
-    // it's seems that slice breaks unicode symbols and
-    // i don't know how to merge them back, so i get this: �
-    // if you know how to fight this problem, please send PR to repo!
-    this.chunkSize = 4096
+    this.chunkSize = 256
     this.readPos = 0
     this.reader = new FileReader()
     this.lines = []
     this.chunk = ''
     this.file = null
     this.readedLines = 0
+    this.skippedBytes = 0
 
     this.reader.onload = () => {
-      this.chunk += this.reader.result
-      this.process()
+      // it seems that broken symbols automaticaly converts to \uFFFD
+      // so we just check line endings and try to read again
+      // one byte more
+      if (/\uFFFD$/.test(this.reader.result)) {
+        this.skippedBytes++
+        this.step()
+      }
+      else {
+        this.readPos += this.chunkSize + this.skippedBytes
+        this.skippedBytes = 0
+        this.chunk += this.reader.result
+        this.process()
+      }
     }
-  }
-
-  /*
-    Remove non printable characters
-  */
-  _fixString (str) {
-    return str.replace(/\uFFFD/g, '')
   }
 
   on (event, cb) {
@@ -59,11 +59,10 @@ class FirstLineReader {
   }
 
   process () {
-    if (/[\r\n]+/.test(this.chunk)) {
-      let lines = this.chunk.split('\n')
-      // it's a hack to remove � symbols, please see chunkSize comment above
-      // this can drop characters in UX, but i think it's more comfortable for user
-      let line = this._fixString(lines.shift())
+    if (/[\r\n]+$/.test(this.chunk)) {
+      const lines = this.chunk.split('\n')
+      const line = lines.shift()
+
       this.readedLines++
 
       if (this.readedLines === this.skipLines) {
@@ -84,7 +83,7 @@ class FirstLineReader {
     }
   }
 
-  read (file, encoding, skipLines = 0) {
+  read (file, encoding, skipLines = 1) {
     this.file = file
     this.lines = []
     this.chunk = ''
@@ -92,16 +91,23 @@ class FirstLineReader {
     this.encoding = encoding || 'UTF8'
     this.skipLines = parseInt(skipLines)
 
+    // minimum 1
+    if (this.skipLines <= 0) {
+      this.skipLines = 1
+    }
+
+    if (isNaN(this.skipLines)) {
+      throw new Error('Please configure skiplines!')
+    }
+
     this.step()
   }
 
   step () {
     let blob = this.file.slice(
       this.readPos,
-      this.readPos + this.chunkSize
+      this.readPos + this.chunkSize + this.skippedBytes
     )
-
-    this.readPos += this.chunkSize
 
     this.reader.readAsText(blob, this.encoding)
   }
