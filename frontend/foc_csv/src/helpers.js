@@ -17,12 +17,17 @@ const validateAppConfig = (config) => {
 
 /*
   Read first string from blob
-  TODO: add support for user defined skip lines parameter
 */
 class FirstLineReader {
   constructor () {
     this.events = {}
-    this.chunkSize = 512
+
+    // i'm using 4kb because i don't hugging know how
+    // to correctly process line_by_line non ascii text
+    // it's seems that slice breaks unicode symbols and
+    // i don't know how to merge them back, so i get this: �
+    // if you know how to fight this problem, please send PR to repo!
+    this.chunkSize = 4096
     this.readPos = 0
     this.reader = new FileReader()
     this.lines = []
@@ -56,6 +61,8 @@ class FirstLineReader {
   process () {
     if (/\n/.test(this.chunk)) {
       let lines = this.chunk.split('\n')
+      // it's a hack to remove � symbols, please see chunkSize comment above
+      // this can drop characters in UX, but i think it's more comfortable for user
       let line = this._fixString(lines.shift())
       this.readedLines++
 
