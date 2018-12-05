@@ -124,7 +124,8 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       'language' => $this->config->get('config_language_id'),
       'attributeParserData' => array(),
       'skipLineOnEmptyFields' => array(),
-      'multicolumnFields' => array()
+      'multicolumnFields' => array(),
+      'replaceAttributes' => false
     );
   }
 
@@ -583,7 +584,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     /*
       Import the product data
     */
-    $product_id = $this->importProduct($productData);
+    $product_id = $this->importProduct($productData, $profile);
 
     if (!$product_id) {
       return false;
@@ -804,7 +805,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   /*
     Import product fields
   */
-  private function importProduct ($fields) {
+  private function importProduct ($fields, $profile) {
     $this->load->model('catalog/product');
 
     if (!empty($fields['image'])) {
@@ -841,11 +842,11 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
     if (!$this->checkBeforeInsert || $this->checkerValue === ($id > 0)) {
       if ($this->updateExisting) {
-        $this->safeEditProduct($id, $fields);
+        $this->safeEditProduct($id, $fields, $profile);
         return $id;
       }
       if ($this->deleteMode) {
-        $this->model_catalog_product->deleteProduct($id);
+        $this->model_catalog_product->deleteProduct($id, $profile);
         return $id;
       }
     }
@@ -854,7 +855,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       Insert new product
     */
     if ($this->insertNew) {
-      return $this->safeAddProduct($fields);
+      return $this->safeAddProduct($fields, $profile);
     }
   }
 
@@ -862,7 +863,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     Fill data object with default values
     before add
   */
-  public function safeAddProduct ($data) {
+  public function safeAddProduct ($data, $profile) {
     $data = $this->productTemplate($data);
     $data['product_description'] = $this->productDescriptionTemplate($data['product_description']);
     $data = $this->processMulticolumnFields($data);
@@ -876,7 +877,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     Unfortunatenally we need to duplicate all this code here
     Only FO CSV supported fields being updated!
   */
-  public function safeEditProduct ($product_id, $data) {
+  public function safeEditProduct ($product_id, $data, $profile) {
     // we do not want to lose product data before import, so use old data as basement
     // $product_data = $this->model_catalog_product->getProduct($product_id);
     $query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "product p WHERE p.product_id = '" . (int)$product_id . "'");
@@ -933,7 +934,11 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     if (isset($data['product_attribute'])
         && !empty($data['product_attribute'])
     ) {
-      $this->db->query("DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id = '" . (int)$product_id . "'");
+      // delete old attributes only if user want it, otherwise, just append
+      // new attributes and delete doubles
+      if ($profile['replaceAttributes']) {
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id = '" . (int)$product_id . "'");
+      }
 
       if (!empty($data['product_attribute'])) {
         foreach ($data['product_attribute'] as $product_attribute) {
@@ -1125,7 +1130,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   private function createOrUpdateAttributeGroup ($name) {
     $this->load->model('catalog/attribute_group');
 
-    $id = $this->db->query('SELECT IFNULL((SELECT attribute_group_id FROM ' . DB_PREFIX . 'attribute_group_description WHERE `name` LIKE "' . $this->db->escape($name) . '" LIMIT 1), 0) AS id')->row['id'];
+    $id = $this->db->query('SELECT IFNULL((SELECT attribute_group_id FROM ' . DB_PREFIX . 'attribute_group_description WHERE `name` LIKE "' . $this->db->escape($name) . '" AND `language_id` = ' . (int) $this->language_id . ' LIMIT 1), 0) AS id')->row['id'];
 
     $data = array(
       'sort_order' => 0,
