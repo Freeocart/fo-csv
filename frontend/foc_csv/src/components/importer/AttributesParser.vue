@@ -11,6 +11,14 @@
   </div>
 
   <div class="form-group">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" v-model="replaceAttributes"> {{ $t('Replace existing attributes') }}
+      </label>
+    </div>
+  </div>
+
+  <div class="form-group">
     <label class="label label-default">{{ $t('Attributes parser') }}</label>
     <select class="form-control" v-model="currentAttributeParserName">
       <option :value="null">{{ $t('Not selected') }}</option>
@@ -61,7 +69,8 @@ export default {
     ...mapVuexModels([
       'attributeParser',
       'defaultAttributesGroup',
-      'attributesCSVField'
+      'attributesCSVField',
+      'replaceAttributes'
     ], 'importer'),
     ...mapGetters([
       'csvFields',

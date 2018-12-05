@@ -60,6 +60,7 @@
   "Opencart status": "Статус в Opencart",
   "CSV status": "Статус в CSV",
   "Processing settings": "Настройки обработки",
+  "Replace existing attributes": "Заменить существующие атрибуты",
   "Default attributes group": "Группа по умолчанию для атрибутов",
   "Attributes import": "Импорт атрибутов",
   "Attributes field": "Поле для извлечения атрибутов",

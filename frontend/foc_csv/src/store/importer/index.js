@@ -34,7 +34,8 @@ let fields = genVuexModels([
   'defaultAttributesGroup',
   'attributesCSVField',
   'skipLineOnEmptyFields',
-  'multicolumnFields'
+  'multicolumnFields',
+  'replaceAttributes'
 ], 'profile')
 
 let importProgress = genVuexModels([
