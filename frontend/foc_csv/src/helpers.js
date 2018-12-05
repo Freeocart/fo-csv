@@ -59,7 +59,7 @@ class FirstLineReader {
   }
 
   process () {
-    if (/\n/.test(this.chunk)) {
+    if (/[\r\n]+/.test(this.chunk)) {
       let lines = this.chunk.split('\n')
       // it's a hack to remove � symbols, please see chunkSize comment above
       // this can drop characters in UX, but i think it's more comfortable for user
