@@ -11,6 +11,9 @@
         <button class="btn btn-success" :disabled="!csvFileRef" @click.prevent="updateFromFile()"><i class="fa fa-refresh"></i> {{ $t('Re-read CSV') }}</button>
       </div>
     </div>
+    <div class="col-md-12 alert alert-danger" v-if="error">
+      <strong>{{ $t('Something wrong with your file! Please choose another.') }}</strong>
+    </div>
   </div>
 </template>
 
@@ -25,7 +28,8 @@ const { mapActions, mapGetters } = createNamespacedHelpers('importer')
 export default {
   data () {
     return {
-      fileSelected: false
+      fileSelected: false,
+      error: false
     }
   },
   computed: {
@@ -57,6 +61,9 @@ export default {
           let headers = parseCsvHeaders(line, this.csvFieldDelimiter)
           this.setCsvFieldNames(headers)
         })
+        reader.on('error', () => {
+          this.error = true
+        })
 
         reader.read(file, this.encoding, skipToHeaders)
       }
@@ -71,6 +78,7 @@ export default {
     },
     fileChange (event) {
       if (event.srcElement.files.length > 0) {
+        this.error = false
         this.setCsvFileRef(this.$refs.fileRef)
         this.readBlob(event.srcElement.files[0])
       }

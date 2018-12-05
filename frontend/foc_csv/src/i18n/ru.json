@@ -99,6 +99,7 @@
   "Invalid profile!": "Ошибки в профиле!",
   "Import canceled!": "Импорт отменён!",
   "Re-read CSV": "Перечитать CSV",
+  "Something wrong with your file! Please choose another.": "С выбранным файлом что-то не так! Пожалуйста, попробуйте другой.",
 
   "Attention! You chosed a danger import mode!": "Внимание! Вы выбрали опасный режим импорта!",
   "Before import from CSV, we will remove all product related data from your database!": "Перед импортом данных из CSV, будут удалены все данные о продуктах из вашей базы данных!",
