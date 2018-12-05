@@ -8,7 +8,7 @@
     </div>
     <div class="col-md-6">
       <div class="form-group">
-        <button class="btn btn-success" :disabled="!csvFileRef" @click.prevent="updateFromFile()"><i class="fa fa-refresh"></i> {{ $t('Re-read CSV') }}</button>
+        <button class="btn btn-success" :disabled="!csvFileRef || readInProgress" @click.prevent="updateFromFile()"><i :class="{'fa-spin': readInProgress, 'fa fa-refresh': true}"></i> {{ $t('Re-read CSV') }}</button>
       </div>
     </div>
     <div class="col-md-12 alert alert-danger" v-if="error">
@@ -29,7 +29,8 @@ export default {
   data () {
     return {
       fileSelected: false,
-      error: false
+      error: false,
+      readInProgress: false
     }
   },
   computed: {
@@ -56,31 +57,37 @@ export default {
       }
 
       if (file !== null && file.type === 'text/csv') {
-        let reader = new FirstLineReader()
+        const reader = new FirstLineReader()
         reader.on('line', (line) => {
-          let headers = parseCsvHeaders(line, this.csvFieldDelimiter)
+          const headers = parseCsvHeaders(line, this.csvFieldDelimiter)
           this.setCsvFieldNames(headers)
+          this.readInProgress = false
         })
         reader.on('error', () => {
           this.error = true
+          this.readInProgress = false
         })
 
         reader.read(file, this.encoding, skipToHeaders)
       }
       else {
-        console.log(file)
+        this.readInProgress = false
+        this.error = true
       }
     },
     updateFromFile () {
+      this.error = false
       if (this.csvFileRef.files && this.csvFileRef.files.length > 0) {
         this.readBlob(this.csvFileRef.files[0])
+        this.readInProgress = true
       }
     },
     fileChange (event) {
+      this.error = false
       if (event.srcElement.files.length > 0) {
-        this.error = false
         this.setCsvFileRef(this.$refs.fileRef)
         this.readBlob(event.srcElement.files[0])
+        this.readInProgress = true
       }
     },
     ...mapActions([
