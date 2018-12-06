@@ -128,7 +128,8 @@ export default {
       'statuses',
       'statusRewrites',
       'stock_statuses',
-      'stockStatusRewrites'
+      'stockStatusRewrites',
+      'csvFields'
     ]),
     ...mapVuexModels([
       'csvFieldDelimiter',
@@ -141,7 +142,6 @@ export default {
       'removeCharsFromCategory',
       'defaultStatus',
       'defaultStockStatus',
-      'csvFields',
       'skipLineOnEmptyFields'
     ], 'importer')
   },
