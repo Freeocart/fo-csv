@@ -26,6 +26,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       mkdir(DIR_IMAGE . $this->imageSavePath, 0755, true);
     }
 
+    $this->language->load('extension/module/foc_csv');
     $this->language->load('extension/module/foc_attribute_parsers');
 
     $this->attributeParsers['advantshop'] = array(
@@ -101,7 +102,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       'csvFieldDelimiter' => ';',
       'categoryDelimiter' => '/',
       'categoryLevelDelimiter' => '>>',
-      'defaultAttributesGroup' => 'FOC',
+      'defaultAttributesGroup' => $this->language->get('foc_default_attributes_group'),
       'keyField' => 'product_id',
       'skipLines' => 0,
       'bindings' => new stdclass,
