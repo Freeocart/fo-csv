@@ -2,7 +2,9 @@ import { DEFAULT_PROFILE_NAME } from '@/config'
 
 export default {
   data: {},
-  profile: {},
+  profile: {
+    exportWithStatus: -1
+  },
   exportJob: {
     exportJobWorking: false,
     exportJobCurrent: 0,

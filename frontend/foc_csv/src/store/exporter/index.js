@@ -19,7 +19,8 @@ let fields = genVuexModels([
   'language',
   'csvFieldDelimiter',
   'csvHeader',
-  'bindings'
+  'bindings',
+  'exportWithStatus'
 ], 'profile')
 
 let exportProgress = genVuexModels([

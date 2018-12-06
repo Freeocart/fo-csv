@@ -47,7 +47,8 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
       'galleryImagesDelimiter' => ',',
       'store' => $this->config->get('config_store_id'),
       'language' => $this->config->get('config_language_id'),
-      'bindings' => array()
+      'bindings' => array(),
+      'exportWithStatus' => -1
     );
   }
 
@@ -78,7 +79,7 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
   */
   public function export ($profile, $offset = 0, $limit = 10) {
 
-    $productIds = array_column($this->getProducts($offset, $limit), 'product_id');
+    $productIds = array_column($this->getProducts($profile, $offset, $limit), 'product_id');
     $preparedItems = array();
     $csvLines = array();
 
@@ -267,8 +268,15 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
   /*
     Select and return product ids by offset and limit
   */
-  public function getProducts ($offset, $limit) {
-    $sql = 'SELECT product_id FROM ' . DB_PREFIX . 'product LIMIT ' . (int)$limit . ' OFFSET ' . (int)$offset;
+  public function getProducts ($profile, $offset, $limit) {
+    $sql = 'SELECT product_id FROM ' . DB_PREFIX . 'product ';
+
+    if ((int)$profile['exportWithStatus'] !== -1) {
+      $sql .= ' WHERE status = ' . (int)$profile['exportWithStatus'];
+    }
+
+    $sql .= ' LIMIT ' . (int)$limit . ' OFFSET ' . (int)$offset;
+
     return $this->db->query($sql)->rows;
   }
 

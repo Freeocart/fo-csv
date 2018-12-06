@@ -34,6 +34,14 @@
           <label class="label label-default">{{ $t('Categories delimiter') }}</label>
           <input type="text" class="form-control" v-model="categoriesDelimiter">
         </div>
+
+        <div class="form-group">
+          <label class="label label-default">{{ $t('Export with status') }}</label>
+          <select class="form-control" v-model="exportWithStatus">
+            <option value="-1">{{ $t('Any status') }}</option>
+            <option v-for="(status,statusIdx) in statuses" :value="status.id" :key="statusIdx">{{ status.name }}</option>
+          </select>
+        </div>
       </div>
     </div>
   </div>
@@ -52,10 +60,13 @@ export default {
       'categoriesNestingDelimiter',
       'categoriesDelimiter',
       'csvFieldDelimiter',
-      'encoding'
+      'encoding',
+      'status',
+      'exportWithStatus'
     ], 'exporter'),
     ...mapGetters([
-      'encodings'
+      'encodings',
+      'statuses'
     ])
   }
 }
