@@ -283,9 +283,18 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
   /*
     return total products count
   */
-  public function getProductTotal () {
+  public function getProductTotal ($profile) {
     $this->load->model('catalog/product');
-    return $this->model_catalog_product->getTotalProducts();
+
+    $filter = array();
+
+    if (is_numeric($profile['exportWithStatus'])
+        && in_array((int)$profile['exportWithStatus'], array(0, 1))
+    ) {
+      $filter['filter_status'] = (int)$profile['exportWithStatus'];
+    }
+
+    return $this->model_catalog_product->getTotalProducts($filter);
   }
 
 }

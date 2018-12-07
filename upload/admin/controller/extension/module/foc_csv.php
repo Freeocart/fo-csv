@@ -306,7 +306,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
         fclose($csv_fid);
       }
 
-      $total = $this->model_extension_module_foc_csv_exporter->getProductTotal();
+      $total = $this->model_extension_module_foc_csv_exporter->getProductTotal($profile);
 
       $export_url = $this->createUrl('extension/module/foc_csv/exportPart');
 
