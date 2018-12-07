@@ -1,5 +1,5 @@
 <?php
-$_['heading_title'] = 'FO: Flexible CSV import/export';
+$_['heading_title'] = 'FOC: Flexible CSV import/export';
 $_['text_extension']   = 'Extensions';
 
 $_['foc_app_preload_title'] = 'Loading...';
