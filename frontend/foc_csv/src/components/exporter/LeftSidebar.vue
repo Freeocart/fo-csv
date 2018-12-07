@@ -7,7 +7,7 @@
       <div class="panel-body">
         <div class="form-group">
           <label class="label label-default">{{ $t('Profile') }}</label>
-          <select v-model="currentProfileName" class="form-control">
+          <select v-model="currentProfileNameModel" class="form-control">
             <option v-for="(profile, name) in profiles" :key="name">{{ name }}</option>
           </select>
         </div>
@@ -39,7 +39,7 @@
         </div>
       </div>
     </div>
-
+    {{ currentProfileName }}
     <images-export-settings></images-export-settings>
   </div>
 </template>
@@ -61,6 +61,14 @@ export default {
     }
   },
   computed: {
+    currentProfileNameModel: {
+      get () {
+        return this.currentProfileName
+      },
+      set (name) {
+        this.setCurrentProfileName(name)
+      }
+    },
     ...mapVuexModels([
       'profile',
       'store',
@@ -75,7 +83,8 @@ export default {
   },
   methods: {
     ...mapActions([
-      'saveNewProfile'
+      'saveNewProfile',
+      'setCurrentProfileName'
     ])
   }
 }
