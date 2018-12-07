@@ -39,7 +39,7 @@
         </div>
       </div>
     </div>
-    {{ currentProfileName }}
+
     <images-export-settings></images-export-settings>
   </div>
 </template>
