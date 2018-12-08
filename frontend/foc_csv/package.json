@@ -11,13 +11,14 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "autocomplete-vue": "^1.0.3",
+    "papaparse": "^4.6.2",
     "vue": "^2.5.2",
     "vue-i18n": "^7.6.0",
+    "vue-resource": "^1.5.0",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
-    "vuex-models": "^1.0.0",
-    "autocomplete-vue": "^1.0.3",
-    "vue-resource": "^1.5.0"
+    "vuex-models": "^1.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

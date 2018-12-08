@@ -1,3 +1,5 @@
+import papaparse from 'papaparse'
+
 /*
   Validate required fields in app config
 */
@@ -117,9 +119,8 @@ class FirstLineReader {
   Parse csv headers - stupid split function:)
 */
 const parseCsvHeaders = (raw, delimiter = ';') => {
-  let clean = raw.replace(/(\r\n|\n)/gm, '')
-  clean = clean.split('"').join('')
-  return clean.split(delimiter)
+  const result = papaparse.parse(raw, { delimiter })
+  return result.data.length > 0 ? result.data[0] : []
 }
 
 /*
