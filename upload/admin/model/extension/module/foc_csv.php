@@ -1321,7 +1321,13 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       $result = array();
 
       foreach ($entries as $entry) {
-        list ($key, $value) = explode($keyValueDelimiter, $entry);
+        $parts = explode($keyValueDelimiter, $entry);
+        // empty or corrupted group value
+        if (count($parts) < 2) {
+          continue;
+        }
+
+        list ($key, $value) = $parts;
         $result[] = array(
           'name' => $key,
           'value' => $value,
