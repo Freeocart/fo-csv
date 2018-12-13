@@ -503,11 +503,13 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
     // inport manufacturers
     $manufacturer_id = 0;
+    $import_manufacturer = false;
     if (isset($tablesData['manufacturer'])) {
       $manufacturerData = $this->manufacturerTemplate($tablesData['manufacturer']);
       $manufacturer_id = $this->importManufacturer($manufacturerData);
       // set manufacturer id to product fields
       $tablesData['product']['manufacturer_id'] = $manufacturer_id;
+      $import_manufacturer = true;
     }
 
     /* IMPORT ATTRIBUTES */
@@ -533,7 +535,9 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
     // fill product data from csv
     $productData = isset($tablesData['product']) ? $tablesData['product'] : array(); //$this->productTemplate($tablesData['product']);
-    $productData['manufacturer_id'] = $manufacturer_id;
+    if ($import_manufacturer) {
+      $productData['manufacturer_id'] = $manufacturer_id;
+    }
 
     // fill product description from csv
     $productData['product_description'] = array();
