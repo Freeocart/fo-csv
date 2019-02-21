@@ -23,7 +23,7 @@
         <p>{{ $t('Check your download links:') }}</p>
         <div class="btn-group">
           <a :href="csvFileUrl" target="_blank" class="btn btn-primary">{{ $t('CSV file') }}</a>
-          <a v-if="imagesZipUrl" target="_blank" :href="imagesZipUrl" class="btn btn-default">{{ $t('Images ZIP file') }}</a>
+          <a v-if="collectedImages > 0" target="_blank" :href="imagesZipUrl" class="btn btn-default">{{ $t('Images ZIP file') }}</a>
         </div>
       </div>
     </div>
@@ -103,6 +103,7 @@ export default {
     return {
       msg: 'Export',
       errors: 0,
+      collectedImages: 0,
       imagesZipUrl: null,
       csvFileUrl: null
     }
@@ -153,6 +154,8 @@ export default {
 
         this.current = position
 
+        this.collectedImages += (parseInt(response.data.message.collected_images) || 0);
+
         if (this.current < this.total) {
           this.submitExportPart(callbackUrl, response.data.message)
         }
@@ -171,6 +174,7 @@ export default {
       this.errors = 0
       this.csvFileUrl = null
       this.imagesZipUrl = null
+      this.collectedImages = 0
 
       try {
         let response = await this.$api.exporter.submitData(data.profile)
