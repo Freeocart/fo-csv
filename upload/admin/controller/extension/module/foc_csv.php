@@ -385,11 +385,14 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
         $position = $offset + $limit;
 
-        $this->sendOk(array(
+        $response = array(
           'key' => $key,
           'position' => $position,
-          'errors' => $errors
-        ));
+          'errors' => $errors,
+          'collected_images' => $this->model_extension_module_foc_csv_exporter->getCollectedImagesCount()
+        );
+
+        $this->sendOk($response);
       }
     }
   }

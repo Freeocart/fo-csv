@@ -255,7 +255,11 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
   }
 
   public function hasCollectedImages () {
-    return count(self::$foundImages) > 0;
+    return $this->getCollectedImagesCount() > 0;
+  }
+
+  public function getCollectedImagesCount () {
+    return count(self::$foundImages);
   }
 
   public function getCollectedImages () {
