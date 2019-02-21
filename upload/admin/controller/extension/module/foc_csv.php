@@ -53,8 +53,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
     return $this->session->data[$this->getTokenName()];
   }
 
-  private function createUrl ($path) {
-    return $this->url->link($path, $this->getTokenName() . '=' . $this->getToken(), 'ssl');
+  private function createUrl ($path, $params = '') {
+    return $this->url->link($path, $this->getTokenName() . '=' . $this->getToken() . '&' . $params, 'ssl');
   }
 
   public function index () {
