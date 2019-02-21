@@ -3,6 +3,8 @@
 class ControllerExtensionModuleFocCsv extends Controller {
 
   const CONFIG_PROFILES = 'fo_csv_profiles';
+  const KEY_FOR_CSV_FILE = 1;
+  const KEY_FOR_IMAGES_ZIP_FILE = 2;
 
   public function install () {
     $this->load->model('extension/module/foc_csv_common');
@@ -288,7 +290,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
       $key = $this->model_extension_module_foc_csv_exporter->prepareUploadPath();
       $exportFile = $this->model_extension_module_foc_csv_exporter->getExportCsvFilePath($key);
-      $exportImagesFile = '';
+      $exportImagesFile = null;
 
       if ($profile['createImagesZIP']) {
         $exportImagesFile = $this->model_extension_module_foc_csv_exporter->getExportImagesZipFilePath($key);
@@ -310,14 +312,19 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
       $export_url = $this->createUrl('extension/module/foc_csv/exportPart');
 
-      $this->sendOk(array(
+      $response = array(
         'total' => $total,
         'key' => $key,
         'exportUrl' => html_entity_decode($export_url),
-        'csvFileUrl' => $this->model_extension_module_foc_csv_exporter->pathToUrl($exportFile),
-        'imagesZipUrl' => $this->model_extension_module_foc_csv_exporter->pathToUrl($exportImagesFile),
+        'csvFileUrl' => html_entity_decode($this->createUrl('extension/module/foc_csv/download', 'key=' . $key . '&mode=' . self::KEY_FOR_CSV_FILE)),
         'position' => 0
-      ));
+      );
+
+      if (!is_null($exportImagesFile)) {
+        $response['imagesZipUrl'] = html_entity_decode($this->createUrl('extension/module/foc_csv/download', 'key=' . $key . '&mode=' . self::KEY_FOR_IMAGES_ZIP_FILE));
+      }
+
+      $this->sendOk($response);
     }
   }
 
@@ -566,6 +573,55 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
     $this->model_extension_module_foc_csv->writeLog('Missing required fields! Fields are $key: [' . $key .'], $position: [' . $position . '] and $profile: [' . print_r($profile, true) . ']', 'error');
     $this->sendFail();
+  }
+
+  /*
+    Download CSV or Images.zip
+  */
+  public function download () {
+    $this->load->model('extension/module/foc_csv_common');
+    $this->load->model('extension/module/foc_csv_exporter');
+    $key = null;
+    $mode = 0;
+
+    if (isset($this->request->get['key'])) {
+      $key = $this->request->get['key'];
+    }
+
+    if (isset($this->request->get['mode'])) {
+      $mode = $this->request->get['mode'];
+    }
+
+    $file_path = null;
+
+    switch ($mode) {
+      case self::KEY_FOR_CSV_FILE:
+        $file_path = $this->model_extension_module_foc_csv_exporter->getExportCsvFilePath($key);
+        break;
+      case self::KEY_FOR_IMAGES_ZIP_FILE:
+        $file_path = $this->model_extension_module_foc_csv_exporter->getExportImagesZipFilePath($key);
+        break;
+    }
+
+    /*
+      TODO:
+        make option for auto remove files after download
+    */
+    if ($file_path !== null && is_file($file_path)) {
+      header('Content-Type: application/octet-stream');
+      header('Content-Description: File Transfer');
+      header('Content-Disposition: attachment; filename="' . basename($file_path) . '"');
+      header('Content-Transfer-Encoding: binary');
+      header('Expires: 0');
+      header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+      header('Pragma: public');
+      header('Content-Length: ' . filesize($file_path));
+
+      readfile($file_path, 'rb');
+    }
+    else {
+      exit('Error: Could not find file ' . $file_path . '!');
+    }
   }
 
   /*
