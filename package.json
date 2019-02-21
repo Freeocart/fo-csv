@@ -13,5 +13,8 @@
   "dependencies": {
     "gulp": "^3.9.1",
     "gulp-zip": "^4.1.0"
+  },
+  "devDependencies": {
+    "yarn": "^1.13.0"
   }
 }
