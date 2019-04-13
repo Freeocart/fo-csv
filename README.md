@@ -1,4 +1,6 @@
 # FO_CSV - flexible CSV import/export for Opencart
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FFreeocart%2Ffo-csv.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FFreeocart%2Ffo-csv?ref=badge_shield)
+
 
 With this module, you can simplify import/export data from CSV files in your Opencart project.
 Current version developed and tested on Opencart 2.3/3.0.2.0.
@@ -30,3 +32,6 @@ Author or contributors are not responsible at data corruption/remove caused by u
 We are strongly recommend you to backup data before using this.
 
 Source code distributed "as is", all parts of the software is free and opensource and respecting GPLv3 license.
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FFreeocart%2Ffo-csv.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FFreeocart%2Ffo-csv?ref=badge_large)
