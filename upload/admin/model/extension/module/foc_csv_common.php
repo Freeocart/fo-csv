@@ -4,7 +4,7 @@
 */
 class ModelExtensionModuleFocCsvCommon extends Model {
 
-  const VERSION = '0.0.98';
+  const VERSION = '0.0.99';
 
   public function getVersion () {
     return self::VERSION;
