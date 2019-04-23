@@ -474,11 +474,12 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       if (!$mc_db_field_raw) {
         continue;
       }
-      list($mc_table, $mc_table_field) = explode(':', $mc_db_field_raw);
 
+      list($mc_table, $mc_table_field) = explode(':', $mc_db_field_raw);
       if (!isset($this->multicolumnData[$mc_table])) {
         $this->multicolumnData[$mc_table] = array();
       }
+
       if (!isset($this->multicolumnData[$mc_table][$mc_table_field])) {
         $this->multicolumnData[$mc_table][$mc_table_field] = '';
       }
@@ -1370,7 +1371,8 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     if (isset($parser['options'])
       && !empty($parser['options'])
       && isset($parser['defaultGroup'])
-      && isset($atts[$attributesIdx])) {
+      && isset($atts[$attributesIdx])
+    ) {
       $options = $parser['options'];
 
       $keyValueDelimiter = $options['keyvalue_delimiter'];

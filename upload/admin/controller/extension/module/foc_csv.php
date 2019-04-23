@@ -360,7 +360,10 @@ class ControllerExtensionModuleFocCsv extends Controller {
       $this->load->model('extension/module/foc_csv_common');
       $this->load->model('extension/module/foc_csv_exporter');
 
-      if (isset($json['position']) && isset($json['key']) && isset($json['profile'])) {
+      if (isset($json['position'])
+          && isset($json['key'])
+          && isset($json['profile'])
+      ) {
         $offset = $json['position'];
         $profile = $json['profile'];
         $key = $json['key'];
@@ -400,7 +403,9 @@ class ControllerExtensionModuleFocCsv extends Controller {
         }
         fclose($csv_fid);
 
-        if ($profile['createImagesZIP'] && $this->model_extension_module_foc_csv_exporter->hasCollectedImages()) {
+        if ($profile['createImagesZIP']
+            && $this->model_extension_module_foc_csv_exporter->hasCollectedImages()
+        ) {
           $exportImagesFile = $this->model_extension_module_foc_csv_exporter->getExportImagesZipFilePath($key);
           $zip = new ZipArchive();
           $zip->open($exportImagesFile, ZipArchive::CREATE);
@@ -499,7 +504,9 @@ class ControllerExtensionModuleFocCsv extends Controller {
       $import_url = $this->createUrl('extension/module/foc_csv/importPart');
 
       // remove manufacturers if necessary
-      if (isset($profile['removeManufacturersBeforeImport']) && $profile['removeManufacturersBeforeImport']) {
+      if (isset($profile['removeManufacturersBeforeImport'])
+          && $profile['removeManufacturersBeforeImport']
+      ) {
         $this->model_extension_module_foc_csv->writeLog('Clearing manufacturers table');
         $this->model_extension_module_foc_csv->clearManufacturers();
       }
@@ -532,7 +539,10 @@ class ControllerExtensionModuleFocCsv extends Controller {
         $this->load->model('extension/module/foc_csv_common');
         $this->load->model('extension/module/foc_csv');
 
-        if (isset($json['position']) && isset($json['key']) && isset($json['profile'])) {
+        if (isset($json['position'])
+            && isset($json['key'])
+            && isset($json['profile'])
+        ) {
           $import_key = $json['key'];
           $position = $json['position'];
           $errors = isset($json['errors']) ? intval($json['errors']) : 0;
