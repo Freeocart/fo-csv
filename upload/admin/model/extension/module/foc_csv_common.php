@@ -51,6 +51,8 @@ class ModelExtensionModuleFocCsvCommon extends Model {
     $this->type = $type;
     $this->profiles_code = 'foc_csv_' . $type;
     $this->profiles_key = 'foc_csv_' . $type . '_profiles';
+
+    $this->load->library('FocSimpleTemplater');
   }
 
   public function install () {
@@ -237,6 +239,20 @@ class ModelExtensionModuleFocCsvCommon extends Model {
 
   /* UTILS */
 
+  /*
+    Set state data from frontend profile
+  */
+  public function applyProfile ($profile) {
+    $this->language_id = (int) $this->config->get('config_language_id');
+    if (isset($profile['languageId'])) {
+      $this->language_id = (int) $profile['languageId'];
+    }
+
+    $this->store_id = (int) $this->config->get('config_store_id');
+    if (isset($profile['storeId'])) {
+      $this->store_id = (int) $profile['storeId'];
+    }
+  }
   /*
     Convert FS path to URL
   */
