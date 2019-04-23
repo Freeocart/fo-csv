@@ -157,6 +157,8 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
     $importer['attributeParsers'] = $this->model_extension_module_foc_csv->getAttributeParsers();
 
+    $exporter['attributeEncoders'] = $this->model_extension_module_foc_csv_exporter->getAttributeEncoders();
+
     $data['initial'] = json_encode(array(
       'importer' => $importer,
       'exporter' => $exporter,

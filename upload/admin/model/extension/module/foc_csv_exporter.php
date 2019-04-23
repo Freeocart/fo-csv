@@ -10,10 +10,51 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
 
   protected $ocDefaultNestingDelimiter = '>';
 
+  private $attributeEncoders = array();
+
   private static $foundImages = array();
 
   public function __construct ($registry) {
     parent::__construct($registry, 'exporter');
+
+    $this->language->load('extension/module/foc_csv');
+    $this->language->load('extension/module/foc_attribute_encoders');
+
+    $this->attributeEncoders['advantshop'] = array(
+      'title' => $this->language->get('encoder_advantshop'),
+      'options' => array(
+        'keyvalue_delimiter' => array(
+          'title' => $this->language->get('encoder_advantshop_keyvalue_delimiter'),
+          'default' => ':'
+        ),
+        'entries_delimiter' => array(
+          'title' => $this->language->get('encoder_advantshop_entries_delimiter'),
+          'default' => ';'
+        )
+      )
+    );
+
+    $this->attributeEncoders['advantshop_grouped'] = array(
+      'title' => $this->language->get('encoder_advantshop_grouped'),
+      'options' => array(
+        'groupattrs_delimiter' => array(
+          'title' => $this->language->get('encoder_advantshop_grouped_groupattr_delimiter'),
+          'default' => '=>'
+        ),
+        'groups_delimiter' => array(
+          'title' => $this->language->get('encoder_advantshop_grouped_groups_delimiter'),
+          'default' => ','
+        ),
+        'keyvalue_delimiter' => array(
+          'title' => $this->language->get('encoder_advantshop_keyvalue_delimiter'),
+          'default' => ':'
+        ),
+        'entries_delimiter' => array(
+          'title' => $this->language->get('encoder_advantshop_entries_delimiter'),
+          'default' => ';'
+        )
+      )
+    );
   }
 
   public function install () {
@@ -299,6 +340,15 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     }
 
     return $this->model_catalog_product->getTotalProducts($filter);
+  }
+
+  /* ATTRIBUTE ENCODERS METHODS */
+
+  /*
+    Encoder list getter
+  */
+  public function getAttributeEncoders () {
+    return $this->attributeEncoders;
   }
 
 }
