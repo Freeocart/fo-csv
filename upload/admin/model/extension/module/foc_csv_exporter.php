@@ -402,4 +402,81 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     return $this->attributeEncoders;
   }
 
+  /*
+    Check if encoder is multicolumn (multicolumn config item - true)
+  */
+  public function isMulticolumnEncoder ($encoder) {
+    return isset($this->attributeEncoders[$encoder]['multicolumn'])
+            ? $this->attributeEncoders[$encoder]['multicolumn']
+            : false;
+  }
+
+  /*
+    Shortcut to create and check encoder method name
+  */
+  private function getEncoderMethodName ($name) {
+    $method = 'encoder_' . $name;
+    if (method_exists($this, $method)) {
+      return $method;
+    }
+
+    return false;
+  }
+
+  /*
+    Validate and fill with default values if need
+    Returns array of 2 - valid and encoder
+  */
+  private function normalizeEncoderOptions ($encoder) {
+    $encoderDescription = $this->attributeEncoders[$encoder['name']];
+    $valid = false;
+
+    if (!empty($encoderDescription['options'])
+        && !empty($encoder['options'])
+    ) {
+      foreach ($encoderDescription['options'] as $name => $option) {
+        if (isset($encoder['options'][$name])
+            && !empty($encoder['options'][$name])
+        ) {
+          $valid = true;
+          continue;
+        }
+        elseif (isset($option['default'])) {
+          $encoder['options'][$name] = $option['default'];
+          $valid = true;
+        }
+        else {
+          $this->writeLog('[OPTION_ERROR] (' . $name . ') is not presented!', 'warn');
+
+          $valid = false;
+        }
+      }
+    }
+    else {
+      $valid = true;
+    }
+
+    return array($valid, $encoder);
+  }
+
+  /*
+    Validate encoder and find encoder method (encode_<ENCODER_NAME> method)
+  */
+  private function normalizeEncoder ($encoder) {
+    $valid = false;
+    $encoderMethod = false;
+
+    if (isset($encoder['name'])
+        && isset($this->attributeEncoders[$encoder['name']])
+    ) {
+      $encoderMethod = $this->getEncoderMethodName($encoder['name']);
+
+      if ($encoderMethod) {
+        list ($valid, $encoder) = $this->normalizeEncoderOptions($encoder);
+      }
+    }
+
+    return array($valid, $encoder, $encoderMethod);
+  }
+
 }
