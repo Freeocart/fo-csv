@@ -136,6 +136,8 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     $preparedItems = array();
     $csvLines = array();
 
+    $encoderEnabled = isset($profile['attributeEncoder']) && !is_null($profile['attributeEncoder']);
+
     foreach ($productIds as $id) {
       $preparedItems[] = $this->prepareData($id, $profile);
     }
@@ -176,7 +178,31 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
         }
       }
 
-      $csvLines[] = $csvLine;
+      // encode attributes and append to end
+      if ($encoderEnabled) {
+        $attributes = $this->encodeAttributes($profile, $dataItem['product_id']);
+
+        // multicolumn mode
+        if (is_array($attributes) && count($attributes) > 0) {
+          if ($this->model_extension_module_foc_csv_exporter->isMulticolumnEncoder($profile['attributeEncoder'])) {
+            $maxKey = max(array_keys($attributes));
+            for ($i = count($csvLine); $i <= $maxKey; $i++) {
+              if (!isset($attributes[$i])) {
+                $csvLine[$i] = '';
+                continue;
+              }
+              $csvLine[$i] = $attributes[$i];
+            }
+          }
+        }
+        else {
+          $csvLine[] = $attributes;
+        }
+      }
+
+      if (!empty($csvLine)) {
+        $csvLines[] = $csvLine;
+      }
     }
 
     return $csvLines;
