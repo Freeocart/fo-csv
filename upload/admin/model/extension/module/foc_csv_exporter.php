@@ -65,6 +65,28 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
         )
       )
     );
+
+    $this->attributeEncoders['column'] = array(
+      'title' => $this->language->get('encoder_column'),
+      'multicolumn' => true,
+      'options' => array(
+        'header_template' => array(
+          'title' => $this->language->get('encoder_header_template'),
+          'default' => '{{ group_name }}:{{ attribute_name }}'
+        )
+      )
+    );
+
+    /*
+      Encoder option "type" - is text by default
+      At the moment there are only textarea and text widgets present
+    */
+
+    /*
+      use this section to describe your attribute encoders via vq/ocmod
+      please see advantshop encoder as reference
+    */
+    /* CUSTOM ATTRIBUTE ENCODER DESCRIBE */
   }
 
   public function install () {
@@ -637,6 +659,44 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
   }
 
   /*
+  ` Column-based headers generator
+    Be aware using this if your shop has many attributes and goods,
+    slow query.
+  */
+  public function encoder_headers_column ($encoder) {
+    $result = array();
+
+    // 1 - get all variations
+    $sql = 'SELECT
+              `pa`.attribute_id AS attribute_id,
+              `ad`.name AS attribute_name,
+              `agd`.attribute_group_id AS group_id,
+              `agd`.name AS group_name,
+              CONCAT(`agd`.attribute_group_id, \':\', `pa`.attribute_id) AS `key`
+            FROM ' . DB_PREFIX . 'product_attribute `pa`
+            LEFT JOIN ' . DB_PREFIX . 'attribute `attr`
+              ON `attr`.attribute_id = `pa`.attribute_id
+            LEFT JOIN ' . DB_PREFIX . 'attribute_description `ad`
+              ON `ad`.attribute_id = `attr`.attribute_id AND `ad`.language_id = ' . (int) $this->language_id . '
+            LEFT JOIN ' . DB_PREFIX . 'attribute_group_description `agd`
+              ON `agd`.attribute_group_id = `attr`.attribute_group_id AND `agd`.language_id = ' . (int) $this->language_id . '
+            WHERE `pa`.language_id = ' . (int) $this->language_id . '
+            GROUP BY `key`';
+
+    $query = $this->db->query($sql);
+
+    if ($query->num_rows > 0) {
+      $template = $encoder['options']['header_template'];
+
+      foreach ($query->rows as $row) {
+        $result[$row['key']] = FocSimpleTemplater::render($template, $row);
+      }
+    }
+
+    return $result;
+  }
+
+  /*
     use this section to describe your attribute encoders via vq/ocmod
     please see advantshop encoder as reference
   */
@@ -707,6 +767,30 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
       }
 
       $result = rtrim($advantshop_string, $groupsDelimiter);
+    }
+
+    return $result;
+  }
+
+  /*
+    Trivial column encoder implementation
+    Seem `getAttributeColumnIdx` for more details
+  */
+  private function encoder_column ($encoder, $atts) {
+    $result = array();
+
+    if (isset($encoder['options'])
+        && !empty($atts)
+    ) {
+      foreach ($atts as $group_id => $attributes) {
+        foreach ($attributes as $data) {
+          $idx = $this->getAttributeColumnIdx($data['key']);
+
+          if ($idx !== false) {
+            $result[$idx] = $data['attribute_value'];
+          }
+        }
+      }
     }
 
     return $result;
