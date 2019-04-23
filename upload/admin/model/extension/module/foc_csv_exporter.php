@@ -353,7 +353,47 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     return $this->model_catalog_product->getTotalProducts($filter);
   }
 
-  /* ATTRIBUTE ENCODERS METHODS */
+  /*
+    Returns attributes grouped by attribute_group_id
+  */
+  public function getProductAttributes ($primary) {
+    $result = array();
+
+    // Fetch attributes with attribute groups for product
+    $sql = 'SELECT
+              `pa`.attribute_id AS attribute_id,
+              `pa`.text AS attribute_value,
+              `ad`.name AS attribute_name,
+              `agd`.attribute_group_id AS group_id,
+              `agd`.name AS group_name,
+              CONCAT(`agd`.attribute_group_id, \':\', `pa`.attribute_id) AS `key`
+            FROM ' . DB_PREFIX . 'product_attribute `pa`
+            LEFT JOIN ' . DB_PREFIX . 'attribute `attr`
+              ON `attr`.attribute_id = `pa`.attribute_id
+            LEFT JOIN ' . DB_PREFIX . 'attribute_description `ad`
+              ON `ad`.attribute_id = `attr`.attribute_id AND `ad`.language_id = ' . (int) $this->language_id . '
+            LEFT JOIN ' . DB_PREFIX . 'attribute_group_description `agd`
+              ON `agd`.attribute_group_id = `attr`.attribute_group_id AND `agd`.language_id = ' . (int) $this->language_id . '
+            WHERE `pa`.product_id = ' . (int)$primary . ' AND `pa`.language_id = ' . (int) $this->language_id;
+
+    $query = $this->db->query($sql);
+
+    if ($query->num_rows > 0) {
+      foreach ($query->rows as $row) {
+        if (!isset($result[$row['group_id']])) {
+          $result[$row['group_id']] = array(
+            $row
+          );
+          continue;
+        }
+
+        $result[$row['group_id']][] = $row;
+      }
+    }
+
+    return $result;
+  }
+
 
   /*
     Encoder list getter
