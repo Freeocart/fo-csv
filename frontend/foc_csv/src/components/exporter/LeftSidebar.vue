@@ -41,6 +41,16 @@
     </div>
 
     <images-export-settings></images-export-settings>
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        {{ $t('Attributes export') }}
+      </div>
+
+      <div class="panel-body">
+        <attributes-encoder></attributes-encoder>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -48,12 +58,14 @@
 import { mapVuexModels } from 'vuex-models'
 import { createNamespacedHelpers } from 'vuex'
 import ImagesExportSettings from './ImagesExportSettings'
+import AttributesEncoder from './AttributesEncoder'
 
 const { mapGetters, mapActions } = createNamespacedHelpers('exporter')
 
 export default {
   components: {
-    ImagesExportSettings
+    ImagesExportSettings,
+    AttributesEncoder
   },
   data () {
     return {

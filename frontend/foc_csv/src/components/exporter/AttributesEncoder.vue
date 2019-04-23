@@ -1,51 +1,22 @@
 <template>
 <div>
   <div class="form-group">
-    <label class="label label-default">{{ $t('Attributes field') }}</label>
-    <select class="form-control" v-model="attributesCSVField">
-      <option :value="undefined">{{ $t('Not selected') }}</option>
-      <option v-for="(csvField, idx) in csvFields" :key="idx" :value="idx">
-        {{ csvField }}
-      </option>
-    </select>
-  </div>
-
-  <div class="form-group">
-    <div class="checkbox">
-      <label>
-        <input type="checkbox" v-model="replaceAttributes"> {{ $t('Replace existing attributes') }}
-      </label>
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label class="label label-default">{{ $t('Attributes parser') }}</label>
-    <select class="form-control" v-model="currentAttributeParserName">
+    <label class="label label-default">{{ $t('Attributes encoder') }}</label>
+    <select class="form-control" v-model="currentAttributeEncoderName">
       <option :value="null">{{ $t('Not selected') }}</option>
-      <option v-for="(parser, key, idx) in attributeParsers" :key="idx" :value="key">
-        {{ parser.title }}
+      <option v-for="(encoder, key, idx) in attributeEncoders" :key="idx" :value="key">
+        {{ encoder.title }}
       </option>
     </select>
   </div>
 
-  <div class="form-group" v-if="showAttributeParserSettings" v-for="(option, key) in attributeParserOptions" :key="key">
+  <div class="form-group" v-if="showAttributeEncoderSettings" v-for="(option, key) in attributeEncoderOptions" :key="key">
     <label class="label label-default">{{ option.title }}</label>
     <component
-      :is="getAttributeParserControl(option)"
-      :value="attributeParserOptionData[key]"
-      @change="setAttributeParserData([key, $event])"
+      :is="getAttributeEncoderControl(option)"
+      :value="attributeEncoderOptionData[key]"
+      @change="setAttributeEncoderData([key, $event])"
     ></component>
-  </div>
-
-  <div class="form-group">
-    <label class="label label-default">{{ $t('Default attributes group') }}</label>
-    <autocomplete
-      :url="attributesGroupUrl"
-      requestType="get"
-      input-class="form-control"
-      v-model="defaultAttributesGroup"
-    >
-    </autocomplete>
   </div>
 </div>
 </template>
@@ -53,45 +24,34 @@
 <script>
 import { mapVuexModels } from 'vuex-models'
 import { createNamespacedHelpers } from 'vuex'
-import Autocomplete from 'autocomplete-vue'
-import { ATTRIBUTES_GROUP_AUTOCOMPLETE_URL } from '@/api/routes'
+import AttributeWidgets from './attributeWidgets'
 
-import AttributeParserSettingsWidgets from './attributeParserSettingsWidgets'
-
-const { mapActions, mapGetters } = createNamespacedHelpers('importer')
+const { mapActions, mapGetters } = createNamespacedHelpers('exporter')
 
 export default {
   components: {
-    Autocomplete,
-    ...AttributeParserSettingsWidgets
+    ...AttributeWidgets
   },
   computed: {
     ...mapVuexModels([
-      'attributeParser',
-      'defaultAttributesGroup',
-      'attributesCSVField',
-      'replaceAttributes'
-    ], 'importer'),
+      'attributeEncoder'
+    ], 'exporter'),
     ...mapGetters([
-      'csvFields',
-      'attributeParsers',
-      'attributeParserOptionData',
-      'currentAttributeParser',
-      'attributeParserOptions'
+      'attributeEncoders',
+      'attributeEncoderOptionData',
+      'currentAttributeEncoder',
+      'attributeEncoderOptions'
     ]),
-    attributesGroupUrl () {
-      return this.$api.mkUrl(ATTRIBUTES_GROUP_AUTOCOMPLETE_URL)
-    },
-    currentAttributeParserName: {
+    currentAttributeEncoderName: {
       get () {
-        return this.currentAttributeParser
+        return this.currentAttributeEncoder
       },
       set (newValue) {
-        this.setAttributeParser(newValue)
+        this.setAttributeEncoder(newValue)
       }
     },
-    showAttributeParserSettings () {
-      let settings = this.attributeParserOptions
+    showAttributeEncoderSettings () {
+      let settings = this.attributeEncoderOptions
 
       if (!settings || Object.keys(settings).length === 0) {
         return false
@@ -101,15 +61,15 @@ export default {
     }
   },
   methods: {
-    getAttributeParserControl (attribute) {
+    getAttributeEncoderControl (attribute) {
       if (attribute.type) {
         return `${attribute.type}-attribute`
       }
       return 'text-attribute'
     },
     ...mapActions([
-      'setAttributeParserData',
-      'setAttributeParser'
+      'setAttributeEncoderData',
+      'setAttributeEncoder'
     ])
   }
 }
