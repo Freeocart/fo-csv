@@ -56,14 +56,14 @@ import { createNamespacedHelpers } from 'vuex'
 import Autocomplete from 'autocomplete-vue'
 import { ATTRIBUTES_GROUP_AUTOCOMPLETE_URL } from '@/api/routes'
 
-import AttributeWidgets from './attributeWidgets'
+import AttributeParserSettingsWidgets from './attributeParserSettingsWidgets'
 
 const { mapActions, mapGetters } = createNamespacedHelpers('importer')
 
 export default {
   components: {
     Autocomplete,
-    ...AttributeWidgets
+    ...AttributeParserSettingsWidgets
   },
   computed: {
     ...mapVuexModels([
