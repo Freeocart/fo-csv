@@ -13,7 +13,7 @@ module.exports = {
 
     proxyTable: {
       '/': {
-        target: 'http://oc2-test.local:80/',
+        target: process.env.PROXY_URL || 'http://oc2.local/',
         changeOrigin: true
       }
     },
