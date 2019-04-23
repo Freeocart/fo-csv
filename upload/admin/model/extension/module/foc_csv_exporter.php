@@ -205,8 +205,10 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
         $attributes = $this->encodeAttributes($profile, $dataItem['product_id']);
 
         // multicolumn mode
-        if (is_array($attributes) && count($attributes) > 0) {
-          if ($this->model_extension_module_foc_csv_exporter->isMulticolumnEncoder($profile['attributeEncoder'])) {
+        if (is_array($attributes)) {
+          if (count($attributes) > 0
+              && $this->model_extension_module_foc_csv_exporter->isMulticolumnEncoder($profile['attributeEncoder'])
+          ) {
             $maxKey = max(array_keys($attributes));
             for ($i = count($csvLine); $i <= $maxKey; $i++) {
               if (!isset($attributes[$i])) {
@@ -215,6 +217,9 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
               }
               $csvLine[$i] = $attributes[$i];
             }
+          }
+          else {
+            $csvLine[] = '';
           }
         }
         else {
