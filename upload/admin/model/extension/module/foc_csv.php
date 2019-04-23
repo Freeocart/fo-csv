@@ -2,7 +2,6 @@
 /*
   Model for FOC CSV Importer
 */
-
 class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
   private $csvImportFileName = 'import.csv';
@@ -1188,6 +1187,18 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   }
 
   /*
+    Find attribute groups by name (fuzzy)
+  */
+  public function findGroups ($name) {
+    $sql = "SELECT * FROM " . DB_PREFIX . "attribute_group ag LEFT JOIN " . DB_PREFIX . "attribute_group_description agd ON (ag.attribute_group_id = agd.attribute_group_id) WHERE agd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND agd.name LIKE '" . $this->db->escape($name) . "%' LIMIT 10";
+
+    $query = $this->db->query($sql);
+
+    return $query->rows;
+
+  }
+
+  /*
     Create options list, fill default values and validate
   */
   private function normalizeParser ($parser) {
@@ -1384,20 +1395,12 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
     return $result;
   }
-  /* CUSTOM ATTRIBUTE PARSERS */
 
-  /* END CUSTOM ATTRIBUTE PARSERS */
 
   /*
-    Find attribute groups by name (fuzzy)
+    use this section to describe your attribute parsers via vq/ocmod
+    please see advantshop parser as reference
   */
-  public function findGroups ($name) {
-    $sql = "SELECT * FROM " . DB_PREFIX . "attribute_group ag LEFT JOIN " . DB_PREFIX . "attribute_group_description agd ON (ag.attribute_group_id = agd.attribute_group_id) WHERE agd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND agd.name LIKE '" . $this->db->escape($name) . "%' LIMIT 10";
-
-    $query = $this->db->query($sql);
-
-    return $query->rows;
-
-  }
+  /* CUSTOM ATTRIBUTE PARSERS */
 
 }
