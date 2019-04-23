@@ -23,6 +23,10 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     $this->attributeEncoders['advantshop'] = array(
       'title' => $this->language->get('encoder_advantshop'),
       'options' => array(
+        'header_template' => array(
+          'title' => $this->language->get('encoder_header_template'),
+          'default' => $this->language->get('encoder_header_template_value')
+        ),
         'keyvalue_delimiter' => array(
           'title' => $this->language->get('encoder_advantshop_keyvalue_delimiter'),
           'default' => ':'
@@ -37,6 +41,10 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     $this->attributeEncoders['advantshop_grouped'] = array(
       'title' => $this->language->get('encoder_advantshop_grouped'),
       'options' => array(
+        'header_template' => array(
+          'title' => $this->language->get('encoder_header_template'),
+          'default' => $this->language->get('encoder_header_template_value')
+        ),
         'groupattrs_delimiter' => array(
           'title' => $this->language->get('encoder_advantshop_grouped_groupattr_delimiter'),
           'default' => '=>'
