@@ -9,4 +9,6 @@ $_['encoder_advantshop_entries_delimiter'] = 'Символ разделител�
 $_['encoder_advantshop_grouped'] = 'Сгруппированные атрибуты в формате Advantshop';
 $_['encoder_advantshop_grouped_groupattr_delimiter'] = 'Символ разделитель между группой и списком значений';
 $_['encoder_advantshop_grouped_groups_delimiter'] = 'Символ разделитель между группами';
+
+$_['encoder_column'] = 'Колоночный преобразователь';
 /* CUSTOM ENCODER */

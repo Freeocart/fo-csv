@@ -11,5 +11,4 @@ $_['encoder_advantshop_grouped_groupattr_delimiter'] = 'Group and attributes del
 $_['encoder_advantshop_grouped_groups_delimiter'] = 'Groups delimiter';
 
 $_['encoder_column'] = 'Column based attributes';
-$_['encoder_column_column'] = 'Column';
 /* CUSTOM ENCODER */
