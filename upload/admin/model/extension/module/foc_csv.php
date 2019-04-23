@@ -120,13 +120,13 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       'statusRewrites' => array(),
       'stockStatusRewrites' => array(),
       'downloadImages' => false,
-      'attributeParser' => null,
       'store' => $this->config->get('config_store_id'),
       'language' => $this->config->get('config_language_id'),
-      'attributeParserData' => array(),
       'skipLineOnEmptyFields' => array(),
       'multicolumnFields' => array(),
-      'replaceAttributes' => false
+      'replaceAttributes' => false,
+      'attributeParser' => null,
+      'attributeParserData' => array()
     );
   }
 
