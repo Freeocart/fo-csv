@@ -1,11 +1,10 @@
 import ColumnAttribute from './ColumnAttribute'
-import TextAttribute from './TextAttribute'
-import TextareaAttribute from './TextareaAttribute'
 import DBColumnAttribute from './DBColumnAttribute'
+
+import CommonWidgets from '../../common/attributeWidgets'
 
 export default {
   ColumnAttribute,
-  TextAttribute,
-  TextareaAttribute,
-  DBColumnAttribute
+  DBColumnAttribute,
+  ...CommonWidgets
 }
