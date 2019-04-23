@@ -154,7 +154,7 @@ export default {
 
         this.current = position
 
-        this.collectedImages += (parseInt(response.data.message.collected_images) || 0);
+        this.collectedImages += (parseInt(response.data.message.collected_images) || 0)
 
         if (this.current < this.total) {
           this.submitExportPart(callbackUrl, response.data.message)
