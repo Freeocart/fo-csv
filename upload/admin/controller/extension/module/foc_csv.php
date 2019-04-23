@@ -290,9 +290,13 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
       $profile = $this->model_extension_module_foc_csv_exporter->fillProfileEmptyValues(json_decode($_POST['profile-json'], true));
 
+      $this->model_extension_module_foc_csv_exporter->applyProfile($profile);
+
       $key = $this->model_extension_module_foc_csv_exporter->prepareUploadPath();
       $exportFile = $this->model_extension_module_foc_csv_exporter->getExportCsvFilePath($key);
       $exportImagesFile = null;
+
+      $encoderEnabled = isset($profile['attributeEncoder']) && !is_null($profile['attributeEncoder']);
 
       if ($profile['createImagesZIP']) {
         $exportImagesFile = $this->model_extension_module_foc_csv_exporter->getExportImagesZipFilePath($key);
@@ -302,8 +306,27 @@ class ControllerExtensionModuleFocCsv extends Controller {
       if ($profile['csvHeader']) {
         $csv_fid = fopen($exportFile, 'w');
         $headers = array();
+
         foreach ($profile['bindings'] as $binding) {
           $headers[] = $binding['header'];
+        }
+
+        // reserving columns for attributes
+        // there is some tricky solution, based on keys order, but it seems to be ok
+        // also we do it only if encoder is multicolumn!
+        // Otherwise - just push attributes after last column
+        if ($encoderEnabled) {
+          // csvIdx => group_id:attribute_id
+          $attributeHeaders = $this->model_extension_module_foc_csv_exporter->encodeAttributeHeaders($profile, count($headers));
+
+          // if encoder is multicolumn we get array
+          // also using += to prevent keys reindexing
+          if (is_array($attributeHeaders)) {
+            $headers += $attributeHeaders;
+          }
+          else {
+            $headers[] = $attributeHeaders;
+          }
         }
 
         fputcsv($csv_fid, $headers, $profile['csvFieldDelimiter']);
@@ -343,6 +366,11 @@ class ControllerExtensionModuleFocCsv extends Controller {
         $key = $json['key'];
         $errors = isset($json['errors']) ? intval($json['errors']) : 0;
         $limit = $profile['entriesPerQuery'];
+
+        // TODO: create initilize method and pass profile/key/other state data to it
+        // also, refactor all file api to use state uploadKey, instead of passing as argument
+        $this->model_extension_module_foc_csv_exporter->applyProfile($profile);
+        $this->model_extension_module_foc_csv_exporter->setUploadKey($key);
 
         $exportFile = $this->model_extension_module_foc_csv_exporter->getExportCsvFilePath($key);
 
