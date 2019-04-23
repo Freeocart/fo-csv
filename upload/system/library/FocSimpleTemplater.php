@@ -3,25 +3,34 @@
   Simple template system
   This class provides simple syntax to interpolation variables and loops support
 
-  Templates:
-  {{ variable_interpolation }}
+  It's not really compatible with Opencart library autoload, because of all functions are static,
+  but you can use the trick:
+    $this->load->library('FocSimpleTemplater');
+    // after that, you can call FinSimpleTemplater directly:
+    FinSimpleTemplater::render($tpl, array())
 
-  [@each (value, index) <= source]
-    loop content here
-    {{ loop.index }} or {{ index }} <- current iteration index (starting from 1)
-    {{ value.name }}
-  [@endeach]
 
-  [@each value <= source]
-    {{ value }}
-  [@endeach]
+  Templates language:
 
-  TODO:
-  0: add some useful default variables
-  1: maybe it would be nice to add some useful functions, like date or time with filter
-      ex:
-        [@fn date | 'Y-m-d'] - calls date('Y-m-d')
-        [@fn nl2br | @variable] - calls nl2br($variables['variable'])
+  Variable interpolation:
+    {{ variable_interpolation }}
+
+  Loops:
+    [@each (value, index) <= source]
+      loop content here
+      {{ loop.index }} or {{ index }} <- current iteration index (starting from 1)
+      {{ value.name }}
+    [@endeach]
+
+    [@each value <= source]
+      {{ value }}
+    [@endeach]
+
+  Functions (see $enabled_functions to list available):
+    [@fn FUNCTION_NAME | ARGUMENT]
+
+    [@date | 'Y-m-d'] - date('Y-m-d')
+    [@md5 | @variable] - md5($variables['variable'])
 */
 class FocSimpleTemplater {
 
