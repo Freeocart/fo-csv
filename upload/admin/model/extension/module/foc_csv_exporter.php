@@ -97,7 +97,9 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
       'store' => $this->config->get('config_store_id'),
       'language' => $this->config->get('config_language_id'),
       'bindings' => array(),
-      'exportWithStatus' => -1
+      'exportWithStatus' => -1,
+      'attributeEncoder' => null,
+      'attributeEncoderData' => array(),
     );
   }
 
