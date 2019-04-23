@@ -12,6 +12,8 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
 
   private $attributeEncoders = array();
 
+  private $attributeEncoderMap = array();
+
   private static $foundImages = array();
 
   public function __construct ($registry) {
