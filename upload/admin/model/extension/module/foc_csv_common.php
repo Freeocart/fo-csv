@@ -230,6 +230,8 @@ class ModelExtensionModuleFocCsvCommon extends Model {
     $this->writeLog('Trying to create import path [' . $path . ']');
     mkdir($path, 0755, true);
 
+    $this->setUploadKey($key);
+
     return $key;
   }
 
