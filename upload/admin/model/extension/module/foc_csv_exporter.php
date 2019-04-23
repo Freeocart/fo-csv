@@ -196,6 +196,7 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
 
     $product = $this->model_catalog_product->getProduct($primary);
     $result = array(
+      'product_id' => $primary,
       'product' => array()
     );
 
