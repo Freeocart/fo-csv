@@ -1,4 +1,6 @@
 <?php
+$_['encoder_header_template'] = 'CSV Header template';
+
 $_['encoder_advantshop'] = 'Advantshop attributes format';
 $_['encoder_advantshop_keyvalue_delimiter'] = 'Key/value delimiter';
 $_['encoder_advantshop_entries_delimiter'] = 'Entries delimiter';
