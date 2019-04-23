@@ -572,4 +572,31 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
 
     return $result;
   }
+
+  /*
+    Run attribute encoders on data
+  */
+  public function encodeAttributes ($profile, $primary) {
+    $result = array();
+
+    if (isset($profile['attributeEncoder'])) {
+      $encoder = $profile['attributeEncoder'];
+      $encoderOptions = isset($profile['attributeEncoderData'][$encoder]) ? $profile['attributeEncoderData'][$encoder] : array();
+
+      $encoderObj = array(
+        'name' => $encoder,
+        'options' => $encoderOptions
+      );
+
+      list ($valid, $encoder, $encoderMethod) = $this->normalizeEncoder($encoderObj);
+
+      if ($valid && $encoderMethod) {
+        $atts = $this->getProductAttributes($primary);
+        $result = $this->{$encoderMethod}($encoder, $atts);
+      }
+    }
+
+    return $result;
+  }
+
 }
