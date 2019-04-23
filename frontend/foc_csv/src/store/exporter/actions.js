@@ -7,6 +7,12 @@ import commonActions from '@/store/common/actions'
 
 export default {
   ...commonActions,
+  setAttributeEncoder ({ commit }, encoder) {
+    commit('SET_ATTRIBUTE_ENCODER', encoder)
+  },
+  setAttributeEncoderData ({ commit }, data) {
+    commit('SET_ATTRIBUTE_ENCODER_DATA', data)
+  },
   async saveNewProfile ({ commit, state }, name) {
     try {
       await Vue.$api.exporter.saveProfile({
