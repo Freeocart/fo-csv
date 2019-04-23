@@ -514,4 +514,60 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     return null;
   }
 
+  /*
+    Create CSV attribute headers
+
+    Function is bit of tricky.
+    For single-column encoders - just returns column header, so if you creating
+    singlecolumn encoder - just return any string in your `encoder_headers_ENCODER`
+
+    But if encoder is multicolumn, then we create "special" array, which keys
+    starting from $startIdx (which is first empty column index).
+
+    Also, to keep columns idx consistency between requests (export/exportPart) - it's creating
+    encoderMap, and store it to file.
+
+    If you develop multicolumn encoder - your function must return array with correct format - {hash=>name}, where hash is any key you can restore (in column encoder used simple
+    "group_id:attribute_id" scheme), and name is column header name)
+  */
+  public function encodeAttributeHeaders ($profile, $startIdx) {
+    $result = array();
+
+    $encoder = $profile['attributeEncoder'];
+    $multicolumn_mode = $this->isMulticolumnEncoder($encoder);
+
+    $encoderOptions = isset($profile['attributeEncoderData'][$encoder]) ? $profile['attributeEncoderData'][$encoder] : array();
+
+    $encoderObj = array(
+      'name' => $encoder,
+      'options' => $encoderOptions
+    );
+
+    list ($valid, $encoder) = $this->normalizeEncoderOptions($encoderObj);
+    $encoderMethod = $this->getEncoderMethodName('headers_' . $encoderObj['name']);
+
+    if ($valid && $encoderMethod) {
+      $headers = $this->{$encoderMethod}($encoder);
+
+      // if multicolumn - method must return map as ["hash" => "name"]
+      // else - just a string
+      if ($multicolumn_mode && is_array($headers)) {
+        foreach ($headers as $key => $header) {
+          $this->attributeEncoderMap[$key] = $startIdx;
+          $result[$startIdx] = $header;
+          $startIdx++;
+        }
+
+        $this->saveEncoderMap();
+      }
+      else {
+        return $headers;
+      }
+    }
+    else {
+      return 'attributes';
+    }
+
+    return $result;
+  }
 }
