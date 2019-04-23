@@ -479,4 +479,39 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     return array($valid, $encoder, $encoderMethod);
   }
 
+  /*
+    There are two actions on exporting:
+      1) export creates csv headers
+      2) exportPart fill with data
+    We storing mapped group_id:attr_id to csvIdx fields
+    to keep correct order between calls
+  */
+  // save encoder map data to file
+  public function saveEncoderMap () {
+    $path = $this->model_extension_module_foc_csv_exporter->getUploadPath($this->uploadKey);
+    file_put_contents($path . 'map.json', json_encode($this->attributeEncoderMap));
+  }
+
+  // load encoder map data from file
+  public function loadEncoderMap () {
+    static $loaded = false;
+
+    if (!$loaded) {
+      $loaded = true;
+      $path = $this->model_extension_module_foc_csv_exporter->getUploadPath($this->uploadKey);
+      $this->attributeEncodeMap = json_decode(file_get_contents($path . 'map.json'), true);
+    }
+  }
+
+  // shortcut - loads encoder map from file if need and searching idx by key
+  public function getAttributeColumnIdx ($key) {
+    $this->loadEncoderMap();
+
+    if (isset($this->attributeEncodeMap[$key])) {
+      return $this->attributeEncodeMap[$key];
+    }
+
+    return null;
+  }
+
 }
