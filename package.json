@@ -8,7 +8,7 @@
     "pack": "bash pack.sh",
     "test": "gulp test",
     "build": "yarn run --cwd=./frontend/foc_csv build --prod && bash pack.sh",
-    "dev-oc": "yarn run --cwd=./frontend/foc_csv build && cp upload build/upload && cp -R build/upload/** ../../oc2/"
+    "dev-oc": "yarn run --cwd=./frontend/foc_csv build && cp -R upload $SITE_DIR"
   },
   "dependencies": {
     "gulp": "^3.9.1",

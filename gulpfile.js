@@ -3,7 +3,7 @@ const gulp = require('gulp'),
 
 gulp.task('mktest', () => {
   gulp.src('./upload/**')
-      .pipe(gulp.dest('../../oc2/'));
+      .pipe(gulp.dest(process.env.SITE_DIR));
 });
 
 gulp.task('test', ['mktest'], () => {
