@@ -1,5 +1,6 @@
 <?php
 $_['encoder_header_template'] = 'Шаблон заголовка CSV';
+$_['encoder_header_template_value'] = 'Атрибуты товаров';
 
 $_['encoder_advantshop'] = 'Атрибуты в формате Advantshop';
 $_['encoder_advantshop_keyvalue_delimiter'] = 'Символ разделитель ключей и значений';
