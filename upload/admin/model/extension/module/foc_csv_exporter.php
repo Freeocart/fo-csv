@@ -625,4 +625,97 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     return $result;
   }
 
+  /* ATTRIBUTE HEADERS GENERATOR METHODS */
+  // advantshop header
+  public function encoder_headers_advantshop ($encoder) {
+    return $encoder['options']['header_template'];
+  }
+
+  // grouped advantshop header
+  public function encoder_headers_advantshop_grouped ($encoder) {
+    return $encoder['options']['header_template'];
+  }
+
+  /*
+    use this section to describe your attribute encoders via vq/ocmod
+    please see advantshop encoder as reference
+  */
+  /* CUSTOM ATTRIBUTE HEADERS GENERATOR METHODS */
+
+  /* ATTRIBUTE ENCODERS METHODS */
+  /*
+    Advantshop attributes format encoder
+    Format:
+      attr:val,attr:val
+      delimiters are configurable.
+  */
+  private function encoder_advantshop ($encoder, $atts) {
+    $result = '';
+
+    if (isset($encoder['options'])
+        && !empty($atts)
+    ) {
+      $options = $encoder['options'];
+
+      $keyValueDelimiter = $options['keyvalue_delimiter'];
+      $entriesDelimiter = $options['entries_delimiter'];
+
+      $advantshop_string = '';
+
+      foreach ($atts as $group_id => $attributes) {
+        foreach ($attributes as $data) {
+          $advantshop_string .= $data['attribute_name'] . $keyValueDelimiter . $data['attribute_value'] . $entriesDelimiter;
+        }
+      }
+
+      $result = rtrim($advantshop_string, $entriesDelimiter);
+    }
+
+    return $result;
+  }
+
+  /*
+    Advantshop attributes format encoder
+    Format:
+      group=>{attr:val},
+      only { and } is required by protocol, you can change delimiters, for example:
+        group^^^{attr###val}|||group...
+  */
+  private function encoder_advantshop_grouped ($encoder, $atts) {
+    $result = '';
+
+    if (isset($encoder['options'])
+        && !empty($atts)
+    ) {
+      $options = $encoder['options'];
+
+      $keyValueDelimiter = $options['keyvalue_delimiter'];
+      $entriesDelimiter = $options['entries_delimiter'];
+      $groupAttrsDelimiter = $options['groupattrs_delimiter'];
+      $groupsDelimiter = $options['groups_delimiter'];
+
+      $advantshop_string = '';
+
+      foreach ($atts as $group_id => $attributes) {
+        $group_name = '';
+        $attributes_string = '';
+        foreach ($attributes as $data) {
+          $group_name = $data['group_name'];
+          $attributes_string .= $data['attribute_name'] . $keyValueDelimiter . $data['attribute_value'] . $entriesDelimiter;
+        }
+        $advantshop_string .= $group_name . $groupAttrsDelimiter . '{' . rtrim($attributes_string, $entriesDelimiter) . '}' . $groupsDelimiter;
+      }
+
+      $result = rtrim($advantshop_string, $groupsDelimiter);
+    }
+
+    return $result;
+  }
+
+  /*
+    use this section to describe your attribute encoders via vq/ocmod
+    please see advantshop encoder as reference
+  */
+  /* CUSTOM ATTRIBUTE ENCODERS */
+
 }
