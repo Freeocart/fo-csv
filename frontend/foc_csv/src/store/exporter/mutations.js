@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import commonMutations from '@/store/common/mutations'
 
 export default {
