@@ -367,26 +367,33 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       'multicolumn' => array()
     );
     foreach ($config['csvFields'] as $group) {
-      $fields = $group['fields'];//json_decode($group['fields'], true);
+      $fields = $group['fields'];
 
       foreach ($fields as $field) {
         $variable = array();
 
         if (is_array($field)) {
-          foreach ($field as $field_key => $field_value) {
-            if ($field_key == 'field') {
-              $variable[$field_key] = $csv_row[$field_value];
-            }
-            else {
-              $variable[$field_key] = $field_value;
-            }
-          }
-          $variables[$group['variable']][] = $variable;
-        }
+          // process field before others
+          $variable_field_value = $field['field'];
+          if (isset($csv_row[$variable_field_value])
+              && !empty($csv_row[$variable_field_value])
+          ) {
+            $variable['field'] = $csv_row[$variable_field_value];
 
+            foreach ($field as $field_key => $field_value) {
+              if ($field_key == 'field') {
+                continue;
+              }
+              else {
+                $variable[$field_key] = $field_value;
+              }
+            }
+
+            $variables[$group['variable']][] = $variable;
+          }
+        }
       }
     }
-
     return FocSimpleTemplater::render($config['valueTemplate'], $variables);
   }
 
