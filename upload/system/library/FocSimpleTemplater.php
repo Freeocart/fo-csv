@@ -206,7 +206,8 @@ class FocSimpleTemplater {
           $pre = $matches[1];
           $loop_cond = $matches[2];
           $loop_body = $matches[3];
-          $result .= trim(self::render_vars($pre, $vars));
+          $pre = trim(self::render_vars($pre, $vars));
+          $result .= trim(self::render_functions($pre, $vars));
           $result .= trim(self::render_loop($loop_cond, $loop_body, $vars));
         }
       }
