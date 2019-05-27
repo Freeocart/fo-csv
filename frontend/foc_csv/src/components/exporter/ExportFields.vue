@@ -40,6 +40,7 @@
     <div class="form-group">
       <button class="btn btn-primary" @click.prevent="addBinding()"><i class="fa fa-plus"></i> {{ $t('Add new db field binding') }}</button>
       <button @click.prevent="bindings = []" class="btn btn-danger"><i class="fa fa-trash"></i> {{ $t('Reset db field bindings') }}</button>
+      <button @click.prevent="makeBindingsForAllFields()" class="btn btn-warning"><i class="fa fa-bars"></i> {{ $t('Create bindings for all fields') }}</button>
     </div>
   </div>
 </template>
@@ -80,6 +81,18 @@ export default {
       if (!binding.header) {
         binding.header = value
       }
+    },
+    makeBindingsForAllFields () {
+      const all = []
+      Object.keys(this.dbFields).forEach(group => {
+        Object.values(this.dbFields[group]).forEach(field => {
+          all.push({
+            header: `${group}:${field}`,
+            dbField: `${group}:${field}`
+          })
+        })
+      })
+      this.bindings = all
     }
   }
 }
