@@ -3,6 +3,9 @@
   Model for FOC CSV Exporter
 */
 class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommon {
+  public $type = 'exporter';
+  public $profiles_code = 'foc_csv_exporter';
+  public $profiles_key = 'foc_csv_exporter_profiles';
 
   protected $exportPath = '';
   protected $csvExportFileName = 'export.csv';
@@ -18,6 +21,8 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
 
   public function __construct ($registry) {
     parent::__construct($registry, 'exporter');
+
+    $this->load->library('FocSimpleTemplater');
 
     $this->language->load('extension/module/foc_csv');
     $this->language->load('extension/module/foc_attribute_encoders');
@@ -109,7 +114,7 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
   public function getDefaultProfile () {
     return array(
       'entriesPerQuery' => 10,
-      'encoding' => 'UTF8',
+      'encoding' => 'none',
       'dumpParentCategories' => false,
       'categoriesNestingDelimiter' => '|',
       'categoriesDelimiter' => '\n',

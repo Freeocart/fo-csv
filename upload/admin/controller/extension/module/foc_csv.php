@@ -104,7 +104,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
     $importer['profiles'] = $this->model_extension_module_foc_csv->loadProfiles();
     $importer['keyFields'] = $this->model_extension_module_foc_csv->getKeyFields();
-    $common['encodings'] = array('UTF8', 'cp1251');
+    $common['encodings'] = array('none', 'UTF8', 'cp1251');
     $common['dbFields'] = $this->model_extension_module_foc_csv->getDbFields();
 
     $exporter['profiles'] = $this->model_extension_module_foc_csv_exporter->loadProfiles();
@@ -381,21 +381,29 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
         $csv_fid = fopen($exportFile, 'a');
 
-        $charset = strtolower($this->model_extension_module_foc_csv_exporter->getDBCharset());
+        $db_charset = strtolower($this->model_extension_module_foc_csv_exporter->getDBCharset());
+        $charset = strtolower($this->model_extension_module_foc_csv_exporter->dbToIconvCharset($db_charset));
         $encoding = strtolower($profile['encoding']);
 
         foreach ($exportable as $csvLine) {
           // try change file encoding
-          if ($charset !== $encoding) {
-            $this->model_extension_module_foc_csv_exporter->writeLog('Trying to convert character encoding from [' . $encoding . '] to [' . $charset . ']');
+          if ($encoding !== 'none' && $charset !== $encoding) {
+            $this->model_extension_module_foc_csv_exporter->writeLog('Trying to convert character encoding from [' . $charset . '] to [' . $encoding . ']');
 
             if (!function_exists('iconv')) {
-              $this->model_extension_module_foc_csv_exporter->writeLog('Please install iconv or convert csv file to [' . $charset . ']', 'error');
-              $this->sendFail('Please install iconv or convert csv file to [' . $charset . ']');
+              $this->model_extension_module_foc_csv_exporter->writeLog('Please install iconv or convert csv file to [' . $encoding . ']', 'error');
+              $this->sendFail('Please install iconv or convert csv file to [' . $encoding . ']');
             }
 
             foreach ($csvLine as $part_idx => $part) {
-              $csvLine[$part_idx] = iconv($charset, $encoding . '//TRANSLIT//IGNORE', $part);
+              $encoded = iconv($charset, $encoding . '//TRANSLIT//IGNORE', $part);
+
+              if ($encoded) {
+                $csvLine[$part_idx] = $encoded;
+              }
+              else {
+                $this->model_extension_module_foc_csv_exporter->writeLog('Failed iconv from [' . $charset . '] to [' . $encoding . ']', 'error');
+              }
             }
           }
 
@@ -453,6 +461,41 @@ class ControllerExtensionModuleFocCsv extends Controller {
         $this->model_extension_module_foc_csv->writeLog('CSV file uploaded');
 
         $charset = strtolower($this->model_extension_module_foc_csv->getDBCharset());
+        $encoding = strtolower($profile['encoding']);
+
+        // try change file encoding
+        if ($charset !== $encoding) {
+          $this->model_extension_module_foc_csv->writeLog('Trying to convert character encoding from [' . $encoding . '] to [' . $charset . ']');
+
+          if (!function_exists('iconv')) {
+            $this->model_extension_module_foc_csv->writeLog('Please install iconv or convert csv file to [' . $charset . ']', 'error');
+            $this->sendFail('Please install iconv or convert csv file to [' . $charset . ']');
+          }
+
+          $src = fopen($_FILES['csv-file']['tmp_name'], 'r');
+          $out = fopen($importFile, 'w');
+
+          while ($line = fgets($src)) {
+            fwrite($out, iconv($encoding, $charset . '//TRANSLIT//IGNORE', $line));
+          }
+
+          fclose($src);
+          fclose($out);
+
+          $this->model_extension_module_foc_csv->writeLog('File [' . $src . '] encoded successfully!');
+        }
+        else {
+          move_uploaded_file($_FILES['csv-file']['tmp_name'], $importFile);
+        }
+      }
+
+      // csv file operations
+      if (isset($_FILES['csv-file'])) {
+
+        $this->model_extension_module_foc_csv->writeLog('CSV file uploaded');
+
+        $db_charset = strtolower($this->model_extension_module_foc_csv->getDBCharset());
+        $charset = $this->model_extension_module_foc_csv->dbToIconvCharset($db_charset);
         $encoding = strtolower($profile['encoding']);
 
         // try change file encoding

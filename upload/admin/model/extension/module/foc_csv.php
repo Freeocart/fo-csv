@@ -3,6 +3,9 @@
   Model for FOC CSV Importer
 */
 class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
+  public $type = 'importer';
+  public $profiles_code = 'foc_csv_importer';
+  public $profiles_key = 'foc_csv_importer_profiles';
 
   private $csvImportFileName = 'import.csv';
   private $imagesZipImportFileName = 'images.zip';
@@ -97,7 +100,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
   */
   public function getDefaultProfile () {
     return array(
-      'encoding' => 'UTF8',
+      'encoding' => 'none',
       'csvFieldDelimiter' => ';',
       'categoryDelimiter' => '/',
       'categoryLevelDelimiter' => '>>',
