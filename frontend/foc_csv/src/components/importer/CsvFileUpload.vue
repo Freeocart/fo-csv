@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { FirstLineReader, parseCsvHeaders } from '@/helpers'
+import { FirstLineReader, parseCsvHeaders, isFileSeemsLikeCsv } from '@/helpers'
 
 import { createNamespacedHelpers } from 'vuex'
 import { mapVuexModels } from 'vuex-models'
@@ -56,7 +56,7 @@ export default {
         skipToHeaders = parseInt(this.skipLines) + 1
       }
 
-      if (file !== null && file.type === 'text/csv') {
+      if (file !== null && isFileSeemsLikeCsv(file)) {
         const reader = new FirstLineReader()
         reader.on('line', (line) => {
           const headers = parseCsvHeaders(line, this.csvFieldDelimiter)

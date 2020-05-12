@@ -116,6 +116,30 @@ class FirstLineReader {
 }
 
 /*
+  Valid mimetypes for csv
+  https://stackoverflow.com/questions/7076042/what-mime-type-should-i-use-for-csv#answer-42140178
+*/
+const VALID_CSV_MIMETYPES = [
+  'text/csv',
+  'text/x-csv',
+  'text/comma-separated-values',
+  'text/x-comma-separated-values',
+  'text/tab-separated-values',
+  'application/vnd.ms-excel',
+  'application/csv',
+  'application/x-csv'
+]
+
+/*
+  Simple csv mime-type or filename check
+*/
+const isFileSeemsLikeCsv = (file) => {
+  const validMime = VALID_CSV_MIMETYPES.includes(file.type)
+  const validExt = /^.*\.csv$/.test(file.name)
+  return validMime || (file.type === '' && validExt) || false
+}
+
+/*
   Parse csv headers - stupid split function:)
 */
 const parseCsvHeaders = (raw, delimiter = ';') => {
@@ -136,5 +160,6 @@ export {
   validateAppConfig,
   FirstLineReader,
   parseCsvHeaders,
-  validateProfile
+  validateProfile,
+  isFileSeemsLikeCsv
 }
