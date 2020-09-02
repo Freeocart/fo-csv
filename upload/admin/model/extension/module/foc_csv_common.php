@@ -27,6 +27,12 @@ class ModelExtensionModuleFocCsvCommon extends Model {
       'length_class_id',
       'subtract',
       'minimum'
+    ),    
+    'product_special' => array(
+      'product_special_id',
+      'customer_group_id',
+      'product_id',
+      'priority'
     ),
     'product_description' => array(
       'product_id'
@@ -113,6 +119,7 @@ class ModelExtensionModuleFocCsvCommon extends Model {
       'product',
       'product_description',
       'product_image',
+      'product_special',
       'manufacturer',
       'category',
       'category_description'
