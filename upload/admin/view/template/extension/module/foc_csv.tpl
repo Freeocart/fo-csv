@@ -23,7 +23,15 @@
         <div class="panel panel-default">
           <div class="panel-content">
             <h3><?php echo $foc_app_preload_title; ?></h3>
-            <p><?php echo $foc_app_preload_description; ?></p>
+            <p>
+              <?php echo $foc_app_preload_description ?>
+            </p>
+            <p>
+              <?php echo $heading_title ?>: <strong><?php echo $foc_version ?></strong>
+            </p>
+            <noscript>
+              <?php echo $foc_app_preload_nojs; ?>
+            </noscript>
           </div>
         </div>
       </div>

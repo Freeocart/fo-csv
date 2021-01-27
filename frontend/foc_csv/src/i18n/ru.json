@@ -147,7 +147,7 @@
   "Disclaimer": "Дисклеймер",
   "Module <strong>{name}</strong> targets to be a maximum flexible for import/export CSV data, without any restrictions in CSV format.": "Модуль <strong>{name}</strong> задумывался как максимально гибкое решение для импорта/экспорта данных. Нет каких-либо ограничений на формат входных CSV файлов.",
   "However, more flexibility costs more complexity, so if you not sure what you do, please, entrust the work to more qualified employee!": "Однако, такая гибкость сопряжена с довольно высокой сложностью использования, поэтому, если вы не уверены в своей квалификации, лучше доверьте работу с модулем более квалифицированному сотруднику!",
-  "Please, look for instructions below": "Далее прилагается инструкция пользователя, а также небольшой видеоурок.",
+  "Please, look for instructions below": "Для получения дополнительной информации - заходите на страницу проекта - <a target=\"_blank\" href=\"https://freeocart.ru/project/fo-csv-import/\">freeocart.ru</a>",
   "Thank you for choosing <strong>{name}</strong> opencart module!": "Спасибо за выбор модуля <strong>{name}</strong>!",
   "I hope, my work will be useful for you": "Я надеюсь, моя работа была полезна для вас",
   "If you have any questions, found bugs, or want request a features, you can send me email, or use github issues to inform me.": "Если у вас есть вопросы, вы нашли ошибки, или хотите новые возможности, пожалуйста, пришлите мне email, или отпишитесь в issues на github.",
