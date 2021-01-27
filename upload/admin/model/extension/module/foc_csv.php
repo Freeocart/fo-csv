@@ -507,17 +507,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       );
     }
 
-    $this->language_id = (int) $this->config->get('config_language_id');
-    if (isset($profile['language']) && $profile['language']) {
-      $this->language_id = (int) $profile['language'];
-    }
-
-    $this->store_id = (int) $this->config->get('config_store_id');
-    if (isset($profile['store']) && $profile['store']) {
-      $this->store_id = (int) $profile['store'];
-    }
-
-    // inport manufacturers
+    // import manufacturers
     $manufacturer_id = 0;
     $import_manufacturer = false;
     if (isset($tablesData['manufacturer'])) {
