@@ -23,7 +23,7 @@
         <p>{{ $t('Check your download links:') }}</p>
         <div class="btn-group">
           <a :href="csvFileUrl" target="_blank" class="btn btn-primary">{{ $t('CSV file') }}</a>
-          <a v-if="collectedImages > 0" target="_blank" :href="imagesZipUrl" class="btn btn-default">{{ $t('Images ZIP file') }}</a>
+          <a v-if="imagesZipUrl && collectedImages > 0" target="_blank" :href="imagesZipUrl" class="btn btn-default">{{ $t('Images ZIP file') }}</a>
         </div>
       </div>
     </div>
