@@ -460,46 +460,12 @@ class ControllerExtensionModuleFocCsv extends Controller {
 
         $this->model_extension_module_foc_csv->writeLog('CSV file uploaded');
 
-        $charset = strtolower($this->model_extension_module_foc_csv->getDBCharset());
-        $encoding = strtolower($profile['encoding']);
-
-        // try change file encoding
-        if ($charset !== $encoding) {
-          $this->model_extension_module_foc_csv->writeLog('Trying to convert character encoding from [' . $encoding . '] to [' . $charset . ']');
-
-          if (!function_exists('iconv')) {
-            $this->model_extension_module_foc_csv->writeLog('Please install iconv or convert csv file to [' . $charset . ']', 'error');
-            $this->sendFail('Please install iconv or convert csv file to [' . $charset . ']');
-          }
-
-          $src = fopen($_FILES['csv-file']['tmp_name'], 'r');
-          $out = fopen($importFile, 'w');
-
-          while ($line = fgets($src)) {
-            fwrite($out, iconv($encoding, $charset . '//TRANSLIT//IGNORE', $line));
-          }
-
-          fclose($src);
-          fclose($out);
-
-          $this->model_extension_module_foc_csv->writeLog('File [' . $src . '] encoded successfully!');
-        }
-        else {
-          move_uploaded_file($_FILES['csv-file']['tmp_name'], $importFile);
-        }
-      }
-
-      // csv file operations
-      if (isset($_FILES['csv-file'])) {
-
-        $this->model_extension_module_foc_csv->writeLog('CSV file uploaded');
-
         $db_charset = strtolower($this->model_extension_module_foc_csv->getDBCharset());
         $charset = $this->model_extension_module_foc_csv->dbToIconvCharset($db_charset);
         $encoding = strtolower($profile['encoding']);
 
         // try change file encoding
-        if ($charset !== $encoding) {
+        if ($encoding !== 'none' && $charset !== $encoding) {
           $this->model_extension_module_foc_csv->writeLog('Trying to convert character encoding from [' . $encoding . '] to [' . $charset . ']');
 
           if (!function_exists('iconv')) {
