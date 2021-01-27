@@ -102,6 +102,8 @@
   "Something wrong with your file! Please choose another.": "С выбранным файлом что-то не так! Пожалуйста, попробуйте другой.",
   "Seems that file is empty or has invalid newline characters. Please make sure to convert file into valid format.": "Похоже что вы пытаетесь использовать файл с неподдерживаемыми разделителями строк. Пожалуйста, сконвертируйте файл корректно",
   "Please make sure if skip lines option is number!": "Пожалуйста, убедитесь что параметр Номер строки с заголовками является числом!",
+  "Error while reading file": "Ошибка чтения файла",
+  "Wrong file format": "Некорректный формат файла.",
 
   "Attention! You chosed a danger import mode!": "Внимание! Вы выбрали опасный режим импорта!",
   "Before import from CSV, we will remove all product related data from your database!": "Перед импортом данных из CSV, будут удалены все данные о продуктах из вашей базы данных!",

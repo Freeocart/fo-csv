@@ -8,12 +8,14 @@
     </div>
     <div class="col-md-6">
       <div class="form-group">
-        <button class="btn btn-success" :disabled="!csvFileRef || readInProgress" @click.prevent="updateFromFile()"><i :class="{'fa-spin': readInProgress, 'fa fa-refresh': true}"></i> {{ $t('Re-read CSV') }}</button>
+        <button class="btn btn-success" :disabled="!csvFileRef || (!error && readInProgress)" @click.prevent="updateFromFile()">
+          <i :class="{'fa-spin': (!error && readInProgress), 'fa fa-refresh': true}"></i> {{ $t('Re-read CSV') }}
+        </button>
       </div>
     </div>
     <div class="col-md-12 alert alert-danger" v-if="error">
       <strong>{{ $t('Something wrong with your file! Please choose another.') }}</strong>
-      <span>{{ $t(errorMessage) }}</span>
+      <p>{{ $t(errorMessage) }}</p>
     </div>
   </div>
 </template>
@@ -76,6 +78,7 @@ export default {
       else {
         this.readInProgress = false
         this.error = true
+        this.errorMessage = 'Wrong file format'
       }
     },
     updateFromFile () {
