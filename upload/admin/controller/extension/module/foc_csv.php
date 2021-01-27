@@ -453,7 +453,9 @@ class ControllerExtensionModuleFocCsv extends Controller {
       $importFile = $this->model_extension_module_foc_csv->getImportCsvFilePath($key);
       $imagesFile = $this->model_extension_module_foc_csv->getImportImagesZipPath($key);
 
-      $profile = json_decode($_POST['profile-json'], true);
+      // $profile = json_decode($_POST['profile-json'], true);
+      $profile = $this->model_extension_module_foc_csv->fillProfileEmptyValues(json_decode($_POST['profile-json'], true));
+      $this->model_extension_module_foc_csv->applyProfile($profile);
 
       // csv file operations
       if (isset($_FILES['csv-file'])) {
@@ -561,6 +563,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
           $this->model_extension_module_foc_csv->writeLog('Import part start [' . $lines . ']');
 
           $profile = $this->model_extension_module_foc_csv->fillProfileEmptyValues($profile);
+          $this->model_extension_module_foc_csv->applyProfile($profile);
 
           $this->model_extension_module_foc_csv->setUploadKey($import_key);
 
