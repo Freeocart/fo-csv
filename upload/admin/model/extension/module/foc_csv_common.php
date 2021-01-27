@@ -254,13 +254,13 @@ class ModelExtensionModuleFocCsvCommon extends Model {
   */
   public function applyProfile ($profile) {
     $this->language_id = (int) $this->config->get('config_language_id');
-    if (isset($profile['languageId'])) {
-      $this->language_id = (int) $profile['languageId'];
+    if (isset($profile['language'])) {
+      $this->language_id = (int) $profile['language'];
     }
 
-    $this->store_id = (int) $this->config->get('config_store_id');
-    if (isset($profile['storeId'])) {
-      $this->store_id = (int) $profile['storeId'];
+    $this->store_id = $this->config->get('config_store_id');
+    if (isset($profile['store'])) {
+      $this->store_id = $profile['store'];
     }
   }
   /*
