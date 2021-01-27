@@ -13,6 +13,7 @@
     </div>
     <div class="col-md-12 alert alert-danger" v-if="error">
       <strong>{{ $t('Something wrong with your file! Please choose another.') }}</strong>
+      <span>{{ $t(errorMessage) }}</span>
     </div>
   </div>
 </template>
@@ -30,6 +31,7 @@ export default {
     return {
       fileSelected: false,
       error: false,
+      errorMessage: '',
       readInProgress: false
     }
   },
@@ -63,9 +65,10 @@ export default {
           this.setCsvFieldNames(headers)
           this.readInProgress = false
         })
-        reader.on('error', () => {
+        reader.on('error', (e = 'Error while reading file') => {
           this.error = true
           this.readInProgress = false
+          this.errorMessage = e
         })
 
         reader.read(file, this.encoding, skipToHeaders)

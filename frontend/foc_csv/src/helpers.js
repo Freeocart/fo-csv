@@ -61,8 +61,14 @@ class FirstLineReader {
   }
 
   process () {
-    if (/[\r\n]+$/.test(this.chunk)) {
-      const lines = this.chunk.split('\n')
+    /*
+      Firstly check if file have line breaks at all
+      Unix: \n
+      Windows: \r\n
+      Old macs: \r
+    */
+    if (/(\r\n|\r|\n)/.test(this.chunk)) {
+      const lines = this.chunk.split(/(\r\n|\r|\n)/)
       const line = lines.shift()
 
       this.readedLines++
@@ -80,7 +86,9 @@ class FirstLineReader {
         this.step()
       }
       else {
-        this._emit('error')
+        this._emit('error', [
+          `Seems that file is empty or has invalid newline characters. Please make sure to convert file into valid format.`
+        ])
       }
     }
   }
@@ -99,10 +107,13 @@ class FirstLineReader {
     }
 
     if (isNaN(this.skipLines)) {
-      throw new Error('Please configure skiplines!')
+      this._emit('error', [
+        'Please make sure if skip lines option is number!'
+      ])
     }
-
-    this.step()
+    else {
+      this.step()
+    }
   }
 
   step () {
