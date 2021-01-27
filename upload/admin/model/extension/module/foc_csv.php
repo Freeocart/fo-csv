@@ -721,7 +721,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
             $this->db->query('INSERT INTO ' . DB_PREFIX . 'category_description (category_id, name, language_id) VALUES ('.(int)$prev_id.',"' . $this->db->escape($categoryName) . '", ' . (int)$this->language_id . ')');
           }
           else {
-            $this->db->query('UPDATE ' . DB_PREFIX . 'category_description SET name = "' . $this->db->escape($categoryName) . '", language_id = ' . (int)$this->language_id . ' WHERE category_id = ' . (int)$id);
+            $this->db->query('UPDATE ' . DB_PREFIX . 'category_description SET name = "' . $this->db->escape($categoryName) . '" WHERE category_id = ' . (int)$id) . ' AND language_id = ' . (int)$this->language_id;
             $prev_id = $id;
           }
 
