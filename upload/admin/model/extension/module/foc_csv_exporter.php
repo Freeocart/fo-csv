@@ -254,7 +254,7 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
     $dumpParentCategories = $profile['dumpParentCategories'];
     $categoriesNestingDelimiter = $profile['categoriesNestingDelimiter'];
 
-    $product = $this->model_catalog_product->getProduct($primary);
+    $product = $this->getProduct($primary);
     $result = array(
       'product_id' => $primary,
       'product' => array()
@@ -412,6 +412,15 @@ class ModelExtensionModuleFocCsvExporter extends ModelExtensionModuleFocCsvCommo
 
     return $this->model_catalog_product->getTotalProducts($filter);
   }
+
+  /*
+    Get product info
+  */
+	public function getProduct ($product_id) {
+		$query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id) WHERE p.product_id = '" . (int)$product_id . "' AND pd.language_id = '" . (int)$this->language_id . "'");
+
+		return $query->row;
+	}
 
   /*
     Returns attributes grouped by attribute_group_id
