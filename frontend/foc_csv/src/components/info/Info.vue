@@ -57,14 +57,11 @@
           <p v-html="$t('If you have any questions, found bugs, or want request a features, you can send me email, or use github issues to inform me.')">
           </p>
 
-          <p>
-            <i class="fa fa-github"></i>
-            <a href="https://github.com/ikenfin/fo-csv" target="_blank">Github</a>
-          </p>
-          <p>
-            <i class="fa fa-envelope"></i>
-            <a :href="'mailto:' + $t('focsv-support@freeocart.ru')">{{ $t('focsv-support@freeocart.ru') }}</a>
-          </p>
+          <a class="btn btn-primary btn-block" href="https://freeocart.ru/" target="_blank"><i class="fa fa-link"></i> <strong>Freeocart.ru</strong></a>
+
+          <a class="btn btn-default btn-block" href="https://github.com/ikenfin/fo-csv" target="_blank"><i class="fa fa-github"></i> Github</a>
+
+          <a class="btn btn-default btn-block" :href="'mailto:' + $t('focsv-support@freeocart.ru')"><i class="fa fa-envelope"></i> {{ $t('focsv-support@freeocart.ru') }}</a>
         </div>
       </div>
 

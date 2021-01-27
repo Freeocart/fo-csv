@@ -20,18 +20,27 @@
   <div class="container-fluid">
     <div id="foc_csv">
       <div class="container">
-        <div class="panel panel-default">
-          <div class="panel-content">
-            <h3><?php echo $foc_app_preload_title; ?></h3>
-            <p>
-              <?php echo $foc_app_preload_description ?>
-            </p>
-            <p>
-              <?php echo $heading_title ?>: <strong><?php echo $foc_version ?></strong>
-            </p>
-            <noscript>
-              <?php echo $foc_app_preload_nojs; ?>
-            </noscript>
+        <div class="row">
+          <noscript>
+            <div class="col-sm-6 col-sm-offset-3">
+              <div class="panel panel-danger">
+                <div class="panel-heading">
+                  <span class="panel-title"><?php echo $foc_app_preload_nojs; ?></span>
+                </div>
+              </div>
+            </div>
+          </noscript>
+          <div class="col-sm-6 col-sm-offset-3">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <span class="panel-title"><?php echo $heading_title ?>: <?php echo $foc_version ?></span>
+              </div>
+              <div class="panel-body">
+                <p>
+                  <?php echo $foc_app_preload_description ?>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
