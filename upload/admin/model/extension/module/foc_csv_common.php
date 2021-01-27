@@ -4,7 +4,7 @@
 */
 class ModelExtensionModuleFocCsvCommon extends Model {
 
-  const VERSION = '1.0.1';
+  const VERSION = '1.0.2';
 
   public function getVersion () {
     return self::VERSION;
@@ -27,7 +27,7 @@ class ModelExtensionModuleFocCsvCommon extends Model {
       'length_class_id',
       'subtract',
       'minimum'
-    ),    
+    ),
     'product_special' => array(
       'product_special_id',
       'customer_group_id',
