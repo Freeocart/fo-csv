@@ -117,8 +117,6 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
       'removeManufacturersBeforeImport' => false,
       'csvWithoutHeaders' => false,
       'csvHeadersLineNumber' => 1,
-      // 'storeId' => $this->config->get('config_store_id'),
-      // 'languageId' => $this->config->get('language_id'),
       'statusRewrites' => array(),
       'stockStatusRewrites' => array(),
       'downloadImages' => false,
@@ -163,7 +161,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
 
     return $tableData;
   }
-  
+
   private function productSpecialTemplate ($data = array()) {
     return array_replace(array(
       'date_start' => date('Y-m-d'),
@@ -510,13 +508,13 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     }
 
     $this->language_id = (int) $this->config->get('config_language_id');
-    if (isset($profile['languageId'])) {
-      $this->language_id = (int) $profile['languageId'];
+    if (isset($profile['language']) && $profile['language']) {
+      $this->language_id = (int) $profile['language'];
     }
 
     $this->store_id = (int) $this->config->get('config_store_id');
-    if (isset($profile['storeId'])) {
-      $this->store_id = (int) $profile['storeId'];
+    if (isset($profile['store']) && $profile['store']) {
+      $this->store_id = (int) $profile['store'];
     }
 
     // inport manufacturers
@@ -601,7 +599,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
     ) {
       $productData['stock_status_id'] = array_search($productData['stock_status_id'], $profile['stockStatusRewrites']);
     }
-    
+
     if (isset($tablesData['product_special'])) {
       $productData['product_special'] = $this->productSpecialTemplate($tablesData['product_special']);
     }
@@ -943,7 +941,7 @@ class ModelExtensionModuleFocCsv extends ModelExtensionModuleFocCsvCommon {
         $this->db->query("INSERT INTO " . DB_PREFIX . "product_description SET " . rtrim($insert_string, ','));
       }
     }
-    
+
     // product_special update
     if (isset($data['product_special'])
         && !empty($data['product_special'])
