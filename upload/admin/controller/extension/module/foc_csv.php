@@ -72,7 +72,7 @@ class ControllerExtensionModuleFocCsv extends Controller {
     $data['tokenName'] = $this->getTokenName();
     $data['token'] = $this->getToken();
     $data['baseRoute'] = 'extension/module/foc_csv';
-    $data['baseUrl'] = $this->url->link('');
+    $data['baseUrl'] = $this->url->link('', '', 'ssl');
 
     $this->load->model('extension/module/foc_csv_common');
     $this->load->model('extension/module/foc_csv');
