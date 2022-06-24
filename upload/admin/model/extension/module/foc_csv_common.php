@@ -4,7 +4,7 @@
 */
 class ModelExtensionModuleFocCsvCommon extends Model {
 
-  const VERSION = '1.0.3';
+  const VERSION = '1.0.4';
 
   public function getVersion () {
     return self::VERSION;
@@ -53,7 +53,49 @@ class ModelExtensionModuleFocCsvCommon extends Model {
 
 
   // db encoding -> iconv encoding
-  protected $charsetMap = array();
+  protected $charsetMap = array(
+    'armscii8' => 'ARMSCII-8',
+    'ascii' => 'ASCII',
+    'big5' => 'BIG-5',
+    'binary'=> null, // Not sure what is it
+    'cp1250'=> 'CP1250',
+    'cp1251'=> 'CP1251',
+    'cp1256'=> 'CP1256',
+    'cp1257'=> 'CP1257',
+    'cp850'=> 'CP850',
+    'cp852'=> 'CP852',
+    'cp866'=> 'CP866',
+    'cp932'=> 'CP932',
+    'dec8'=> 'ISO-8859-1',
+    'eucjpms'=> 'EUC-JISX0213',
+    'euckr'=> 'EUC-KR',
+    'gb18030'=> 'GB18030',
+    'gb2312'=> 'GB_2312-80',
+    'gbk'=> 'GBK',
+    'geostd8'=> 'GEORGIAN-PS',
+    'greek'=> 'GREEK',
+    'hebrew'=> 'HEBREW',
+    'hp8'=> 'R8',
+    'keybcs2'=> null, // Not sure here
+    'koi8r'=> 'KOI8-R',
+    'koi8u'=> 'KOI8-U',
+    'latin1'=> 'LATIN1',
+    'latin2'=> 'LATIN2',
+    'latin5'=> 'LATIN5',
+    'latin7'=> 'LATIN7',
+    'macce'=> 'MACCENTRALEUROPE',
+    'macroman'=> 'MACROMANIA',
+    'sjis'=> 'SJIS',
+    'swe7'=> null, // Not sure here, please make PR if there is error
+    'tis620'=> 'TIS-620',
+    'ucs2'=> 'UCS-2',
+    'ujis'=> 'EUC-JP',
+    'utf16'=> 'UTF-16',
+    'utf16le'=> 'UTF-16LE',
+    'utf32'=> 'UTF-32',
+    'utf8mb3'=> 'UTF-8',
+    'utf8mb4'=> 'UTF-8',
+  );
 
   public function __construct ($registry) {
     parent::__construct($registry);
